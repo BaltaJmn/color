@@ -39,15 +39,16 @@ fun GlyphButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     tint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    enabled: Boolean = true,
 ) {
     Box(
         modifier
             .size(48.dp)
             .clip(CircleShape)
             .semantics { contentDescription = label }
-            .clickable(role = Role.Button, onClick = onClick),
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,
-    ) { GlyphIcon(glyph, tint = tint) }
+    ) { GlyphIcon(glyph, tint = if (enabled) tint else tint.copy(alpha = 0.3f)) }
 }
 
 @Composable

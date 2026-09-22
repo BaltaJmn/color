@@ -23,10 +23,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.today
+import kotlinx.datetime.LocalDate
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.ui.Glyph
 import com.baltajmn.color.ui.GlyphIcon
+import com.baltajmn.color.ui.DaySheet
 import com.baltajmn.color.ui.PhotoViewer
+import com.baltajmn.color.ui.YearScreen
 import com.baltajmn.color.ui.TodayScreen
 import com.baltajmn.color.ui.theme.ChromaTheme
 import com.baltajmn.color.ui.theme.Styles
@@ -43,6 +46,7 @@ fun App() {
     var screen by remember { mutableStateOf(Screen.Today) }
     // The photo is an overlay over whichever screen opened it, so back closes it first.
     var photo by remember { mutableStateOf<ImageBitmap?>(null) }
+    var openDay by remember { mutableStateOf<LocalDate?>(null) }
 
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
         // Coming back after 03:00 is a new day, and the widgets are told before they are looked at.
@@ -65,16 +69,22 @@ fun App() {
                             onPhoto = { photo = it },
                             onShare = null,
                         )
-                        // Filled in by #13, #16 and v1.1.
-                        Screen.Year, Screen.Friends, Screen.Settings -> Unit
+                        Screen.Year -> YearScreen(day, onOpenDay = { openDay = it }, onPoster = null)
+                        // Filled in by #16 and v1.1.
+                        Screen.Friends, Screen.Settings -> Unit
                     }
                 }
                 if (screen != Screen.Settings) BottomBar(screen) { screen = it }
             }
+            openDay?.let { DaySheet(it, onClose = { openDay = null }, onPhoto = { photo = it }, onShare = null) }
             photo?.let { PhotoViewer(it) { photo = null } }
 
-            BackHandler(photo != null || screen != Screen.Today) {
-                if (photo != null) photo = null else screen = Screen.Today
+            BackHandler(photo != null || openDay != null || screen != Screen.Today) {
+                when {
+                    photo != null -> photo = null
+                    openDay != null -> openDay = null
+                    else -> screen = Screen.Today
+                }
             }
         }
     }

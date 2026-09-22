@@ -91,9 +91,11 @@ Tras la foto, en la misma pantalla:
 
 - Título: el año, con flechas a los lados si hay más de uno con entradas.
 - Selector de vista segmentado: `viewGrid` y `viewStrip`.
-- **Rejilla**: 12 filas (meses) por 31 columnas (días), celdas cuadradas con 2 de separación y radio 3;
-  inicial del mes a la izquierda en `caption`. Días sin entrada en `surfaceVariant`; días que no
-  existen (31 de febrero), vacíos. Hoy lleva un borde de 1,5 en `onBackground`.
+- **Rejilla**: una columna por mes y una fila por día (12 x 31), como Purl: en un móvil da celdas de
+  unos 24, que se tocan bien; girada saldrían de 10. Celdas cuadradas con 3 de separación y radio 3;
+  inicial del mes arriba y los días 1, 10, 20 y 30 a la izquierda, en `caption`. Días sin color en
+  `surfaceVariant` (los futuros, más claros); días que no existen (31 de febrero), vacíos. Hoy lleva
+  un borde de 1,5 en `onBackground`.
 - **Tira**: el año como columnas de 1 día, sin separación, a toda la altura disponible (proporción
   4:5). Los días vacíos no se pintan: la tira se comprime.
 - Tocar un día con entrada abre el día (sección 5).
