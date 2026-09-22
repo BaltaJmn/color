@@ -62,7 +62,22 @@ data class JournalFile(
     @EncodeDefault val version: Int = BACKUP_VERSION,
     @EncodeDefault val entries: Map<String, ChromaEntry> = emptyMap(),
     val settings: Settings = Settings(),
+    /**
+     * Days whose shared copy on the server is behind this phone, oldest first. It lives in the same
+     * file as the days so a change and its place in the queue are written together or not at all.
+     */
+    val outbox: List<String> = emptyList(),
 )
+
+/** Days whose change the server has to hear about: anything that is or was shared. */
+fun sharedChanges(before: Journal, after: Journal): List<String> =
+    (before.keys + after.keys).filter { day ->
+        val a = before[day]
+        val b = after[day]
+        a != b && (a.isShared() || b.isShared())
+    }.sorted()
+
+private fun ChromaEntry?.isShared() = this != null && share != Share.Private
 
 /** What goes into a backup: the days without the settings of this phone. */
 @OptIn(ExperimentalSerializationApi::class)

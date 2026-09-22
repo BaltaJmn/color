@@ -56,6 +56,7 @@ import com.baltajmn.color.data.isFromToday
 import com.baltajmn.color.data.samplePixels
 import com.baltajmn.color.data.startExport
 import com.baltajmn.color.i18n.S
+import com.baltajmn.color.social.Social
 import com.baltajmn.color.model.WORD_MAX
 import com.baltajmn.color.model.codePointCount
 import com.baltajmn.color.model.isoKey
@@ -171,6 +172,10 @@ fun TodayScreen(
                     }
                     Spacer(Modifier.height(12.dp))
                     WordField(today, entry.word)
+                    if (Social.available && Social.me != null) {
+                        Spacer(Modifier.height(20.dp))
+                        ShareSwitch(entry.share, entry.photo != null) { ChromaRepository.setShare(it) }
+                    }
                 }
                 else -> Empty(
                     firstTime = journal.isEmpty(),

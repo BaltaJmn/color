@@ -23,6 +23,12 @@ const val SAMPLE_SIDE = 64
 class Picked(val jpeg: ByteArray, val takenOn: LocalDateTime?)
 
 /** The system camera and the system photo picker. Neither needs a permission of its own. */
+/**
+ * Decodes, scales so the long side is at most [side], and encodes again at [quality] (0 to 100).
+ * Whatever metadata the input carried does not survive. Null if [jpeg] is not an image.
+ */
+expect fun reencodeJpeg(jpeg: ByteArray, side: Int, quality: Int): ByteArray?
+
 expect object Capture {
     /** False on a device without a camera, like the iOS simulator. */
     val cameraAvailable: Boolean

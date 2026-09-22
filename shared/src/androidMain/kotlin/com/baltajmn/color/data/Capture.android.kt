@@ -118,3 +118,18 @@ internal fun process(open: () -> InputStream?): Picked? {
     }
     return Picked(jpeg, takenOn)
 }
+
+actual fun reencodeJpeg(jpeg: ByteArray, side: Int, quality: Int): ByteArray? {
+    val decoded = BitmapFactory.decodeByteArray(jpeg, 0, jpeg.size) ?: return null
+    val scale = (side.toFloat() / max(decoded.width, decoded.height)).coerceAtMost(1f)
+    val bitmap = Bitmap.createScaledBitmap(
+        decoded,
+        (decoded.width * scale).toInt().coerceAtLeast(1),
+        (decoded.height * scale).toInt().coerceAtLeast(1),
+        true,
+    )
+    return ByteArrayOutputStream().use { out ->
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, out)
+        out.toByteArray()
+    }
+}

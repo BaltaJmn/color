@@ -437,6 +437,23 @@ object S {
         "Noch keine Freunde hier. Lade jemanden ein, der dich kennt.",
         "Pas encore d'amis ici. Invite quelqu'un qui te connaît.",
     )
+    val sharePrivate get() = t("Private", "Privado", "Privado", "Privat", "Privé")
+    val shareLabel get() = t("Your friends see", "Tus amigos ven", "Seus amigos veem", "Deine Freunde sehen", "Tes amis voient")
+    val defaultShareRow get() = t("New days", "Días nuevos", "Dias novos", "Neue Tage", "Nouveaux jours")
+    val askDefaultShareTitle get() = t(
+        "What do your friends see?",
+        "¿Qué ven tus amigos?",
+        "O que seus amigos veem?",
+        "Was sehen deine Freunde?",
+        "Que voient tes amis ?",
+    )
+    val askDefaultShareText get() = t(
+        "Choose what new days share. You can change it for each day, and here in Settings.",
+        "Elige qué comparten los días nuevos. Puedes cambiarlo en cada día, y aquí en Ajustes.",
+        "Escolha o que os dias novos compartilham. Dá para mudar em cada dia, e aqui em Ajustes.",
+        "Wähle, was neue Tage teilen. Du kannst es für jeden Tag ändern, und hier in den Einstellungen.",
+        "Choisis ce que partagent les nouveaux jours. Tu peux le changer pour chaque jour, et ici dans Réglages.",
+    )
     val sectionFriends get() = t("Friends", "Amigos", "Amigos", "Freunde", "Amis")
     val nameRow get() = t("Your name", "Tu nombre", "Seu nome", "Dein Name", "Ton nom")
     val signOut get() = t("Sign out", "Cerrar sesión", "Sair", "Abmelden", "Se déconnecter")

@@ -27,6 +27,7 @@ import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.Route
 import com.baltajmn.color.data.today
+import com.baltajmn.color.social.Outbox
 import com.baltajmn.color.social.Social
 import kotlinx.datetime.LocalDate
 import com.baltajmn.color.i18n.S
@@ -55,6 +56,8 @@ fun App() {
     remember {
         ChromaRepository.load()
         Billing.configure()
+        // Whatever was saved and shared goes out after the save, never before it.
+        ChromaRepository.afterSave += { Outbox.kick() }
     }
     var day by remember { mutableStateOf(today()) }
     var screen by remember { mutableStateOf(Screen.Today) }
@@ -70,6 +73,7 @@ fun App() {
         day = today()
         ChromaRepository.syncWidgets()
         Reminder.sync(askPermission = false)
+        Outbox.kick()
         // A purchase or a refund may have happened on another device.
         proCheck++
     }

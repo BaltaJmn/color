@@ -434,11 +434,23 @@ años o más, obligatoria. Sin proyecto (`SupabaseConfig.url` nulo), la pestaña
 
 ### 9.2 Subida
 
-`Outbox`: lista de días pendientes en `outbox.json` (junto a `entries.json`). Guardar un día con
-`share != Private` lo añade; pasar a privado o borrar añade un borrado. Se vacía al arrancar, al
-guardar y al volver la red, en orden, y un fallo deja el trabajo en la cola. La foto se sube solo
-con `share == Photo`: reducida a `UPLOAD_SIDE`, JPEG `UPLOAD_QUALITY`, recodificada (sin
-metadatos), con `upsert` a `<uid>/<day>.jpg`.
+`Outbox` (`social/Outbox.kt`). La cola es el campo `outbox` de `entries.json` y no un fichero
+aparte: un cambio y su sitio en la cola se escriben juntos o no se escriben. `ChromaRepository.edit`
+añade cada día cuyo contenido cambia y que está o estaba compartido (`sharedChanges`); un día
+privado no entra nunca.
+
+Se vacía en orden al arrancar, después de cada guardado y al abrir Amigos. Cada día se manda como
+está ahora, no como estaba al entrar en la cola: privado o borrado quita la fila y después la foto;
+compartido sube primero la foto y después la fila, para que nadie reciba nunca una ruta sin fichero.
+Un fallo corta la ronda y deja el resto para la siguiente. Un día solo sale de la cola si no cambió
+mientras se mandaba (`synced`).
+
+La foto se sube solo con `share == Photo`: reducida a `UPLOAD_SIDE`, JPEG `UPLOAD_QUALITY`,
+recodificada (`reencodeJpeg`, sin metadatos), con `upsert` a `<uid>/<day>.jpg`. Con `Color`, la
+foto del servidor se borra.
+
+El interruptor de cada día (privado, solo el color, con la foto) está en Hoy bajo la palabra, solo
+con cuenta; el valor para los días nuevos, en Ajustes > Amigos.
 
 ### 9.3 Feed
 

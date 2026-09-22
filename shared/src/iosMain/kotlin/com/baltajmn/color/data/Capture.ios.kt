@@ -2,6 +2,8 @@ package com.baltajmn.color.data
 
 import kotlin.coroutines.resume
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.CoreFoundation.CFDataRef
@@ -11,6 +13,7 @@ import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.CFBridgingRelease
 import platform.Foundation.CFBridgingRetain
 import platform.Foundation.NSData
+import platform.Foundation.create
 import platform.ImageIO.CGImageSourceCopyPropertiesAtIndex
 import platform.ImageIO.CGImageSourceCreateWithData
 import platform.PhotosUI.PHPickerConfiguration
@@ -146,15 +149,23 @@ private fun exifDate(data: NSData): String? {
  * carries none of the original metadata, GPS included.
  */
 @OptIn(ExperimentalForeignApi::class)
-private fun UIImage.toStoredJpeg(): ByteArray? {
+private fun UIImage.toStoredJpeg(): ByteArray? = toJpeg(PHOTO_SIDE, JPEG_QUALITY)
+
+private fun UIImage.toJpeg(side: Int, quality: Double): ByteArray? {
     val width = size.useContents { this.width }
     val height = size.useContents { this.height }
     if (width <= 0.0 || height <= 0.0) return null
-    val scale = (PHOTO_SIDE.toDouble() / maxOf(width, height)).coerceAtMost(1.0)
+    val scale = (side.toDouble() / maxOf(width, height)).coerceAtMost(1.0)
     val w = width * scale
     val h = height * scale
     val format = UIGraphicsImageRendererFormat.defaultFormat().apply { setScale(1.0) }
     val renderer = UIGraphicsImageRenderer(size = CGSizeMake(w, h), format = format)
-    val scaled = renderer.imageWithActions { this@toStoredJpeg.drawInRect(CGRectMake(0.0, 0.0, w, h)) }
-    return UIImageJPEGRepresentation(scaled, JPEG_QUALITY)?.toByteArray()
+    val scaled = renderer.imageWithActions { this@toJpeg.drawInRect(CGRectMake(0.0, 0.0, w, h)) }
+    return UIImageJPEGRepresentation(scaled, quality)?.toByteArray()
+}
+
+actual fun reencodeJpeg(jpeg: ByteArray, side: Int, quality: Int): ByteArray? {
+    if (jpeg.isEmpty()) return null
+    val data = jpeg.usePinned { NSData.create(bytes = it.addressOf(0), length = jpeg.size.toULong()) }
+    return UIImage.imageWithData(data)?.toJpeg(side, quality / 100.0)
 }

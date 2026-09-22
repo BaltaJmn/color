@@ -74,6 +74,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var restored by remember { mutableStateOf<String?>(null) }
     var renaming by remember { mutableStateOf(false) }
     var leaving by remember { mutableStateOf(false) }
+    var choosingShare by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     Column(
         Modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()),
@@ -103,6 +104,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             if (Social.available && me != null) {
                 Section(S.sectionFriends) {
                     SettingRow(S.nameRow, me.displayName, onClick = { renaming = true })
+                    SettingRow(S.defaultShareRow, shareLabel(settings.defaultShare), onClick = { choosingShare = true })
                     SettingRow(S.signOut, onClick = { leaving = true })
                 }
             }
@@ -225,6 +227,16 @@ fun SettingsScreen(onBack: () -> Unit) {
     }
 
     restored?.let { Ask(null, it, S.ok, onConfirm = { restored = null }) }
+
+    if (choosingShare) {
+        ShareChoiceDialog(
+            S.defaultShareRow,
+            null,
+            settings.defaultShare,
+            onPick = { share -> ChromaRepository.updateSettings { it.copy(defaultShare = share, shareAsked = true) } },
+            onDismiss = { choosingShare = false },
+        )
+    }
 
     if (renaming) RenameDialog(Social.me?.displayName.orEmpty()) { renaming = false }
 

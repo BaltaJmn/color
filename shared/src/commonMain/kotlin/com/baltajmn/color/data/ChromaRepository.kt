@@ -12,6 +12,7 @@ import com.baltajmn.color.model.Settings
 import com.baltajmn.color.model.Share
 import com.baltajmn.color.model.isoKey
 import com.baltajmn.color.model.logicalDate
+import com.baltajmn.color.model.sharedChanges
 import com.baltajmn.color.model.withPick
 import com.baltajmn.color.model.withWord
 import kotlin.time.Clock
@@ -107,7 +108,10 @@ object ChromaRepository {
     }
 
     fun edit(change: (JournalFile) -> JournalFile) {
-        file = change(file)
+        val before = file
+        val next = change(before)
+        val touched = sharedChanges(before.entries, next.entries)
+        file = if (touched.isEmpty()) next else next.copy(outbox = (next.outbox + touched).distinct())
         saveJob?.cancel()
         // Cancelling only ever stops the wait: a write that has started always finishes.
         saveJob = scope.launch {
@@ -224,6 +228,14 @@ object ChromaRepository {
             withContext(Dispatchers.IO) { Storage.importDir() }
             onDone()
         }
+    }
+
+    /**
+     * The server has [sent] for [day]. Only then does the day leave the queue: if it changed again
+     * while it was being sent, it stays for the next round.
+     */
+    fun synced(day: String, sent: ChromaEntry?) = edit { f ->
+        if (f.entries[day] == sent) f.copy(outbox = f.outbox - day) else f
     }
 
     fun syncWidgets(f: JournalFile = file) {

@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.i18n.S
+import com.baltajmn.color.social.Outbox
 import com.baltajmn.color.social.Social
 import com.baltajmn.color.social.isValidName
 import com.baltajmn.color.ui.theme.GUTTER
@@ -114,6 +115,7 @@ private fun SignedIn(today: LocalDate) {
     var attempt by remember { mutableStateOf(0) }
     LaunchedEffect(attempt) {
         offline = runCatching { Social.loadMe() }.isFailure
+        Outbox.kick()
     }
     when {
         offline -> Notice(S.friendsOffline, S.retry to { attempt++ })
