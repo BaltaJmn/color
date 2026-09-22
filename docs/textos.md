@@ -53,6 +53,7 @@ Viven en sus ficheros de plataforma y se escriben en los cinco idiomas.
 |---|---|---|
 | `NSCameraUsageDescription` | `iosApp/iosApp/<lang>.lproj/InfoPlist.strings` | Para hacer la foto de la que sale el color de tu día. |
 | `CFBundleDisplayName` | igual | Chroma |
+| `NSPhotoLibraryAddUsageDescription` | igual | Para guardar tus tarjetas y pósteres en tus fotos. |
 | Nombre y descripción de los widgets | `iosApp/ChromaWidget/<lang>.lproj/Localizable.strings`, `androidApp/src/main/res/values-<lang>/strings.xml` | Hoy: "El color de hoy". Año: "Tu año en colores". |
 | Canal de notificación | `Strings.kt`, `reminderChannel` | Recordatorio diario |
 

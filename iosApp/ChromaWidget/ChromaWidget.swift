@@ -60,7 +60,7 @@ struct ChromaTodayWidget: Widget {
         StaticConfiguration(kind: "ChromaTodayWidget", provider: TodayProvider()) { entry in
             TodayView(entry: entry)
         }
-        // Literals, not L: the widget gallery reads these at build time.
+        // Literals, not L: the gallery reads them at build time; translations in <lang>.lproj.
         .configurationDisplayName("Today")
         .description("Today's color")
         .supportedFamilies([.systemSmall])

@@ -90,7 +90,7 @@ struct ChromaYearWidget: Widget {
         StaticConfiguration(kind: "ChromaYearWidget", provider: YearProvider()) { entry in
             YearView(entry: entry)
         }
-        // Literals, not L: the widget gallery reads these at build time.
+        // Literals, not L: the gallery reads them at build time; translations in <lang>.lproj.
         .configurationDisplayName("The year")
         .description("Your year in colors")
         .supportedFamilies([.systemMedium])
