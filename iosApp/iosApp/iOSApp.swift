@@ -12,6 +12,7 @@ struct iOSApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onOpenURL { ChromaBridge.shared.open(url: $0.absoluteString) }
         }
     }
 }

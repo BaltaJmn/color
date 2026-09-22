@@ -1,0 +1,5 @@
+<resources>
+    <string name="widget_today_description">A cor de hoje</string>
+    <string name="widget_preview_today">Hoje</string>
+    <string name="widget_preview_name">Azul tempestade</string>
+</resources>

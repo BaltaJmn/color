@@ -1,6 +1,7 @@
 package com.baltajmn.color
 
 import android.Manifest
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -12,6 +13,7 @@ import com.baltajmn.color.data.AndroidContext
 import com.baltajmn.color.data.Capture
 import com.baltajmn.color.data.FilePicker
 import com.baltajmn.color.data.Reminder
+import com.baltajmn.color.data.Route
 
 // FragmentActivity and not ComponentActivity: the biometric lock of v1.2 needs a fragment host.
 class MainActivity : FragmentActivity() {
@@ -50,7 +52,15 @@ class MainActivity : FragmentActivity() {
         Capture.launchGallery = {
             pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
+        Route.pending = intent?.getStringExtra("screen")
         setContent { App() }
+    }
+
+    // singleTask: a widget tapped while the app is open arrives here and not in onCreate.
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        Route.pending = intent.getStringExtra("screen")
     }
 
     // The launchers belong to this instance's registry: leaving them in a process wide object would

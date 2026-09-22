@@ -1,0 +1,5 @@
+<resources>
+    <string name="widget_today_description">Die Farbe von heute</string>
+    <string name="widget_preview_today">Heute</string>
+    <string name="widget_preview_name">Sturmblau</string>
+</resources>

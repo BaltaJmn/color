@@ -25,6 +25,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import com.baltajmn.color.billing.Billing
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Reminder
+import com.baltajmn.color.data.Route
 import com.baltajmn.color.data.today
 import kotlinx.datetime.LocalDate
 import com.baltajmn.color.i18n.S
@@ -71,6 +72,24 @@ fun App() {
         proCheck++
     }
     LaunchedEffect(proCheck) { Billing.refresh() }
+    // A widget asked for a screen, maybe before the app existed.
+    LaunchedEffect(Route.pending) {
+        when (Route.pending) {
+            "today" -> screen = Screen.Today
+            "year" -> screen = Screen.Year
+            "pro" -> {
+                screen = Screen.Year
+                Paywall.open = true
+            }
+            else -> Unit
+        }
+        if (Route.pending != null) {
+            openDay = null
+            sharing = null
+            poster = null
+            Route.pending = null
+        }
+    }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
         // The debounce may still be waiting when the app leaves the screen: write now.
         ChromaRepository.saveNow()

@@ -38,6 +38,13 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name="com.baltajmn.color.widget.TodayWidgetReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/today_widget_info" />
+        </receiver>
+
         <!-- La camara escribe la foto aqui, y la hoja de compartir lee la tarjeta: nada mas sale de la cache. -->
         <provider
             android:name="androidx.core.content.FileProvider"

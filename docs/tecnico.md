@@ -149,7 +149,7 @@ data class ChromaEntry(
 ### 4.2 `widget.json`
 
 ```json
-{ "today": "2026-09-22", "color": "#3A6EA5", "name": "Storm blue", "pro": false,
+{ "date": "2026-09-22", "color": "#3A6EA5", "name": "Storm blue", "pro": false,
   "year": 2026, "days": { "2026-01-01": "#AABBCC" }, "friends": ["#112233"] }
 ```
 

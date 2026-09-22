@@ -1,6 +1,11 @@
 package com.baltajmn.color.data
 
+import androidx.glance.appwidget.updateAll
+import com.baltajmn.color.widget.TodayWidget
 import java.io.File
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /** filesDir, next to the journal but readable by the widget process, which the journal never is. */
 actual fun writeWidgetState(json: String) {
@@ -17,12 +22,9 @@ fun readWidgetState(): WidgetState? {
     return runCatching { WidgetJson.decodeFromString(WidgetState.serializer(), text) }.getOrNull()
 }
 
-/** Asked of every widget receiver that exists. They arrive in #21 and #22. */
 actual fun refreshWidgets() {
-    WidgetRefresh.all.forEach { it() }
-}
-
-/** Each Glance widget registers how to update itself, so data/ never imports widget/. */
-object WidgetRefresh {
-    val all = mutableListOf<() -> Unit>()
+    val context = AndroidContext.value
+    CoroutineScope(Dispatchers.Default).launch {
+        TodayWidget().updateAll(context)
+    }
 }
