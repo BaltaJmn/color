@@ -29,6 +29,7 @@ import com.baltajmn.color.ui.Glyph
 import com.baltajmn.color.ui.GlyphIcon
 import com.baltajmn.color.ui.DaySheet
 import com.baltajmn.color.ui.PhotoViewer
+import com.baltajmn.color.ui.SettingsScreen
 import com.baltajmn.color.ui.YearScreen
 import com.baltajmn.color.ui.TodayScreen
 import com.baltajmn.color.ui.theme.ChromaTheme
@@ -70,8 +71,9 @@ fun App() {
                             onShare = null,
                         )
                         Screen.Year -> YearScreen(day, onOpenDay = { openDay = it }, onPoster = null)
-                        // Filled in by #16 and v1.1.
-                        Screen.Friends, Screen.Settings -> Unit
+                        Screen.Settings -> SettingsScreen(onBack = { screen = Screen.Today })
+                        // Arrives with v1.1.
+                        Screen.Friends -> Unit
                     }
                 }
                 if (screen != Screen.Settings) BottomBar(screen) { screen = it }
