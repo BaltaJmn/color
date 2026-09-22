@@ -238,8 +238,9 @@ color vivo.
 
 Luminancia relativa WCAG. La tinta es blanca (`#FFFFFF`) o negra (`#000000`), la de mayor contraste.
 Con esas dos, el peor caso del espacio sRGB da 4,58:1, así que todo el texto de la tarjeta cumple AA.
-En la interfaz se aplica con alfa 0,92 sobre el nombre y 0,72 sobre el hex y la fecha solo si el
-contraste resultante sigue >= 4,5 (test 7).
+**Todo el texto va en tinta plena**: la jerarquía la marcan el tamaño y el peso, nunca la
+transparencia, que en los colores medios bajaría de 4,5 (test 7). Solo el borde de la miniatura usa
+tinta al 24 %, porque no es texto.
 
 ### 6.6 Recordatorio
 
@@ -259,9 +260,10 @@ bloqueado, o la fila de Ajustes.
 
 ### 6.9 Tarjeta y póster a imagen
 
-- Tarjeta: 1080x1350. Fondo del color; nombre a 96 px, hex a 40 px, palabra a 56 px, fecha a 40 px,
-  márgenes de 72 px; miniatura de 320x320 con radio 32 abajo a la derecha, a 72 px de los bordes.
-  Marca "Chroma" a 32 px abajo a la izquierda si `watermark`.
+- Tarjeta: 1080x1350 (`share/ShareCard.kt`). Fondo del color; márgenes de 72 px; nombre a 96 px con
+  su base a 168 px del borde; hex a 40 px; palabra a 56 px en cursiva; fecha con año a 40 px abajo a
+  la izquierda; miniatura cuadrada de 320 px con radio del 10 % abajo a la derecha. Con `watermark`,
+  "Chroma" a 32 px en la última línea y la fecha sube 56 px.
 - Póster: rejilla (1080x1350, 7 filas de semanas en 53 columnas o 12 meses en 31 columnas, lo que
   diga `pantallas.md`), tira (1080x1350, 365 columnas finas) y fondo de pantalla (1170x2532).
 - Se pinta con `Canvas` sobre un `ImageBitmap` en común y se codifica a PNG en cada plataforma, como

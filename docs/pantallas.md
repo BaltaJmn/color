@@ -22,7 +22,8 @@ La interfaz es neutra: el único color vivo lo pone el usuario.
 | `accent` | `#1C1B1A` | `#EDEAE6` | Botón principal: relleno del color del texto, texto del color de fondo |
 | `error` | `#B3261E` | `#F2B8B5` | Avisos de error |
 
-Sobre la tarjeta, la tinta sale de `inkFor(color)` (`tecnico.md` 6.5), nunca del tema.
+Sobre la tarjeta, la tinta sale de `inkFor(color)` (`tecnico.md` 6.5), nunca del tema, y siempre
+plena: la jerarquía es de tamaño y peso, no de transparencia.
 
 ### Tipografía
 
@@ -118,10 +119,10 @@ Componente `ChromaCard(entry, date, author?, compact)`. Proporción 4:5, radio 2
 |---|---|---|
 | Fondo | Todo | El color |
 | Nombre del color | Arriba izquierda, margen 24 | `display` (`title` si `compact`), tinta |
-| Hex | Bajo el nombre, a 4 | `label`, tinta al 72 % |
+| Hex | Bajo el nombre | `label` en peso normal, tinta |
 | Palabra | Bajo el hex, a 12 | `body` en cursiva, tinta |
 | Autor (feed) | Abajo izquierda, sobre la fecha | `body` Medium, tinta |
-| Fecha | Abajo izquierda, margen 24 | `label`, tinta al 72 % |
+| Fecha | Abajo izquierda, margen 24 | `label` en peso normal, tinta |
 | Miniatura | Abajo derecha, margen 20, lado 30 % del ancho | Radio 14, borde de 2 en tinta al 24 % |
 | Marca de sintonía (v1.1) | Arriba derecha | Dos círculos solapados de 10, tinta |
 | Marca de la semana (v1.2) | Arriba derecha, a la izquierda de la sintonía | Un rombo de 10, tinta |

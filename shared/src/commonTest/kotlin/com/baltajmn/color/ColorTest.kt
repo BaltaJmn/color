@@ -93,3 +93,17 @@ class ColorTest {
         assertTrue(extractSwatches(IntArray(16) { 0x00FF0000 }).isEmpty())
     }
 }
+
+// Test 7: the ink on any color passes AA.
+class ContrastTest {
+    @Test
+    fun inkAlwaysPassesAA() {
+        var worst = Double.MAX_VALUE
+        for (r in 0 until 32) for (g in 0 until 32) for (b in 0 until 32) {
+            val rgb = (0xFF shl 24) or ((r * 255 / 31) shl 16) or ((g * 255 / 31) shl 8) or (b * 255 / 31)
+            val c = com.baltajmn.color.color.contrast(rgb, com.baltajmn.color.color.inkFor(hexOf(rgb)))
+            if (c < worst) worst = c
+        }
+        assertTrue(worst >= 4.5, "worst contrast $worst")
+    }
+}
