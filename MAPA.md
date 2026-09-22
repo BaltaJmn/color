@@ -29,6 +29,7 @@ Qué hay en cada sitio. Se actualiza en el mismo commit que añade o mueve algo.
 | `store/app-store/<idioma>/` | Ficha de App Store: nombre, subtítulo, palabras clave, promo y descripción |
 | `store/whatsnew/` | Novedades de la versión, por idioma |
 | `store/capturas.md` | Escenas, titulares y cómo se sacan las capturas |
+| `store/servidor.md` | Cómo se monta el proyecto de Supabase, sus secretos y los inicios de sesión |
 
 ## Código
 
@@ -41,6 +42,9 @@ Qué hay en cada sitio. Se actualiza en el mismo commit que añade o mueve algo.
 | `iosApp/iosApp` | `iOSApp.swift`, `Info.plist`, `PrivacyInfo.xcprivacy`, `<lang>.lproj` |
 | `iosApp/ChromaWidget` | Widgets de WidgetKit. Leen `widget.json` y nada más |
 | `iosApp/Configuration/Config.xcconfig` | Versión, identificador y Team ID de iOS |
+| `supabase/migrations` | Esquema, funciones, RLS y la tarea de cada noche (v1.1) |
+| `supabase/functions` | Edge Functions: `purge-photos`, `report-notify`, `delete-account` |
+| `supabase/tests` | Tests pgTAP de las reglas de acceso (test 17) |
 | `.github/workflows/tests.yml` | Tests comunes en cada push, en JVM y en Kotlin/Native |
 | `.github/workflows/pages.yml` | Publica `web/` en GitHub Pages cuando cambia |
 | `tools/icon.py` | Genera todos los iconos desde una geometría |

@@ -1,0 +1,36 @@
+# Only what differs from the defaults of the Supabase CLI. The hosted project is "chroma" in
+# eu-central-1 (docs/tecnico.md 1); secrets never live here, only in the project (store/servidor.md).
+project_id = "chroma"
+
+[db]
+major_version = 17
+
+[auth]
+site_url = "https://color.baltajmn.dev"
+additional_redirect_urls = ["com.baltajmn.color://login"]
+# Apple and Google only (SPEC 4): no email, no password, no phone.
+enable_signup = true
+
+[auth.email]
+enable_signup = false
+
+[auth.external.apple]
+enabled = true
+client_id = "env(APPLE_CLIENT_ID)"
+secret = "env(APPLE_SECRET)"
+
+[auth.external.google]
+enabled = true
+client_id = "env(GOOGLE_CLIENT_ID)"
+secret = "env(GOOGLE_SECRET)"
+skip_nonce_check = false
+
+# purge-photos checks the service key itself; the other two need a real user or the webhook secret.
+[functions.purge-photos]
+verify_jwt = false
+
+[functions.report-notify]
+verify_jwt = false
+
+[functions.delete-account]
+verify_jwt = true
