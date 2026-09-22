@@ -1,2 +1,3 @@
 "CFBundleDisplayName" = "Chroma";
 "NSCameraUsageDescription" = "Pour prendre la photo d'où vient la couleur de ta journée.";
+"NSPhotoLibraryAddUsageDescription" = "Pour enregistrer tes cartes et affiches dans tes photos.";

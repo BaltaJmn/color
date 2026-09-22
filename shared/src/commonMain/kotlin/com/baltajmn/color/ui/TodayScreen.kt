@@ -78,7 +78,7 @@ fun TodayScreen(
     today: LocalDate,
     onSettings: () -> Unit,
     onPhoto: (ImageBitmap) -> Unit,
-    onShare: ((LocalDate) -> Unit)?,
+    onShare: (LocalDate) -> Unit,
     below: @Composable () -> Unit = {},
 ) {
     val journal = ChromaRepository.journal
@@ -124,7 +124,7 @@ fun TodayScreen(
                 if (entry != null && pending == null) {
                     CardMenu(
                         onRetake = { if (Capture.cameraAvailable) camera() else gallery() },
-                        onShare = onShare?.let { { it(today) } },
+                        onShare = { onShare(today) },
                         onDelete = { confirmDelete = true },
                     )
                 }
@@ -277,15 +277,13 @@ private fun WordField(today: LocalDate, word: String?) {
 }
 
 @Composable
-private fun CardMenu(onRetake: () -> Unit, onShare: (() -> Unit)?, onDelete: () -> Unit) {
+private fun CardMenu(onRetake: () -> Unit, onShare: () -> Unit, onDelete: () -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box {
         GlyphButton(Glyph.MORE, S.a11yMore, { open = true })
         DropdownMenu(open, onDismissRequest = { open = false }, containerColor = MaterialTheme.colorScheme.surface) {
             DropdownMenuItem(text = { Text(S.retakePhoto, style = Styles.body) }, onClick = { open = false; onRetake() })
-            onShare?.let { share ->
-                DropdownMenuItem(text = { Text(S.share, style = Styles.body) }, onClick = { open = false; share() })
-            }
+            DropdownMenuItem(text = { Text(S.share, style = Styles.body) }, onClick = { open = false; onShare() })
             DropdownMenuItem(text = { Text(S.deleteDay, style = Styles.body) }, onClick = { open = false; onDelete() })
         }
     }

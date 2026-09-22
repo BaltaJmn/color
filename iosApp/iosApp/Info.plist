@@ -8,11 +8,14 @@
 	<true/>
 	<key>CFBundleDisplayName</key>
 	<string>Chroma</string>
-	<!-- La app no usa cifrado propio, solo HTTPS del sistema. Sin esta clave App Store Connect
-	     pregunta por el cumplimiento de exportacion en cada build y la retiene hasta responder. -->
 	<!-- Sin esta clave la camara del sistema no abre. Traducciones en <lang>.lproj. -->
 	<key>NSCameraUsageDescription</key>
 	<string>To take the photo your color of the day comes from.</string>
+	<!-- Guardar una tarjeta o el poster pide acceso solo para añadir; sin la clave iOS cierra la app. -->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>To save your cards and posters to your photos.</string>
+	<!-- La app no usa cifrado propio, solo HTTPS del sistema. Sin esta clave App Store Connect
+	     pregunta por el cumplimiento de exportacion en cada build y la retiene hasta responder. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<!-- El widget abre la app con com.baltajmn.color://today. -->

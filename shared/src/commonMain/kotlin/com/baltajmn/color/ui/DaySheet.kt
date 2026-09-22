@@ -37,7 +37,7 @@ fun DaySheet(
     date: LocalDate,
     onClose: () -> Unit,
     onPhoto: (ImageBitmap) -> Unit,
-    onShare: ((LocalDate) -> Unit)?,
+    onShare: (LocalDate) -> Unit,
 ) {
     val entry = ChromaRepository.journal[date.isoKey()]
     var confirmDelete by remember { mutableStateOf(false) }
@@ -54,7 +54,7 @@ fun DaySheet(
                 GlyphButton(Glyph.CLOSE, S.a11yClose, onClose)
                 Text(S.longDateWithYear(date), style = Styles.title, modifier = Modifier.weight(1f).padding(start = 4.dp))
                 if (entry != null) {
-                    onShare?.let { GlyphButton(Glyph.SHARE, S.a11yShare, { it(date) }) }
+                    GlyphButton(Glyph.SHARE, S.a11yShare, { onShare(date) })
                     GlyphButton(Glyph.TRASH, S.deleteDay, { confirmDelete = true })
                 }
             }

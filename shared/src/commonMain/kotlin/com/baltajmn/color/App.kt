@@ -31,6 +31,7 @@ import com.baltajmn.color.ui.GlyphIcon
 import com.baltajmn.color.ui.DaySheet
 import com.baltajmn.color.ui.PhotoViewer
 import com.baltajmn.color.ui.SettingsScreen
+import com.baltajmn.color.ui.ShareScreen
 import com.baltajmn.color.ui.YearScreen
 import com.baltajmn.color.ui.TodayScreen
 import com.baltajmn.color.ui.theme.ChromaTheme
@@ -49,6 +50,7 @@ fun App() {
     // The photo is an overlay over whichever screen opened it, so back closes it first.
     var photo by remember { mutableStateOf<ImageBitmap?>(null) }
     var openDay by remember { mutableStateOf<LocalDate?>(null) }
+    var sharing by remember { mutableStateOf<LocalDate?>(null) }
 
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
         // Coming back after 03:00 is a new day, and the widgets are told before they are looked at.
@@ -70,7 +72,7 @@ fun App() {
                             today = day,
                             onSettings = { screen = Screen.Settings },
                             onPhoto = { photo = it },
-                            onShare = null,
+                            onShare = { sharing = it },
                         )
                         Screen.Year -> YearScreen(day, onOpenDay = { openDay = it }, onPoster = null)
                         Screen.Settings -> SettingsScreen(onBack = { screen = Screen.Today })
@@ -80,12 +82,14 @@ fun App() {
                 }
                 if (screen != Screen.Settings) BottomBar(screen) { screen = it }
             }
-            openDay?.let { DaySheet(it, onClose = { openDay = null }, onPhoto = { photo = it }, onShare = null) }
+            openDay?.let { DaySheet(it, onClose = { openDay = null }, onPhoto = { photo = it }, onShare = { sharing = it }) }
+            sharing?.let { ShareScreen(it, onClose = { sharing = null }) }
             photo?.let { PhotoViewer(it) { photo = null } }
 
-            BackHandler(photo != null || openDay != null || screen != Screen.Today) {
+            BackHandler(photo != null || sharing != null || openDay != null || screen != Screen.Today) {
                 when {
                     photo != null -> photo = null
+                    sharing != null -> sharing = null
                     openDay != null -> openDay = null
                     else -> screen = Screen.Today
                 }

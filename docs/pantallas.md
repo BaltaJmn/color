@@ -111,6 +111,15 @@ pasado no se edita.
 
 Tocar la miniatura abre la foto a pantalla completa, sobre negro, con cerrar arriba a la izquierda.
 
+### Compartir
+
+Capa a pantalla completa desde el menú de Hoy o desde el día abierto. Arriba, cerrar. En medio, la
+tarjeta de 1080x1350 (`tecnico.md` 6.9) a 320 de ancho como mucho, con radio 14 y borde `outline`.
+Debajo, si el día tiene foto, un segmentado `shareColorOnly` / `shareWithPhoto` (empieza con la
+foto): solo el color quita la miniatura de la imagen, no del día. Después, `share` (hoja del
+sistema) y `saveToPhotos` (en Android solo desde la 10, que no pide permiso). La marca "Chroma" la
+decide el ajuste `watermarkRow`, no esta pantalla.
+
 ---
 
 ## 6. La tarjeta
