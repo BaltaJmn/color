@@ -149,7 +149,7 @@ Sin foto (día compartido solo con color, o foto caducada en el servidor), no ha
 Lista de secciones, como Purl:
 
 1. **Recordatorio**: interruptor y hora (`reminderRow`).
-2. **Amigos** (v1.1): cuenta y nombre visible, `defaultShareRow`, `inviteRow`, `signOut`,
+2. **Amigos** (v1.1): cuenta y nombre visible, `defaultShareRow`, `friendsRow`, `inviteRow`, `signOut`,
    `deleteAccount`.
 3. **Privacidad**: bloqueo (v1.2), política.
 4. **Tarjeta**: `watermarkRow`, `weekColorRow` (v1.2).
@@ -191,7 +191,15 @@ es la primera vez: nombre visible, casilla `age16` y `continue`.
 ### 8.4 Mosaico de un amigo
 
 La rejilla de Mi año con los días que compartió. Título: su nombre. Menú: `removeFriend` y `block`.
-Sin contadores.
+Sin contadores. Con más de un año, flechas de año bajo el título. Un año sin nada dice
+`friendYearEmpty`.
+
+Tocar un día abre su tarjeta a tamaño completo, con su nombre y su fecha. Pasada la semana de la
+foto en el servidor, la tarjeta es solo el color.
+
+Se llega tocando el nombre en una tarjeta del feed, o desde `friendsRow` en Ajustes > Amigos: la
+lista de nombres, por orden alfabético y sin número. Es la forma de llegar a un amigo que no ha
+compartido nada hoy ni ayer.
 
 ### 8.5 Compartir el día
 

@@ -84,6 +84,7 @@ Nada más. No hay librería de imágenes: las fotos se decodifican con el sistem
 | `social/Qr.kt` | Codificador QR | Nuevo (v1.1) |
 | `social/Friends.kt` | Amigos, solicitudes, enlaces de invitación | Nuevo (v1.1) |
 | `ui/InviteScreen.kt` | El enlace, su QR, compartir y regenerar | Nuevo (v1.1) |
+| `ui/FriendYear.kt` | Lista de amigos, el año de uno y uno de sus días | Nuevo (v1.1) |
 | `ui/Card.kt` | La tarjeta | Nuevo |
 | `ui/TodayScreen.kt`, `ui/YearScreen.kt`, `ui/SettingsScreen.kt`, `ui/FriendsScreen.kt` | Pantallas | Purl y nuevo |
 | `ui/DaySheet.kt`, `ui/ShareScreen.kt`, `ui/Pro.kt`, `ui/LockScreen.kt`, `ui/Icons.kt` | Capas y dibujos | Purl |

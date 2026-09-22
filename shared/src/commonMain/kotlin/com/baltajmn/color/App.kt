@@ -35,6 +35,9 @@ import com.baltajmn.color.i18n.S
 import com.baltajmn.color.ui.Glyph
 import com.baltajmn.color.ui.GlyphIcon
 import com.baltajmn.color.ui.DaySheet
+import com.baltajmn.color.ui.FriendDay
+import com.baltajmn.color.ui.FriendList
+import com.baltajmn.color.ui.FriendYear
 import com.baltajmn.color.ui.FriendsScreen
 import com.baltajmn.color.ui.InviteScreen
 import com.baltajmn.color.ui.Paywall
@@ -97,6 +100,9 @@ fun App() {
             sharing = null
             poster = null
             Friends.inviteOpen = false
+            Friends.listOpen = false
+            Friends.viewing = null
+            Friends.viewingDay = null
             Route.pending = null
         }
     }
@@ -127,11 +133,17 @@ fun App() {
             sharing?.let { ShareScreen(it, onClose = { sharing = null }) }
             poster?.let { PosterScreen(it, onClose = { poster = null }) }
             if (Friends.inviteOpen) InviteScreen { Friends.inviteOpen = false }
+            if (Friends.listOpen) FriendList { Friends.listOpen = false }
+            Friends.viewing?.let { FriendYear(it, day, onClose = { Friends.viewing = null }) }
+            Friends.viewingDay?.let { row ->
+                FriendDay(row, Friends.viewing?.displayName.orEmpty(), onClose = { Friends.viewingDay = null }, onPhoto = { photo = it })
+            }
             photo?.let { PhotoViewer(it) { photo = null } }
             if (Paywall.open) ProDialog { Paywall.open = false }
 
             BackHandler(
                 Paywall.open || photo != null || sharing != null || poster != null || Friends.inviteOpen ||
+                    Friends.listOpen || Friends.viewing != null || Friends.viewingDay != null ||
                     openDay != null || screen != Screen.Today,
             ) {
                 when {
@@ -140,6 +152,9 @@ fun App() {
                     sharing != null -> sharing = null
                     poster != null -> poster = null
                     Friends.inviteOpen -> Friends.inviteOpen = false
+                    Friends.viewingDay != null -> Friends.viewingDay = null
+                    Friends.viewing != null -> Friends.viewing = null
+                    Friends.listOpen -> Friends.listOpen = false
                     openDay != null -> openDay = null
                     else -> screen = Screen.Today
                 }

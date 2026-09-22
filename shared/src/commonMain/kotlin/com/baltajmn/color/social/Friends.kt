@@ -85,6 +85,11 @@ object Friends {
         private set
 
     var inviteOpen by mutableStateOf(false)
+    var listOpen by mutableStateOf(false)
+
+    /** Whose year is open, and which of their days. */
+    var viewing by mutableStateOf<Profile?>(null)
+    var viewingDay by mutableStateOf<FeedRow?>(null)
 
     fun opened(code: String) {
         pendingCode = code
@@ -132,6 +137,10 @@ object Friends {
         bytes?.let(::decodeImage)
     }
 
+    /** Everything one friend has shared, for their year. */
+    suspend fun year(id: String): List<FeedRow> =
+        Social.client.from("shared_entries").select { filter { eq("author", id) } }.decodeList<FeedRow>()
+
     suspend fun request(code: String): InviteResult {
         val answer = Social.client.postgrest.rpc("request_friend", buildJsonObject { put("code", code) }).decodeAs<String>()
         refresh()
@@ -174,6 +183,9 @@ object Friends {
         requests = emptyList()
         feed = emptyList()
         pendingCode = null
+        listOpen = false
+        viewing = null
+        viewingDay = null
         Storage.keepCached(emptySet())
     }
 }

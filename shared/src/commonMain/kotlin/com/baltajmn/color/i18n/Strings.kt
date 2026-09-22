@@ -509,6 +509,14 @@ object S {
     val feedToday get() = t("Today", "Hoy", "Hoje", "Heute", "Aujourd'hui")
     val feedYesterday get() = t("Yesterday", "Ayer", "Ontem", "Gestern", "Hier")
     val caughtUp get() = t("You're all caught up.", "Ya estás al día.", "Você está em dia.", "Du bist auf dem Laufenden.", "Tu es à jour.")
+    val friendsRow get() = t("Your friends", "Tus amigos", "Seus amigos", "Deine Freunde", "Tes amis")
+    val friendYearEmpty get() = t(
+        "Nothing shared this year.",
+        "Nada compartido este año.",
+        "Nada compartilhado este ano.",
+        "Dieses Jahr nichts geteilt.",
+        "Rien de partagé cette année.",
+    )
     val requestsTitle get() = t("Requests", "Solicitudes", "Pedidos", "Anfragen", "Demandes")
     val accept get() = t("Accept", "Aceptar", "Aceitar", "Annehmen", "Accepter")
     val ignore get() = t("Ignore", "Ignorar", "Ignorar", "Ignorieren", "Ignorer")

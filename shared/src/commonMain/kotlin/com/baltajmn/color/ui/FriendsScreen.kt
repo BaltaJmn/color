@@ -361,7 +361,15 @@ private fun LazyListScope.feedSection(
 @Composable
 private fun FeedCard(row: FeedRow, author: String, onPhoto: (ImageBitmap) -> Unit) {
     val photo by produceState<ImageBitmap?>(null, row.cacheName) { value = Friends.photo(row) }
-    ChromaCard(row.entry(), row.date, author = author, compact = true, photo = photo, onPhoto = onPhoto)
+    ChromaCard(
+        row.entry(),
+        row.date,
+        author = author,
+        compact = true,
+        photo = photo,
+        onPhoto = onPhoto,
+        onAuthor = { Friends.viewing = Friends.friends.find { it.id == row.author } },
+    )
 }
 
 private fun inviteResultText(result: InviteResult): String = when (result) {

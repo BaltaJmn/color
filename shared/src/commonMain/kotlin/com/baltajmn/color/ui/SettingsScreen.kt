@@ -106,6 +106,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 Section(S.sectionFriends) {
                     SettingRow(S.nameRow, me.displayName, onClick = { renaming = true })
                     SettingRow(S.defaultShareRow, shareLabel(settings.defaultShare), onClick = { choosingShare = true })
+                    SettingRow(S.friendsRow, onClick = { Friends.listOpen = true })
                     SettingRow(S.inviteRow, onClick = { Friends.inviteOpen = true })
                     SettingRow(S.signOut, onClick = { leaving = true })
                 }

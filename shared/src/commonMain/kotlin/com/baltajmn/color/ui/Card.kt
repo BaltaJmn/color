@@ -54,6 +54,7 @@ fun ChromaCard(
     compact: Boolean = false,
     photo: ImageBitmap? = Photos.get(entry.photo),
     onPhoto: ((ImageBitmap) -> Unit)? = null,
+    onAuthor: (() -> Unit)? = null,
     marks: @Composable RowScope.() -> Unit = {},
 ) {
     val ink = inkColorFor(entry.color)
@@ -79,7 +80,13 @@ fun ChromaCard(
         }
         Row(Modifier.align(Alignment.TopEnd).padding(pad), horizontalArrangement = Arrangement.spacedBy(6.dp), content = marks)
         Column(Modifier.align(Alignment.BottomStart).padding(pad).padding(end = thumb)) {
-            author?.let { Text(it, style = Styles.body.copy(color = ink, fontWeight = FontWeight.Medium)) }
+            author?.let {
+                Text(
+                    it,
+                    style = Styles.body.copy(color = ink, fontWeight = FontWeight.Medium),
+                    modifier = if (onAuthor != null) Modifier.clickable(role = Role.Button, onClick = onAuthor) else Modifier,
+                )
+            }
             Text(S.shortDate(date), style = Styles.label.copy(color = ink, fontWeight = FontWeight.Normal))
         }
         photo?.let { image ->
