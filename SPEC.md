@@ -401,7 +401,7 @@ Strings.kt             cinco idiomas por firma de función
 
 ### Nombres de color
 
-Una tabla de unos 150 colores, cada uno con su clave, su color de referencia y su nombre en los cinco
+Una tabla de unos 100 colores, cada uno con su clave, su color de referencia y su nombre en los cinco
 idiomas. Se asigna el más cercano. La tabla vive solo en `Names.kt`: dos copias acaban divergiendo.
 
 ### Servidor (v1.1)
