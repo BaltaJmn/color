@@ -1,12 +1,20 @@
 package com.baltajmn.color.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.plus
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -81,3 +89,11 @@ object Styles {
     private fun system(size: TextUnit, line: TextUnit, weight: FontWeight, color: Color) =
         TextStyle(fontSize = size, lineHeight = line, fontWeight = weight, color = color)
 }
+
+/**
+ * Top and sides only: the bottom bar already sits above the system bar, so a screen over it that
+ * padded the bottom too would leave the gap twice. The keyboard still pushes content up.
+ */
+@Composable
+fun Modifier.screenInsets(): Modifier =
+    windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)).imePadding()

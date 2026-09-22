@@ -33,7 +33,13 @@ enum class Glyph { BACK, FORWARD, SHARE, SETTINGS, YEAR, CLOSE, PHOTO, CAMERA, T
 
 /** A 48dp tap target with no background: the glyph is the whole control. */
 @Composable
-fun GlyphButton(glyph: Glyph, label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun GlyphButton(
+    glyph: Glyph,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+) {
     Box(
         modifier
             .size(48.dp)
@@ -41,7 +47,7 @@ fun GlyphButton(glyph: Glyph, label: String, onClick: () -> Unit, modifier: Modi
             .semantics { contentDescription = label }
             .clickable(role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,
-    ) { GlyphIcon(glyph) }
+    ) { GlyphIcon(glyph, tint = tint) }
 }
 
 @Composable
