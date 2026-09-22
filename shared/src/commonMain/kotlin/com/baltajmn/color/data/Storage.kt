@@ -36,4 +36,11 @@ expect object Storage {
 
     /** Moves an accepted photo from import/ into photos/, under the name the entry will carry. */
     fun adoptImport(name: String, asName: String)
+
+    /** Friends' photos, in the system cache: it may be emptied at any time and they come back. */
+    fun readCached(name: String): ByteArray?
+    fun writeCached(name: String, bytes: ByteArray)
+
+    /** Deletes every cached photo not named here: what the feed no longer shows goes. */
+    fun keepCached(names: Set<String>)
 }

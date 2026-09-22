@@ -16,6 +16,7 @@ actual object Storage {
     private val backup get() = File(dir, "entries.bak.json")
     private val temp get() = File(dir, "entries.tmp.json")
     private val photos get() = File(dir, "photos").apply { mkdirs() }
+    private val cached get() = File(rootOverride ?: AndroidContext.value.cacheDir, "friends").apply { mkdirs() }
 
     actual fun read(): String? = file.textOrNull()
 
@@ -75,6 +76,16 @@ actual object Storage {
     }
 
     /** Flushed to the disk before any rename, so a power cut cannot leave a renamed empty file. */
+    actual fun readCached(name: String): ByteArray? = File(cached, name).takeIf { it.exists() }?.readBytes()
+
+    actual fun writeCached(name: String, bytes: ByteArray) {
+        File(cached, name).writeBytes(bytes)
+    }
+
+    actual fun keepCached(names: Set<String>) {
+        cached.listFiles()?.filter { it.name !in names }?.forEach { it.delete() }
+    }
+
     private fun writeTemp(text: String) {
         FileOutputStream(temp).use {
             it.write(text.encodeToByteArray())

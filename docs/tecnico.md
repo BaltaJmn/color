@@ -458,8 +458,15 @@ con cuenta; el valor para los días nuevos, en Ajustes > Amigos.
 
 - `select * from shared_entries where day in (hoy, ayer) and author <> me order by updated_at desc`.
   `hoy` y `ayer` son los de quien mira.
-- Nombres: una consulta a `profiles` con los autores.
-- Fotos: URL firmada, descarga una vez, caché en disco en `cacheDir/friends/<author>-<day>.jpg`.
+- Nombres: los de la lista de amigos, que se carga a la vez. Una fila de alguien que ya no es amigo
+  no se enseña aunque llegue.
+- Fotos: `downloadAuthenticated` con la sesión (las políticas del bucket deciden, igual que con una
+  URL firmada, y es una llamada en vez de dos), una vez, y caché en disco en la caché del sistema,
+  `friends/<author>-<day>-<updated_at>.jpg`. El `updated_at` en el nombre hace que una foto cambiada
+  nunca salga de la caché vieja. Tras cada carga se borra de la caché todo lo que el feed ya no
+  enseña, y al cerrar sesión, todo.
+- La tarjeta se decodifica al entrar en pantalla (`LazyColumn`): 50 amigos por dos días no caben
+  decodificados a la vez.
 - Se refresca al abrir Amigos y al tirar hacia abajo. Sin sondeo en segundo plano.
 
 ### 9.4 Invitación

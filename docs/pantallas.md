@@ -175,12 +175,15 @@ es la primera vez: nombre visible, casilla `age16` y `continue`.
 ### 8.3 Feed
 
 - Arriba, **la paleta del círculo**: una tira de 24 de alto, radio 12, con un segmento por amigo con
-  color hoy, en orden de hora. Sin nombres.
+  color hoy, en orden de hora (el primero del día a la izquierda). Sin nombres. Si nadie tiene color
+  hoy, no hay tira.
 - Solicitudes recibidas, si las hay: bajo la etiqueta `requestsTitle`, una fila por persona con su
   nombre, `ignore` y `accept`. Sin número. Ignorar no avisa a nadie.
 - Las tarjetas (`compact`) de hoy y de ayer, separadas por los títulos `feedToday` y
-  `feedYesterday`, en orden de hora.
-- Al final, `caughtUp`. Nada debajo.
+  `feedYesterday`, en orden de hora: la última cambiada, arriba. Cada una con el nombre y la fecha de
+  su autor, que puede no ser la tuya cerca de medianoche.
+- Al final, `caughtUp`. Nada debajo. Por eso, con amigos, `inviteFriend` va arriba a la derecha,
+  junto al título, y no al final.
 - Tirar hacia abajo refresca.
 - Tocar el nombre del autor abre su mosaico. Mantener pulsada la tarjeta, o su menú, da `report`,
   `block` y `removeFriend`.

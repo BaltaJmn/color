@@ -11,6 +11,7 @@ import kotlinx.cinterop.usePinned
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import platform.Foundation.NSApplicationSupportDirectory
+import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSData
 import platform.Foundation.NSDataWritingAtomic
 import platform.Foundation.NSDataWritingFileProtectionCompleteUntilFirstUserAuthentication
@@ -45,6 +46,10 @@ actual object Storage {
     private val backupPath get() = "$root/entries.bak.json"
     private val photosDir get() = "$root/photos".also { fm.createDirectoryAtPath(it, true, protection, null) }
     private val importFolder get() = "$root/import".also { fm.createDirectoryAtPath(it, true, protection, null) }
+    private val cachedDir: String by lazy {
+        val base = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).first() as String
+        "$base/friends".also { fm.createDirectoryAtPath(it, true, protection, null) }
+    }
 
     actual fun read(): String? = textAt(path)
 
@@ -94,6 +99,16 @@ actual object Storage {
     actual fun adoptImport(name: String, asName: String) {
         fm.removeItemAtPath("$photosDir/$asName", null)
         fm.moveItemAtPath("$importFolder/$name", "$photosDir/$asName", null)
+    }
+
+    actual fun readCached(name: String): ByteArray? = NSData.dataWithContentsOfFile("$cachedDir/$name")?.toByteArray()
+
+    actual fun writeCached(name: String, bytes: ByteArray) = writeAtomically("$cachedDir/$name", bytes)
+
+    actual fun keepCached(names: Set<String>) {
+        fm.contentsOfDirectoryAtPath(cachedDir, null)?.filterIsInstance<String>()
+            ?.filter { it !in names }
+            ?.forEach { fm.removeItemAtPath("$cachedDir/$it", null) }
     }
 
     private fun writeAtomically(target: String, bytes: ByteArray) {

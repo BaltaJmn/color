@@ -118,7 +118,7 @@ fun App() {
                         )
                         Screen.Year -> YearScreen(day, onOpenDay = { openDay = it }, onPoster = { poster = it })
                         Screen.Settings -> SettingsScreen(onBack = { screen = Screen.Today })
-                        Screen.Friends -> FriendsScreen(day)
+                        Screen.Friends -> FriendsScreen(day, onPhoto = { photo = it })
                     }
                 }
                 if (screen != Screen.Settings) BottomBar(screen) { screen = it }

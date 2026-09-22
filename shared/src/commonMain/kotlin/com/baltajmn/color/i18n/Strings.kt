@@ -506,6 +506,9 @@ object S {
         "Chroma hält Kreise klein: höchstens 50 Freunde, und einer von euch hat sie erreicht.",
         "Chroma garde les cercles petits : 50 amis au plus, et l'un de vous y est déjà.",
     )
+    val feedToday get() = t("Today", "Hoy", "Hoje", "Heute", "Aujourd'hui")
+    val feedYesterday get() = t("Yesterday", "Ayer", "Ontem", "Gestern", "Hier")
+    val caughtUp get() = t("You're all caught up.", "Ya estás al día.", "Você está em dia.", "Du bist auf dem Laufenden.", "Tu es à jour.")
     val requestsTitle get() = t("Requests", "Solicitudes", "Pedidos", "Anfragen", "Demandes")
     val accept get() = t("Accept", "Aceptar", "Aceitar", "Annehmen", "Accepter")
     val ignore get() = t("Ignore", "Ignorar", "Ignorar", "Ignorieren", "Ignorer")
