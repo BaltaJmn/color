@@ -47,7 +47,7 @@ En v1.1 se añaden:
 |---|---|---|
 | `io.github.jan-tennert.supabase:bom` | 3.8.0 | Auth, Postgrest, Storage, Functions |
 | `io.github.jan-tennert.supabase:compose-auth` | la del bom | Google nativo (Credential Manager) y Apple nativo |
-| `io.ktor:ktor-client-okhttp` / `ktor-client-darwin` | la que pida el bom | Motor HTTP de cada plataforma |
+| `io.ktor:ktor-client-okhttp` / `ktor-client-darwin` | 3.5.1, la que pide supabase-kt 3.8.0 | Motor HTTP de cada plataforma |
 
 Nada más. No hay librería de imágenes: las fotos se decodifican con el sistema (`BitmapFactory`,
 `UIImage`) y se cachean como en Purl. No hay librería de QR: el QR se genera en común (6.10).
@@ -423,9 +423,14 @@ clave pública (`anon`), que ya viajan en el binario, en `social/SupabaseConfig.
 
 ### 9.1 Sesión
 
-`supabase-kt` con Auth (sesión guardada en el almacén seguro por defecto del SDK), Postgrest y
-Storage. Apple y Google con `compose-auth`: nativos en su plataforma, y Apple por el flujo web en
-Android. Al crear la cuenta: nombre visible y casilla de 16 años o más, obligatoria.
+`supabase-kt` con Auth, Postgrest, Storage y Functions (`social/Social.kt`). La sesión la guarda el
+gestor por defecto del SDK: preferencias privadas de la app en Android y `NSUserDefaults` en iOS,
+que por eso figura en `PrivacyInfo.xcprivacy` (razón `CA92.1`). Flujo PKCE; la vuelta del flujo web
+es `com.baltajmn.color://login`.
+
+Apple y Google con `compose-auth`: nativos en su plataforma, y el otro por el flujo web (Apple en
+Android, Google en iOS). Al crear la cuenta: nombre visible de 1 a 30 caracteres y casilla de 16
+años o más, obligatoria. Sin proyecto (`SupabaseConfig.url` nulo), la pestaña Amigos no existe.
 
 ### 9.2 Subida
 

@@ -27,11 +27,13 @@ import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.Route
 import com.baltajmn.color.data.today
+import com.baltajmn.color.social.Social
 import kotlinx.datetime.LocalDate
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.ui.Glyph
 import com.baltajmn.color.ui.GlyphIcon
 import com.baltajmn.color.ui.DaySheet
+import com.baltajmn.color.ui.FriendsScreen
 import com.baltajmn.color.ui.Paywall
 import com.baltajmn.color.ui.PhotoViewer
 import com.baltajmn.color.ui.PosterScreen
@@ -77,6 +79,7 @@ fun App() {
         when (Route.pending) {
             "today" -> screen = Screen.Today
             "year" -> screen = Screen.Year
+            "friends" -> if (Social.available) screen = Screen.Friends
             "pro" -> {
                 screen = Screen.Year
                 Paywall.open = true
@@ -108,8 +111,7 @@ fun App() {
                         )
                         Screen.Year -> YearScreen(day, onOpenDay = { openDay = it }, onPoster = { poster = it })
                         Screen.Settings -> SettingsScreen(onBack = { screen = Screen.Today })
-                        // Arrives with v1.1.
-                        Screen.Friends -> Unit
+                        Screen.Friends -> FriendsScreen(day)
                     }
                 }
                 if (screen != Screen.Settings) BottomBar(screen) { screen = it }
@@ -138,7 +140,13 @@ fun App() {
 private fun BottomBar(current: Screen, onSelect: (Screen) -> Unit) {
     val colors = MaterialTheme.colorScheme
     NavigationBar(containerColor = colors.background, tonalElevation = 0.dp) {
-        listOf(Screen.Today to (Glyph.TODAY to S.navToday), Screen.Year to (Glyph.YEAR to S.navYear)).forEach { (s, look) ->
+        // Friends only exists once there is a server to be friends on.
+        val tabs = listOfNotNull(
+            Screen.Today to (Glyph.TODAY to S.navToday),
+            Screen.Year to (Glyph.YEAR to S.navYear),
+            (Screen.Friends to (Glyph.FRIENDS to S.navFriends)).takeIf { Social.available },
+        )
+        tabs.forEach { (s, look) ->
             val (glyph, label) = look
             val tint = if (s == current) colors.onBackground else colors.onSurfaceVariant
             NavigationBarItem(

@@ -51,6 +51,8 @@ import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.SIBLINGS
 import com.baltajmn.color.data.storeUrl
 import com.baltajmn.color.i18n.S
+import com.baltajmn.color.social.Social
+import com.baltajmn.color.social.isValidName
 import com.baltajmn.color.ui.theme.GUTTER
 import com.baltajmn.color.ui.theme.MAX_CONTENT_WIDTH
 import com.baltajmn.color.ui.theme.Styles
@@ -70,6 +72,8 @@ fun SettingsScreen(onBack: () -> Unit) {
     var imported by remember { mutableStateOf<Int?>(null) }
     var restoring by remember { mutableStateOf(false) }
     var restored by remember { mutableStateOf<String?>(null) }
+    var renaming by remember { mutableStateOf(false) }
+    var leaving by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     Column(
         Modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()),
@@ -92,6 +96,14 @@ fun SettingsScreen(onBack: () -> Unit) {
                         // Turning it on is the one moment the permission question makes sense.
                         Reminder.sync(askPermission = on)
                     }
+                }
+            }
+
+            val me = Social.me
+            if (Social.available && me != null) {
+                Section(S.sectionFriends) {
+                    SettingRow(S.nameRow, me.displayName, onClick = { renaming = true })
+                    SettingRow(S.signOut, onClick = { leaving = true })
                 }
             }
 
@@ -214,6 +226,21 @@ fun SettingsScreen(onBack: () -> Unit) {
 
     restored?.let { Ask(null, it, S.ok, onConfirm = { restored = null }) }
 
+    if (renaming) RenameDialog(Social.me?.displayName.orEmpty()) { renaming = false }
+
+    if (leaving) {
+        Ask(
+            S.signOut,
+            S.signOutText,
+            S.signOut,
+            onConfirm = {
+                leaving = false
+                scope.launch { Social.signOut() }
+            },
+            onDismiss = { leaving = false },
+        )
+    }
+
     failure?.let { (title, text) -> Ask(title = title, text = text, confirm = S.ok, onConfirm = { failure = null }) }
 
     imported?.let { n -> Ask(title = S.importTitle, text = S.importDone(n), confirm = S.ok, onConfirm = { imported = null }) }
@@ -225,6 +252,33 @@ fun SettingsScreen(onBack: () -> Unit) {
             pickTime = false
         }
     }
+}
+
+@Composable
+private fun RenameDialog(current: String, onDone: () -> Unit) {
+    var name by remember { mutableStateOf(current) }
+    var busy by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    AlertDialog(
+        onDismissRequest = { if (!busy) onDone() },
+        title = { Text(S.nameRow, style = Styles.title) },
+        text = { NameField(name) { name = it } },
+        confirmButton = {
+            TextAction(
+                if (busy) S.working else S.ok,
+                onClick = {
+                    busy = true
+                    scope.launch {
+                        runCatching { Social.rename(name) }
+                        onDone()
+                    }
+                },
+                enabled = !busy && isValidName(name),
+            )
+        },
+        dismissButton = { TextAction(S.cancel, onClick = onDone, enabled = !busy) },
+        containerColor = MaterialTheme.colorScheme.surface,
+    )
 }
 
 private fun importText(e: Throwable): String = when ((e as? ImportFailed)?.problem) {

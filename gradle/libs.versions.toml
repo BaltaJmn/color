@@ -19,6 +19,9 @@ material3 = "1.11.0-alpha07"
 kotlinx-datetime = "0.8.0"
 kotlinx-serialization = "1.11.0"
 purchases-kmp = "3.2.1"
+supabase = "3.8.0"
+# The one supabase-kt 3.8.0 is built against: an engine of another minor breaks at runtime, not at build.
+ktor = "3.5.1"
 
 [libraries]
 glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
@@ -46,6 +49,14 @@ compose-uiBackhandler = { module = "org.jetbrains.compose.ui:ui-backhandler", ve
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 purchases-kmp-core = { module = "com.revenuecat.purchases:purchases-kmp-core", version.ref = "purchases-kmp" }
+supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabase" }
+supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt" }
+supabase-postgrest = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
+supabase-storage = { module = "io.github.jan-tennert.supabase:storage-kt" }
+supabase-functions = { module = "io.github.jan-tennert.supabase:functions-kt" }
+supabase-composeAuth = { module = "io.github.jan-tennert.supabase:compose-auth" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

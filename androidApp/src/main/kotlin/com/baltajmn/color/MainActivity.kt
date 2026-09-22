@@ -14,6 +14,7 @@ import com.baltajmn.color.data.Capture
 import com.baltajmn.color.data.FilePicker
 import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.Route
+import com.baltajmn.color.social.handleLoginIntent
 
 // FragmentActivity and not ComponentActivity: the biometric lock of v1.2 needs a fragment host.
 class MainActivity : FragmentActivity() {
@@ -53,6 +54,7 @@ class MainActivity : FragmentActivity() {
             pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
         Route.pending = intent?.getStringExtra("screen")
+        handleLoginIntent(intent)
         setContent { App() }
     }
 
@@ -61,6 +63,7 @@ class MainActivity : FragmentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         Route.pending = intent.getStringExtra("screen")
+        handleLoginIntent(intent)
     }
 
     // The launchers belong to this instance's registry: leaving them in a process wide object would

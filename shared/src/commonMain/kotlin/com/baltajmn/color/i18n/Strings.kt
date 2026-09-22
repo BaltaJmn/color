@@ -380,6 +380,74 @@ object S {
     val widgetYearName get() = t("The year", "El año", "O ano", "Das Jahr", "L'année")
     val widgetYearDescription get() = t("Your year in colors", "Tu año en colores", "Seu ano em cores", "Dein Jahr in Farben", "Ton année en couleurs")
 
+    // 13. Friends (v1.1)
+
+    val friendsIntro1 get() = t(
+        "See the color of your friends' day.",
+        "Mira el color del día de tus amigos.",
+        "Veja a cor do dia dos seus amigos.",
+        "Sieh die Farbe vom Tag deiner Freunde.",
+        "Vois la couleur du jour de tes amis.",
+    )
+    val friendsIntro2 get() = t(
+        "Only people you invite, and who say yes.",
+        "Solo gente a la que invitas y que dice que sí.",
+        "Só pessoas que você convida e que aceitam.",
+        "Nur Leute, die du einlädst und die zusagen.",
+        "Seulement les personnes que tu invites et qui acceptent.",
+    )
+    val friendsIntro3 get() = t(
+        "No likes, no counts. What you don't share stays on your phone.",
+        "Sin likes ni contadores. Lo que no compartes no sale de tu móvil.",
+        "Sem curtidas nem contadores. O que você não compartilha não sai do seu celular.",
+        "Keine Likes, keine Zahlen. Was du nicht teilst, bleibt auf deinem Handy.",
+        "Pas de likes, pas de compteurs. Ce que tu ne partages pas reste sur ton téléphone.",
+    )
+    val signInApple get() = t("Continue with Apple", "Continuar con Apple", "Continuar com a Apple", "Weiter mit Apple", "Continuer avec Apple")
+    val signInGoogle get() = t("Continue with Google", "Continuar con Google", "Continuar com o Google", "Weiter mit Google", "Continuer avec Google")
+    val signInFailed get() = t(
+        "Couldn't sign in. Try again.",
+        "No se ha podido iniciar sesión. Inténtalo de nuevo.",
+        "Não foi possível entrar. Tente de novo.",
+        "Anmeldung fehlgeschlagen. Versuch es noch einmal.",
+        "Connexion impossible. Réessaie.",
+    )
+    val nameTitle get() = t("Your name for friends", "Tu nombre para tus amigos", "Seu nome para os amigos", "Dein Name für Freunde", "Ton nom pour tes amis")
+    val nameHint get() = t(
+        "The one your friends know you by.",
+        "El que tus amigos reconocen.",
+        "O nome pelo qual seus amigos te conhecem.",
+        "Der, unter dem deine Freunde dich kennen.",
+        "Celui sous lequel tes amis te connaissent.",
+    )
+    val age16 get() = t("I'm 16 or older", "Tengo 16 años o más", "Tenho 16 anos ou mais", "Ich bin 16 oder älter", "J'ai 16 ans ou plus")
+    val continueAction get() = t("Continue", "Continuar", "Continuar", "Weiter", "Continuer")
+    val friendsOffline get() = t(
+        "Friends can't be reached right now.",
+        "Ahora mismo no se llega a Amigos.",
+        "Não foi possível acessar Amigos agora.",
+        "Freunde sind gerade nicht erreichbar.",
+        "Impossible de joindre Amis pour le moment.",
+    )
+    val retry get() = t("Retry", "Reintentar", "Tentar de novo", "Erneut versuchen", "Réessayer")
+    val friendsEmpty get() = t(
+        "No friends here yet. Invite someone who knows you.",
+        "Aún no hay amigos aquí. Invita a alguien que te conozca.",
+        "Ainda não há amigos aqui. Convide alguém que te conheça.",
+        "Noch keine Freunde hier. Lade jemanden ein, der dich kennt.",
+        "Pas encore d'amis ici. Invite quelqu'un qui te connaît.",
+    )
+    val sectionFriends get() = t("Friends", "Amigos", "Amigos", "Freunde", "Amis")
+    val nameRow get() = t("Your name", "Tu nombre", "Seu nome", "Dein Name", "Ton nom")
+    val signOut get() = t("Sign out", "Cerrar sesión", "Sair", "Abmelden", "Se déconnecter")
+    val signOutText get() = t(
+        "Your friends stay on the account. Signing in again brings them back.",
+        "Tus amigos se quedan en la cuenta. Al volver a entrar, vuelven.",
+        "Seus amigos ficam na conta. Ao entrar de novo, eles voltam.",
+        "Deine Freunde bleiben im Konto. Meldest du dich wieder an, sind sie wieder da.",
+        "Tes amis restent sur le compte. En te reconnectant, ils reviennent.",
+    )
+
     // 12. Accessibility
 
     val a11yBack get() = t("Back", "Volver", "Voltar", "Zurück", "Retour")
