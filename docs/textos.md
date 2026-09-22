@@ -59,4 +59,8 @@ Viven en sus ficheros de plataforma y se escriben en los cinco idiomas.
 
 ## 5. Ficha de tienda
 
-`store/listings/<lang>/`: título, subtítulo, descripción corta y larga. Se escriben en #26.
+Viven en `store/listings/<idioma>/` (Play) y `store/app-store/<idioma>/` (App Store), en los cinco
+idiomas; `tools/store/fichas.py` comprueba los topes. Las mismas reglas de tono, más dos:
+
+- Lo gratis se dice con la misma fuerza que lo de pago, y el pago se dice como es: uno, una vez.
+- La lista de lo que no hay (rachas, filtros, likes, anuncios, analítica) cierra siempre la ficha.

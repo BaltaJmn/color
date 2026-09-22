@@ -1,0 +1,1 @@
+foto,diario,paleta,colores,año,píxeles,visual,tono,muestra,degradado,recuerdos,rejilla,pintar

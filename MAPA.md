@@ -25,6 +25,10 @@ Qué hay en cada sitio. Se actualiza en el mismo commit que añade o mueve algo.
 |---|---|
 | `web/index.html` | Política de privacidad, en color.baltajmn.dev por GitHub Pages |
 | `store/formularios.md` | Respuestas de los formularios de las dos consolas y cómo se publica la web |
+| `store/listings/<idioma>/` | Ficha de Play: título, corta y larga, un párrafo por línea |
+| `store/app-store/<idioma>/` | Ficha de App Store: nombre, subtítulo, palabras clave, promo y descripción |
+| `store/whatsnew/` | Novedades de la versión, por idioma |
+| `store/capturas.md` | Escenas, titulares y cómo se sacan las capturas |
 
 ## Código
 
@@ -40,4 +44,6 @@ Qué hay en cada sitio. Se actualiza en el mismo commit que añade o mueve algo.
 | `.github/workflows/tests.yml` | Tests comunes en cada push, en JVM y en Kotlin/Native |
 | `.github/workflows/pages.yml` | Publica `web/` en GitHub Pages cuando cambia |
 | `tools/icon.py` | Genera todos los iconos desde una geometría |
+| `tools/demo/generar.py` | El año de demostración de las capturas |
+| `tools/store/capturas.py`, `tools/store/fichas.py` | Marco de las capturas; topes y subida de las fichas |
 | `gradle/libs.versions.toml` | Versiones, las de Purl sin tocar |
