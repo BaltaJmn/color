@@ -21,4 +21,14 @@ Qué hay en cada sitio. Se actualiza en el mismo commit que añade o mueve algo.
 
 ## Código
 
-Llega con #5 en adelante. El árbol previsto está en `docs/tecnico.md` 3.
+| Ruta | Qué es |
+|---|---|
+| `shared/src/commonMain` | Toda la interfaz y la lógica. El árbol está en `docs/tecnico.md` 3 |
+| `shared/src/androidMain`, `shared/src/iosMain` | Solo los `actual` que el sistema obliga |
+| `shared/src/commonTest` | Tests comunes, en JVM y en Kotlin/Native |
+| `androidApp` | `MainActivity`, manifiesto, recursos, icono. Nada de lógica |
+| `iosApp/iosApp` | `iOSApp.swift`, `Info.plist`, `PrivacyInfo.xcprivacy`, `<lang>.lproj` |
+| `iosApp/ChromaWidget` | Widgets de WidgetKit. Leen `widget.json` y nada más |
+| `iosApp/Configuration/Config.xcconfig` | Versión, identificador y Team ID de iOS |
+| `.github/workflows/tests.yml` | Tests comunes en cada push, en JVM y en Kotlin/Native |
+| `gradle/libs.versions.toml` | Versiones, las de Purl sin tocar |

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The window paints the neutral background before Compose draws its first frame, so launch never flashes. -->
+    <style name="Theme.Chroma" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#F6F4F1</item>
+    </style>
+</resources>

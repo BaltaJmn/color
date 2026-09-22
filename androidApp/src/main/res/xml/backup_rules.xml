@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 11 y anteriores. requireFlags="clientSideEncryption": sin cifrado de cliente, el diario de colores no
+  sale del telefono. Las fotos no entran aqui; en estas versiones no hay traspaso directo.
+-->
+<full-backup-content>
+    <include domain="file" path="entries.json" requireFlags="clientSideEncryption" />
+    <include domain="file" path="entries.bak.json" requireFlags="clientSideEncryption" />
+</full-backup-content>
