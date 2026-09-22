@@ -3,6 +3,7 @@ package com.baltajmn.color.data
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.baltajmn.color.i18n.S
 import com.baltajmn.color.model.ChromaEntry
 import com.baltajmn.color.model.Journal
 import com.baltajmn.color.model.JournalFile
@@ -190,11 +191,8 @@ object ChromaRepository {
     internal fun replaceEntries(entries: Map<String, ChromaEntry>) = edit { it.copy(entries = entries) }
 
     fun syncWidgets(f: JournalFile = file) {
-        syncWidgets(widgetState(f.entries, f.settings, today(), nameOf = colorNameOf))
+        syncWidgets(widgetState(f.entries, f.settings, today(), nameOf = S::colorName))
     }
-
-    /** Resolves a name key for the widget. Set by the name table (#9) so data/ stays free of it. */
-    var colorNameOf: (String) -> String = { it }
 
     // --- internals ----------------------------------------------------------------------------
 
