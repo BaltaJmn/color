@@ -62,10 +62,12 @@
 
 <div class="box">
   <p><strong>The short version.</strong> Chroma turns one photo a day into one color, and your year of
-  colors never leaves your phone. There is no account and no server: your photos, your colors, your
-  words and your settings are stored only on your device and are never uploaded to us. The only data
-  that leaves your device is what is needed to know whether you have bought Chroma Pro. There is no
-  advertising, no analytics and no tracking of any kind.</p>
+  colors lives on your phone. Without an account, your photos, your colors, your words and your
+  settings are stored only on your device and are never uploaded to us; the only data that leaves it is
+  what is needed to know whether you have bought Chroma Pro. <strong>Friends</strong> is optional and
+  needs an account: only if you turn it on, your visible name and the days you choose to share go to
+  our server so that the friends you accepted can see them. Shared photos are deleted from the server
+  after 7 days. There is no advertising, no analytics and no tracking of any kind.</p>
 </div>
 
 <h2>Who is responsible</h2>
@@ -85,8 +87,8 @@ developer based in Spain, who acts as data controller for the limited processing
 </ul>
 <p>The home screen widgets read a small separate file with today's color and its name and, with Chroma
 Pro, the colors of this year's days. It never contains your photos or your words.</p>
-<p>None of this is sent to us or to anyone else. We have no server, so we could not receive it even
-if we wanted to. Uninstalling the app deletes it.</p>
+<p>None of this is sent to us or to anyone else, except the days you choose to share with Friends,
+described below. Uninstalling the app deletes it.</p>
 
 <h3>The camera and your photos</h3>
 <p>To take the photo of the day, Chroma opens your phone's camera; the app receives only the picture
@@ -115,16 +117,50 @@ card details, billing address or any other payment information.</p>
 <p>To know whether a given installation has bought Chroma Pro, the app uses <strong>RevenueCat,
 Inc.</strong> as a processor. RevenueCat assigns each installation an anonymous identifier and stores,
 on our behalf, that identifier, the purchase history associated with it, and technical device
-identifiers. Because Chroma has no accounts, this identifier is not linked to your name, your email
-address or any profile. Nothing from your photos or your colors is ever sent to RevenueCat. See
+identifiers. This identifier is never linked to your name, your email address or your Friends
+account, if you have one. Nothing from your photos or your colors is ever sent to RevenueCat. See
 <a href="https://www.revenuecat.com/privacy" rel="noopener">RevenueCat's privacy policy</a>.</p>
 <p>RevenueCat processes data in the United States. Transfers outside the European Economic Area are
 covered by the European Commission's Standard Contractual Clauses.</p>
 
+<h3>Friends (optional)</h3>
+<p>Friends lets people who already know each other see each other's colors. It is off until you open
+it and sign in, and everything below applies only if you do.</p>
+<ul>
+  <li><strong>Your account.</strong> You sign in with Apple or Google. We receive from them an account
+  identifier and an email address (with Apple, it can be a private relay address), and we store them
+  with the dates you signed in. We use the email only to identify your account if you ask us to delete
+  it or contact us; we never write to you otherwise.</li>
+  <li><strong>Your profile.</strong> The name your friends see, which you choose and can change, and a
+  random invite code for your link. You confirm you are 16 or older; we do not store your age or birth
+  date.</li>
+  <li><strong>What you share.</strong> Each day is private unless you say otherwise. For a day you share,
+  the server keeps its date, color, color name, your word if there is one, and the time of its last
+  change. If you share it with the photo, a reduced copy (at most 720 pixels on the long side, made
+  again from the pixels, with no location or camera metadata) is kept for <strong>7 days</strong> and
+  then deleted automatically. Only the friends you accepted can see it: there are no public profiles
+  and no search.</li>
+  <li><strong>Your circle.</strong> Who you are friends with, open requests, and the people you
+  blocked.</li>
+  <li><strong>Reports.</strong> If you report a friend's card, we store who reported, whose card and
+  which day, and we receive it by email with the reported content so that we can act within 24
+  hours. The person reported is never told who reported them.</li>
+</ul>
+<p>Friends runs on <strong>Supabase, Inc.</strong> as our processor, with the data stored in the
+European Union (Frankfurt, Germany). Report emails are delivered by <strong>Resend, Inc.</strong>, which
+processes them in the United States under the European Commission's Standard Contractual Clauses.
+See <a href="https://supabase.com/privacy" rel="noopener">Supabase's privacy policy</a> and
+<a href="https://resend.com/legal/privacy-policy" rel="noopener">Resend's privacy policy</a>.</p>
+<p>You can delete your account at any time in Settings &gt; Friends &gt; Delete account, or as
+explained at <a href="/delete">color.baltajmn.dev/delete</a>. That erases your profile, your
+friendships, everything you shared and its photos, and the reports you made. Your journal on the phone
+is not touched.</p>
+
 <h3>Nothing else</h3>
 <p>Chroma contains no advertising SDK, no analytics SDK and no crash-reporting SDK. We do not build
 profiles, we do not use remarketing, and we do not sell or share personal information with anyone.
-The app needs an internet connection only to check your purchase status.</p>
+The app needs an internet connection only to check your purchase status and, if you use Friends, to
+reach our server.</p>
 
 <h2>Permissions the app asks for</h2>
 <div class="wrap">
@@ -132,7 +168,7 @@ The app needs an internet connection only to check your purchase status.</p>
   <tr><th>Permission</th><th>Why</th></tr>
   <tr><td>Notifications</td><td>To show the daily reminder, if you turn it on. It is generated on your device; nothing is sent through a server.</td></tr>
   <tr><td>Run at startup</td><td>To restore your reminder after the phone reboots or the time zone changes.</td></tr>
-  <tr><td>Internet / network state</td><td>Only to check your purchase status with RevenueCat.</td></tr>
+  <tr><td>Internet / network state</td><td>To check your purchase status with RevenueCat and, if you use Friends, to reach our server.</td></tr>
   <tr><td>In-app billing</td><td>To offer the Chroma Pro purchase through Google Play.</td></tr>
 </table>
 <p class="note">The table lists the Android permissions; on Android the photo is taken by the system
@@ -152,13 +188,17 @@ control, and if it goes to a cloud folder or to another app, that provider's pol
 this one.</p>
 
 <h2>How long data is kept</h2>
-<p>Data on your device is kept until you delete a day or uninstall the app. Purchase records held by
-RevenueCat and by the app store are kept for as long as those services require in order to honour
-restores and to meet their own legal and tax obligations.</p>
+<p>Data on your device is kept until you delete a day or uninstall the app. With Friends, a shared
+photo is kept 7 days; a shared day without its photo, until you make it private, delete it, or delete
+your account; your profile and friendships, until you delete your account; a report, until the account
+of whoever made it or of whoever was reported is deleted. Purchase records held by RevenueCat and by
+the app store are kept for as long as those services require in order to honour restores and to meet
+their own legal and tax obligations.</p>
 
 <h2>Children</h2>
 <p>Chroma is not directed at children under 13 and we do not knowingly collect information from them.
-This version of the app has no accounts, no public content and no social features.</p>
+Friends requires being 16 or older. There is no public content: what is shared is seen only by friends
+who were invited by link and accepted.</p>
 
 <h2>Your rights under the GDPR</h2>
 <p>If you are in the European Economic Area or the United Kingdom, you have the right to access,
@@ -166,19 +206,24 @@ rectify, erase, restrict and object to the processing of your personal data, and
 portability.</p>
 <p>In practice, most of these you can exercise yourself and instantly: the data is on your phone.
 Deleting a day erases it; uninstalling the app erases everything; the export feature is data
-portability. For the purchase data held by RevenueCat, write to
+portability. With Friends, you can change your name, make any day private, and delete your account
+from the app. For a copy of what the server holds about you, or for the purchase data held by
+RevenueCat, write to
 <a href="mailto:baltajmn@gmail.com">baltajmn@gmail.com</a> and we will act on your request. We can only
 identify your records if you provide the Google Play or App Store order number, precisely because we
 hold nothing that identifies you.</p>
-<p>Legal bases: performance of a contract (delivering the purchase you made) and our legitimate
-interest in preventing fraudulent restores. You also have the right to lodge a complaint with your
+<p>Legal bases: performance of a contract (delivering the purchase you made, and the Friends service
+you signed up for) and our legitimate interest in preventing fraudulent restores and in keeping
+Friends safe through reports. You also have the right to lodge a complaint with your
 supervisory authority. In Spain, the
 <a href="https://www.aepd.es" rel="noopener">Agencia Española de Protección de Datos</a>.</p>
 
 <h2>Your rights under the CCPA / CPRA</h2>
 <p>If you are a California resident: in the last twelve months we have collected the categories
-"identifiers" (an anonymous installation identifier and device identifiers) and "commercial
-information" (your purchase history), for the sole purpose of delivering the product you bought.</p>
+"identifiers" (an anonymous installation identifier and device identifiers and, with Friends, your
+account identifier and email address), "commercial information" (your purchase history) and, with
+Friends, the content you chose to share, for the sole purpose of delivering the product and the
+service you asked for.</p>
 <p>We have <strong>not</strong> sold or shared personal information, and we do not use it for
 cross-context behavioural advertising. We do not knowingly sell the personal information of anyone
 under 16. You have the right to know, to delete, to correct and to non-discrimination for exercising
@@ -190,9 +235,8 @@ response to a Do Not Track signal.</p>
 
 <h2>Changes to this policy</h2>
 <p>If this policy changes, the new version will be published at this address with a new date at the
-top, and material changes will also be described in the app's release notes in the store. If a future
-version adds optional features to share with friends, this policy will be updated before that version
-is published, and nothing will leave your phone unless you turn those features on.</p>
+top, and material changes will also be described in the app's release notes in the store. The terms
+of use of Friends are at <a href="/terms.html">color.baltajmn.dev/terms.html</a>.</p>
 
 </section>
 
@@ -206,11 +250,13 @@ is published, and nothing will leave your phone unless you turn those features o
 <p class="nav"><a href="#en">English</a> - <strong>Español</strong></p>
 
 <div class="box">
-  <p><strong>En corto.</strong> Chroma convierte una foto al día en un color, y tu año de colores no
-  sale de tu móvil. No hay cuenta ni servidor: tus fotos, tus colores, tus palabras y tus ajustes se
-  guardan solo en tu dispositivo y no se nos envían nunca. Lo único que sale de tu móvil es lo necesario
-  para saber si has comprado Chroma Pro. No hay publicidad, ni analítica, ni seguimiento de ningún
-  tipo.</p>
+  <p><strong>En corto.</strong> Chroma convierte una foto al día en un color, y tu año de colores
+  vive en tu móvil. Sin cuenta, tus fotos, tus colores, tus palabras y tus ajustes se guardan solo en tu
+  dispositivo y no se nos envían nunca; lo único que sale es lo necesario para saber si has comprado
+  Chroma Pro. <strong>Amigos</strong> es opcional y necesita cuenta: solo si lo activas, tu nombre
+  visible y los días que decidas compartir van a nuestro servidor para que los vean los amigos que has
+  aceptado. Las fotos compartidas se borran del servidor a los 7 días. No hay publicidad, ni analítica,
+  ni seguimiento de ningún tipo.</p>
 </div>
 
 <h2>Quién es el responsable</h2>
@@ -232,8 +278,8 @@ describe abajo.</p>
 </ul>
 <p>Los widgets de inicio leen un fichero aparte, pequeño, con el color de hoy y su nombre y, con Chroma
 Pro, los colores de los días de este año. Nunca contiene tus fotos ni tus palabras.</p>
-<p>Nada de esto se nos envía ni se envía a terceros. No tenemos servidor, así que no podríamos
-recibirlo aunque quisiéramos. Desinstalar la app lo borra.</p>
+<p>Nada de esto se nos envía ni se envía a terceros, salvo los días que decidas compartir en Amigos,
+como se explica abajo. Desinstalar la app lo borra.</p>
 
 <h3>La cámara y tus fotos</h3>
 <p>Para hacer la foto del día, Chroma abre la cámara de tu móvil; la app recibe solo la foto que
@@ -263,17 +309,51 @@ pago.</p>
 <p>Para saber si una instalación concreta ha comprado Chroma Pro, la app usa <strong>RevenueCat,
 Inc.</strong> como encargado del tratamiento. RevenueCat asigna a cada instalación un identificador
 anónimo y guarda, por cuenta nuestra, ese identificador, el historial de compras asociado e
-identificadores técnicos del dispositivo. Como Chroma no tiene cuentas, ese identificador no está
-vinculado a tu nombre, tu correo ni ningún perfil. Nada de tus fotos ni de tus colores se envía nunca
+identificadores técnicos del dispositivo. Ese identificador nunca se vincula a tu nombre, tu correo ni
+a tu cuenta de Amigos, si la tienes. Nada de tus fotos ni de tus colores se envía nunca
 a RevenueCat. Consulta la
 <a href="https://www.revenuecat.com/privacy" rel="noopener">política de privacidad de RevenueCat</a>.</p>
 <p>RevenueCat trata los datos en Estados Unidos. Las transferencias fuera del Espacio Económico
 Europeo están amparadas por las Cláusulas Contractuales Tipo de la Comisión Europea.</p>
 
+<h3>Amigos (opcional)</h3>
+<p>Amigos deja que gente que ya se conoce vea sus colores. Está apagado hasta que lo abres e inicias
+sesión, y todo lo que sigue se aplica solo si lo haces.</p>
+<ul>
+  <li><strong>Tu cuenta.</strong> Entras con Apple o con Google. De ellos recibimos un identificador de
+  cuenta y un correo (con Apple puede ser una dirección de reenvío privada), y los guardamos con las
+  fechas en que entraste. El correo solo lo usamos para identificar tu cuenta si nos pides borrarla o
+  nos escribes; nunca te escribimos por otra cosa.</li>
+  <li><strong>Tu perfil.</strong> El nombre que ven tus amigos, que eliges tú y puedes cambiar, y un
+  código de invitación al azar para tu enlace. Confirmas que tienes 16 años o más; no guardamos tu edad
+  ni tu fecha de nacimiento.</li>
+  <li><strong>Lo que compartes.</strong> Cada día es privado salvo que digas lo contrario. De un día que
+  compartes, el servidor guarda su fecha, su color, el nombre del color, tu palabra si la hay y la hora
+  de su último cambio. Si lo compartes con la foto, se guarda una copia reducida (720 píxeles como
+  mucho en el lado largo, hecha de nuevo a partir de los píxeles, sin ubicación ni datos de la cámara)
+  durante <strong>7 días</strong>, y después se borra sola. Solo la ven los amigos que aceptaste: no hay
+  perfiles públicos ni buscador.</li>
+  <li><strong>Tu círculo.</strong> Con quién eres amigo, las solicitudes abiertas y las personas que
+  bloqueaste.</li>
+  <li><strong>Reportes.</strong> Si reportas la tarjeta de un amigo, guardamos quién reporta, de quién es
+  la tarjeta y qué día, y nos llega por correo con el contenido reportado para poder actuar en menos de
+  24 horas. A la persona reportada nunca se le dice quién la reportó.</li>
+</ul>
+<p>Amigos funciona sobre <strong>Supabase, Inc.</strong>, como encargado del tratamiento, con los datos
+guardados en la Unión Europea (Fráncfort, Alemania). Los correos de los reportes los entrega
+<strong>Resend, Inc.</strong>, que los trata en Estados Unidos al amparo de las Cláusulas
+Contractuales Tipo de la Comisión Europea. Consulta la
+<a href="https://supabase.com/privacy" rel="noopener">política de privacidad de Supabase</a> y la
+<a href="https://resend.com/legal/privacy-policy" rel="noopener">de Resend</a>.</p>
+<p>Puedes borrar tu cuenta cuando quieras en Ajustes &gt; Amigos &gt; Borrar cuenta, o como se explica en
+<a href="/delete#es">color.baltajmn.dev/delete</a>. Eso borra tu perfil, tus amistades, todo lo que
+compartiste y sus fotos, y los reportes que hiciste. Tu diario del móvil no se toca.</p>
+
 <h3>Nada más</h3>
 <p>Chroma no incluye ningún SDK de publicidad, de analítica ni de informes de fallos. No elaboramos
 perfiles, no usamos remarketing y no vendemos ni compartimos información personal con nadie. La app
-necesita conexión a internet únicamente para comprobar el estado de tu compra.</p>
+necesita conexión a internet solo para comprobar el estado de tu compra y, si usas Amigos, para llegar
+a nuestro servidor.</p>
 
 <h2>Permisos que pide la app</h2>
 <div class="wrap">
@@ -281,7 +361,7 @@ necesita conexión a internet únicamente para comprobar el estado de tu compra.
   <tr><th>Permiso</th><th>Para qué</th></tr>
   <tr><td>Notificaciones</td><td>Para mostrar el recordatorio diario, si lo activas. Se genera en tu dispositivo; no pasa por ningún servidor.</td></tr>
   <tr><td>Ejecutar al inicio</td><td>Para recuperar el recordatorio tras reiniciar el móvil o cambiar de zona horaria.</td></tr>
-  <tr><td>Internet y estado de la red</td><td>Solo para comprobar el estado de tu compra con RevenueCat.</td></tr>
+  <tr><td>Internet y estado de la red</td><td>Para comprobar el estado de tu compra con RevenueCat y, si usas Amigos, para llegar a nuestro servidor.</td></tr>
   <tr><td>Facturación en la aplicación</td><td>Para ofrecer la compra de Chroma Pro a través de Google Play.</td></tr>
 </table>
 <p class="note">La tabla recoge los permisos de Android; en Android la foto la hace la app de cámara
@@ -301,33 +381,40 @@ guardado o enviado queda fuera de nuestro control, y si va a una carpeta en la n
 aplica la política de ese proveedor, no esta.</p>
 
 <h2>Cuánto tiempo se conservan los datos</h2>
-<p>Los datos de tu dispositivo se conservan hasta que borras un día o desinstalas la app. Los registros
-de compra que guardan RevenueCat y la tienda se conservan el tiempo que esos servicios necesiten para
+<p>Los datos de tu dispositivo se conservan hasta que borras un día o desinstalas la app. Con Amigos,
+una foto compartida se guarda 7 días; un día compartido sin su foto, hasta que lo haces privado, lo
+borras o borras tu cuenta; tu perfil y tus amistades, hasta que borras tu cuenta; un reporte, hasta que
+se borra la cuenta de quien lo hizo o de quien fue reportado. Los registros de compra que guardan RevenueCat y la tienda se conservan el tiempo que esos servicios necesiten para
 poder restaurar compras y para cumplir sus propias obligaciones legales y fiscales.</p>
 
 <h2>Menores</h2>
 <p>Chroma no está dirigida a menores de 13 años y no recogemos conscientemente información de ellos.
-Esta versión de la app no tiene cuentas, ni contenido público, ni funciones sociales.</p>
+Amigos exige tener 16 años o más. No hay contenido público: lo compartido solo lo ven amigos invitados
+por enlace y aceptados.</p>
 
 <h2>Tus derechos según el RGPD</h2>
 <p>Si estás en el Espacio Económico Europeo o el Reino Unido, tienes derecho a acceder, rectificar,
 suprimir, limitar y oponerte al tratamiento de tus datos personales, y derecho a la portabilidad.</p>
 <p>En la práctica casi todos los puedes ejercer tú mismo y al instante, porque los datos están en tu
 móvil: borrar un día lo elimina, desinstalar la app lo borra todo, y la función de exportar es
-literalmente portabilidad. Para los datos de compra que guarda RevenueCat, escribe a
+literalmente portabilidad. Con Amigos puedes cambiar tu nombre, hacer privado cualquier día y borrar
+tu cuenta desde la app. Para una copia de lo que el servidor guarda de ti, o para los datos de compra
+que guarda RevenueCat, escribe a
 <a href="mailto:baltajmn@gmail.com">baltajmn@gmail.com</a> y atenderemos tu solicitud. Solo podremos
 localizar tus registros si nos facilitas el número de pedido de Google Play o de la App Store,
 precisamente porque no guardamos nada que te identifique.</p>
-<p>Bases jurídicas: la ejecución de un contrato (entregarte la compra que hiciste) y nuestro interés
-legítimo en evitar restauraciones fraudulentas. También tienes derecho a presentar una reclamación
+<p>Bases jurídicas: la ejecución de un contrato (entregarte la compra que hiciste, y el servicio de
+Amigos en el que te diste de alta) y nuestro interés legítimo en evitar restauraciones fraudulentas y
+en mantener Amigos seguro mediante los reportes. También tienes derecho a presentar una reclamación
 ante tu autoridad de control; en España, la
 <a href="https://www.aepd.es" rel="noopener">Agencia Española de Protección de Datos</a>.</p>
 
 <h2>Tus derechos según la CCPA / CPRA</h2>
 <p>Si resides en California: en los últimos doce meses hemos recogido las categorías
-"identificadores" (un identificador anónimo de instalación e identificadores de dispositivo) e
-"información comercial" (tu historial de compras), con el único fin de entregarte el producto que
-compraste.</p>
+"identificadores" (un identificador anónimo de instalación e identificadores de dispositivo y, con
+Amigos, tu identificador de cuenta y tu correo), "información comercial" (tu historial de compras) y,
+con Amigos, el contenido que decidiste compartir, con el único fin de entregarte el producto y el
+servicio que pediste.</p>
 <p><strong>No</strong> hemos vendido ni compartido información personal, y no la usamos para
 publicidad conductual entre contextos. No vendemos conscientemente información personal de menores de
 16 años. Tienes derecho a saber, a suprimir, a corregir y a no sufrir discriminación por ejercer esos
@@ -339,9 +426,8 @@ seguimiento que modificar ante una señal Do Not Track.</p>
 
 <h2>Cambios en esta política</h2>
 <p>Si esta política cambia, la nueva versión se publicará en esta misma dirección con una fecha nueva
-arriba, y los cambios importantes se describirán además en las notas de la versión de la tienda. Si una
-versión futura añade funciones opcionales para compartir con amigos, esta política se actualizará antes
-de publicar esa versión, y nada saldrá de tu móvil a menos que actives esas funciones.</p>
+arriba, y los cambios importantes se describirán además en las notas de la versión de la tienda. Los
+términos de uso de Amigos están en <a href="/terms.html#es">color.baltajmn.dev/terms.html</a>.</p>
 
 <footer>
   <p>Chroma - <a href="#en">English</a> - <a href="#es">Español</a></p>

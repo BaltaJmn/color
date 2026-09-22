@@ -5,7 +5,8 @@ la sostiene. Se pegan a mano. Si el código cambia algo de lo que aquí se afirm
 un dato que sale del teléfono), se cambian en el mismo commit este fichero, `web/index.html` y
 `iosApp/iosApp/PrivacyInfo.xcprivacy`.
 
-Esto es v1.0, sin cuentas. v1.1 (Amigos) lo cambia casi entero: #38.
+Las secciones 1 a 6 son v1.0, sin cuentas. Lo que cambia con Amigos (v1.1) está en 1b, 5b y 6b, y
+se rellena al publicar la primera versión con `SupabaseConfig` puesto.
 
 Hechos de partida, todos de `docs/tecnico.md`:
 
@@ -84,8 +85,12 @@ Resultado esperado: PEGI 3, ESRB Everyone, USK 0.
 | Acceso a la app | Toda la funcionalidad disponible sin restricciones ni inicio de sesión |
 | App de noticias, salud, finanzas, gobierno | No |
 
-En v1.1 la edad mínima de la cuenta es 16 (`SPEC.md`), así que al llegar Amigos el público pasa a 16 y
-más: se cambia aquí en #38, no antes.
+Con Amigos (v1.1), al publicar la primera versión con servidor:
+
+| Campo | Valor v1.1 |
+|---|---|
+| Grupos de edad | 16-17, 18 y más. La cuenta exige 16 declarados (`SPEC.md`), y Play mira la app entera |
+| Acceso a la app | Parte de la funcionalidad necesita iniciar sesión: una cuenta de Google de prueba, ya con nombre y un amigo aceptado, y los pasos para llegar a Amigos |
 
 Permisos del manifiesto fusionado: `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED`, y del SDK de
 RevenueCat `INTERNET`, `ACCESS_NETWORK_STATE` y `com.android.vending.BILLING`. Ninguno pide
@@ -114,6 +119,31 @@ la aplicación?" es **sí** aunque las claves de RevenueCat sean `null`.
 
 Fotografía y no Estilo de vida como Purl: lo que se hace cada día es una foto, y es donde se busca.
 
+## 1b. Play: seguridad de los datos con Amigos (v1.1)
+
+Todo lo de Amigos es **opcional** (solo con cuenta) y **no compartido**: Supabase y Resend son
+encargados del tratamiento, y lo que ven los amigos lo comparte el usuario a propósito, que Play no
+cuenta como compartir. Se añade a la tabla de 1:
+
+| Tipo | Recogido | Compartido | Efímero | Obligatorio | Finalidad |
+|---|---|---|---|---|---|
+| Información personal > Nombre | Sí | No | No | No | Funcionalidad de la app, gestión de la cuenta |
+| Información personal > Dirección de correo | Sí | No | No | No | Gestión de la cuenta |
+| Información personal > IDs de usuario | Sí | No | No | No | Funcionalidad de la app, gestión de la cuenta |
+| Fotos y vídeos > Fotos | Sí | No | No | No | Funcionalidad de la app |
+| Actividad en apps > Otro contenido generado por el usuario | Sí | No | No | No | Funcionalidad de la app |
+
+| Pregunta | Respuesta v1.1 |
+|---|---|
+| ¿Se cifran en tránsito? | Sí: RevenueCat y Supabase, los dos por HTTPS |
+| ¿Permite la app crear una cuenta? | Sí, con inicio de sesión de terceros (Apple y Google) |
+| URL para borrar la cuenta | `https://color.baltajmn.dev/delete` |
+| ¿Se pueden borrar los datos sin borrar la cuenta? | Sí: cualquier día se hace privado y su fila y su foto se borran |
+
+Hechos del código que lo sostienen: el esquema de `supabase/migrations`, la subida de `Outbox.kt`
+(foto a 720, recodificada), el borrado de fotos a los 7 días (`purge-photos`) y el de la cuenta
+(`delete-account`).
+
 ## 5. App Store: privacidad de la app
 
 *App Store Connect > Chroma > Privacidad de la app.*
@@ -125,8 +155,24 @@ Fotografía y no Estilo de vida como Purl: lo que se hace cada día es una foto,
 | Identificadores > ID de usuario | Recogido. Funcionalidad de la app. No vinculado. No rastreo |
 | El resto de tipos | No recogidos |
 
-Es exactamente lo que dice `PrivacyInfo.xcprivacy`. Si el informe de privacidad de Xcode sobre el
-primer archivo añade algo, se añade en los dos sitios.
+Si el informe de privacidad de Xcode sobre el primer archivo añade algo, se añade en los dos sitios.
+
+## 5b. App Store: privacidad con Amigos (v1.1)
+
+Se añade a 5, todo **vinculado** a la identidad (hay cuenta), para funcionalidad de la app y **sin**
+rastreo:
+
+| Tipo | Qué es |
+|---|---|
+| Información de contacto > Nombre | El nombre visible |
+| Información de contacto > Correo electrónico | El de Apple o Google, solo para encontrar la cuenta al borrarla |
+| Contenido del usuario > Fotos o vídeos | Las fotos compartidas, 7 días |
+| Contenido del usuario > Otro contenido del usuario | Colores, nombres de color, palabras, amistades y reportes |
+| Identificadores > ID de usuario | Pasa a **vinculado**: el de la cuenta de Amigos |
+
+`PrivacyInfo.xcprivacy` ya declara esto. Si se publica una versión sin servidor (`SupabaseConfig`
+vacío), el formulario correcto es el de 5 y el manifiesto declara de más, cosa que Apple no rechaza; lo
+que no puede pasar nunca es lo contrario.
 
 ## 6. App Store: el resto de la ficha
 
@@ -165,7 +211,8 @@ Lo que cambia al publicar la v1.1 (los datos que salen, en #38):
 |---|---|
 | Play, IARC | "¿Los usuarios pueden interactuar?": **sí**, con moderación (reportar y bloquear) |
 | Play, política de contenido generado por usuarios | Términos con tolerancia cero, reportar dentro de la app, bloquear, y actuación en 24 horas |
-| App Store, edad | Contenido generado por usuarios: **sí**. El resultado sube, previsiblemente a 12+ |
+| App Store, edad | Contenido generado por usuarios: **sí**, y mensajería o chat: no. El resultado sube, previsiblemente a 12+ |
+| Play, público objetivo y acceso | 16 y más, y cuenta de prueba (tabla de 3) |
 | App Store, notas al revisor | Una cuenta de prueba con un amigo ya aceptado y días compartidos, y dónde están reportar (mantener pulsada una tarjeta), bloquear y los términos |
 | Play, seguridad de los datos | "¿Los usuarios pueden pedir que se borren sus datos?": **sí**. URL de borrado de la cuenta: `https://color.baltajmn.dev/delete` (`web/delete.html`) |
 | App Store | Borrar la cuenta desde la app (5.1.1(v)): Ajustes > Amigos > Borrar cuenta |
