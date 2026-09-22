@@ -1,8 +1,10 @@
 package com.baltajmn.color.data
 
+import com.baltajmn.color.social.Friends
 import com.baltajmn.color.social.LOGIN_HOST
 import com.baltajmn.color.social.LOGIN_SCHEME
 import com.baltajmn.color.social.Social
+import com.baltajmn.color.social.inviteCodeOf
 import io.github.jan.supabase.auth.handleDeeplinks
 import platform.Foundation.NSURL
 
@@ -12,12 +14,16 @@ object ChromaBridge {
     var reloadWidgets: (() -> Unit)? = null
 
     /**
-     * com.baltajmn.color://today from a widget, or ://login back from the web sign in. Anything else
-     * is left alone rather than guessed.
+     * com.baltajmn.color://today from a widget, ://login back from the web sign in, or an invite as
+     * a universal link. Anything else is left alone rather than guessed.
      */
     fun open(url: String) {
         if (url.startsWith("$LOGIN_SCHEME://$LOGIN_HOST")) {
             if (Social.available) NSURL.URLWithString(url)?.let { Social.client.handleDeeplinks(it) }
+            return
+        }
+        inviteCodeOf(url)?.let {
+            if (Social.available) Friends.opened(it)
             return
         }
         Route.pending = url.substringAfterLast('/').takeIf { it.isNotEmpty() }

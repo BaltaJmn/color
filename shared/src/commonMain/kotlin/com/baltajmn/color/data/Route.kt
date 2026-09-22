@@ -9,6 +9,6 @@ import androidx.compose.runtime.setValue
  * because the app may not be running yet, and App picks it up whenever it does.
  */
 object Route {
-    /** "today", "year" or "pro". Anything else is ignored rather than guessed at. */
+    /** "today", "year", "pro" or "friends". Anything else is ignored rather than guessed at. */
     var pending by mutableStateOf<String?>(null)
 }

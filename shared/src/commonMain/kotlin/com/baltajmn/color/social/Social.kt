@@ -93,13 +93,13 @@ object Social {
     /** Leaves the account where it is: signing in again brings the friends back. */
     suspend fun signOut() {
         runCatching { client.auth.signOut() }
-        me = null
-        needsName = false
+        forget()
     }
 
     internal fun forget() {
         me = null
         needsName = false
+        Friends.forget()
     }
 }
 

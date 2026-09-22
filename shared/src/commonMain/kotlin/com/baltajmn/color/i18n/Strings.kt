@@ -448,11 +448,11 @@ object S {
         "Que voient tes amis ?",
     )
     val askDefaultShareText get() = t(
-        "Choose what new days share. You can change it for each day, and here in Settings.",
-        "Elige qué comparten los días nuevos. Puedes cambiarlo en cada día, y aquí en Ajustes.",
-        "Escolha o que os dias novos compartilham. Dá para mudar em cada dia, e aqui em Ajustes.",
-        "Wähle, was neue Tage teilen. Du kannst es für jeden Tag ändern, und hier in den Einstellungen.",
-        "Choisis ce que partagent les nouveaux jours. Tu peux le changer pour chaque jour, et ici dans Réglages.",
+        "Choose what new days share. You can change it for each day, and in Settings.",
+        "Elige qué comparten los días nuevos. Puedes cambiarlo en cada día, y en Ajustes.",
+        "Escolha o que os dias novos compartilham. Dá para mudar em cada dia, e em Ajustes.",
+        "Wähle, was neue Tage teilen. Du kannst es für jeden Tag ändern, und in den Einstellungen.",
+        "Choisis ce que partagent les nouveaux jours. Tu peux le changer pour chaque jour, et dans Réglages.",
     )
     val sectionFriends get() = t("Friends", "Amigos", "Amigos", "Freunde", "Amis")
     val nameRow get() = t("Your name", "Tu nombre", "Seu nome", "Dein Name", "Ton nom")
@@ -464,6 +464,51 @@ object S {
         "Deine Freunde bleiben im Konto. Meldest du dich wieder an, sind sie wieder da.",
         "Tes amis restent sur le compte. En te reconnectant, ils reviennent.",
     )
+    val inviteFriend get() = t("Invite a friend", "Invitar a un amigo", "Convidar um amigo", "Freund einladen", "Inviter un ami")
+    val inviteRow get() = t("Your invite link", "Tu enlace de invitación", "Seu link de convite", "Dein Einladungslink", "Ton lien d'invitation")
+    val inviteText get() = t(
+        "Whoever opens it sends you a request. Nothing changes until you accept it.",
+        "Quien lo abra te envía una solicitud. Nada cambia hasta que la aceptas.",
+        "Quem abrir te envia um pedido. Nada muda até você aceitar.",
+        "Wer ihn öffnet, schickt dir eine Anfrage. Nichts ändert sich, bis du sie annimmst.",
+        "Qui l'ouvre t'envoie une demande. Rien ne change tant que tu ne l'acceptes pas.",
+    )
+    val shareLink get() = t("Share link", "Compartir enlace", "Compartilhar link", "Link teilen", "Partager le lien")
+    val regenerateLink get() = t("New link", "Enlace nuevo", "Novo link", "Neuer Link", "Nouveau lien")
+    val regenerateText get() = t(
+        "The current link and its QR stop working. The friends you have stay.",
+        "El enlace actual y su QR dejan de valer. Los amigos que ya tienes se quedan.",
+        "O link atual e o QR param de funcionar. Os amigos que você já tem continuam.",
+        "Der aktuelle Link und sein QR-Code gelten dann nicht mehr. Deine Freunde bleiben.",
+        "Le lien actuel et son QR ne marcheront plus. Tes amis restent.",
+    )
+    val inviteSent get() = t(
+        "Request sent. Once it is accepted, you will see each other's colors.",
+        "Solicitud enviada. Cuando la acepte, veréis vuestros colores.",
+        "Pedido enviado. Quando for aceito, vocês vão ver as cores um do outro.",
+        "Anfrage gesendet. Sobald sie angenommen ist, seht ihr eure Farben.",
+        "Demande envoyée. Une fois acceptée, vous verrez vos couleurs.",
+    )
+    val inviteAccepted get() = t("You are friends now.", "Ya sois amigos.", "Agora vocês são amigos.", "Ihr seid jetzt Freunde.", "Vous êtes amis maintenant.")
+    val inviteAlready get() = t("You were already friends.", "Ya erais amigos.", "Vocês já eram amigos.", "Ihr seid schon Freunde.", "Vous étiez déjà amis.")
+    val inviteSelf get() = t("This is your own link.", "Este es tu propio enlace.", "Este é o seu próprio link.", "Das ist dein eigener Link.", "C'est ton propre lien.")
+    val inviteInvalid get() = t(
+        "This link no longer works. Ask for a new one.",
+        "Este enlace ya no vale. Pide uno nuevo.",
+        "Este link não funciona mais. Peça um novo.",
+        "Dieser Link gilt nicht mehr. Frag nach einem neuen.",
+        "Ce lien ne marche plus. Demande-en un nouveau.",
+    )
+    val friendLimit get() = t(
+        "Chroma keeps circles small: 50 friends at most, and one of you is there.",
+        "Chroma mantiene los círculos pequeños: 50 amigos como mucho, y uno de los dos ya ha llegado.",
+        "O Chroma mantém os círculos pequenos: no máximo 50 amigos, e um de vocês já chegou lá.",
+        "Chroma hält Kreise klein: höchstens 50 Freunde, und einer von euch hat sie erreicht.",
+        "Chroma garde les cercles petits : 50 amis au plus, et l'un de vous y est déjà.",
+    )
+    val requestsTitle get() = t("Requests", "Solicitudes", "Pedidos", "Anfragen", "Demandes")
+    val accept get() = t("Accept", "Aceptar", "Aceitar", "Annehmen", "Accepter")
+    val ignore get() = t("Ignore", "Ignorar", "Ignorar", "Ignorieren", "Ignorer")
 
     // 12. Accessibility
 
@@ -529,6 +574,14 @@ object S {
         val date = abbrDateWithYear(d)
         return t("Last backup: $date", "Última copia: $date", "Última cópia: $date", "Letzte Sicherung: $date", "Dernière copie : $date")
     }
+
+    fun inviteMessage(link: String) = t(
+        "Add me on Chroma: $link",
+        "Agrégame en Chroma: $link",
+        "Me adicione no Chroma: $link",
+        "Füg mich in Chroma hinzu: $link",
+        "Ajoute-moi sur Chroma : $link",
+    )
 
     fun version(v: String) = t("Version $v", "Versión $v", "Versão $v", "Version $v", "Version $v")
 

@@ -9,6 +9,9 @@ expect object Sharing {
     /** Opens the system share sheet with the image attached. */
     fun sharePng(png: ByteArray)
 
+    /** The share sheet with plain text: the invite link. */
+    fun shareText(text: String)
+
     /** False where the system would need a storage permission for it (Android 9 and older). */
     val canSaveToPhotos: Boolean
 

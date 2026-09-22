@@ -39,6 +39,13 @@ actual object Sharing {
         host.presentViewController(sheet, animated = true, completion = null)
     }
 
+    actual fun shareText(text: String) {
+        val host = topViewController() ?: return
+        val sheet = UIActivityViewController(activityItems = listOf(text), applicationActivities = null)
+        sheet.popoverPresentationController?.sourceView = host.view
+        host.presentViewController(sheet, animated = true, completion = null)
+    }
+
     actual val canSaveToPhotos: Boolean get() = true
 
     actual fun savePngToPhotos(png: ByteArray, onResult: (Boolean) -> Unit) {

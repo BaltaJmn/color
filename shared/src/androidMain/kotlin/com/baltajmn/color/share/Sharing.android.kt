@@ -35,6 +35,14 @@ actual object Sharing {
         context.startActivity(Intent.createChooser(send, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 
+    actual fun shareText(text: String) {
+        val send = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        AndroidContext.value.startActivity(Intent.createChooser(send, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+
     /** Scoped storage asks for nothing; below Q it would need a permission, so the row is hidden. */
     actual val canSaveToPhotos: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 

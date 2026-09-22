@@ -176,8 +176,8 @@ es la primera vez: nombre visible, casilla `age16` y `continue`.
 
 - Arriba, **la paleta del círculo**: una tira de 24 de alto, radio 12, con un segmento por amigo con
   color hoy, en orden de hora. Sin nombres.
-- Solicitudes pendientes, si las hay: una fila discreta `requestsRow(n)` que abre la lista con
-  `accept` y `decline` por persona.
+- Solicitudes recibidas, si las hay: bajo la etiqueta `requestsTitle`, una fila por persona con su
+  nombre, `ignore` y `accept`. Sin número. Ignorar no avisa a nadie.
 - Las tarjetas (`compact`) de hoy y de ayer, separadas por los títulos `feedToday` y
   `feedYesterday`, en orden de hora.
 - Al final, `caughtUp`. Nada debajo.
@@ -198,8 +198,16 @@ ve con cuenta. La primera vez que se acepta un amigo, un diálogo pregunta el va
 
 ### 8.6 Invitar
 
-Hoja con el QR (240 de lado, módulos en `onBackground` sobre `surface`), el enlace y dos botones:
-`shareLink` y `regenerateLink` (con confirmación: el enlace viejo deja de valer).
+Pantalla completa (como la de compartir) con `inviteFriend`, `inviteText`, el QR, el enlace y dos
+botones: `shareLink` y `regenerateLink` (con confirmación `regenerateText`: el enlace viejo deja de
+valer). Se abre desde Amigos y desde `inviteRow` en Ajustes.
+
+El QR mide 240 de lado, radio 20, con cuatro módulos de margen, y es **siempre tinta sobre blanco**
+(`onBackground` y `surface` del tema claro) aunque la app esté en oscuro: no todas las cámaras leen un
+QR invertido. Cada módulo ocupa píxeles enteros para que no queden líneas entre módulos.
+
+Abrir un enlace de otra persona lleva a Amigos y deja un aviso tranquilo con el resultado:
+`inviteSent`, `inviteAccepted`, `inviteAlready`, `inviteSelf`, `inviteInvalid` o `friendLimit`.
 
 ---
 

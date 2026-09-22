@@ -82,6 +82,8 @@ Nada más. No hay librería de imágenes: las fotos se decodifican con el sistem
 | `social/Outbox.kt` | Cola de subida | Nuevo (v1.1) |
 | `social/Friends.kt` | Amigos, solicitudes, feed, mosaicos | Nuevo (v1.1) |
 | `social/Qr.kt` | Codificador QR | Nuevo (v1.1) |
+| `social/Friends.kt` | Amigos, solicitudes, enlaces de invitación | Nuevo (v1.1) |
+| `ui/InviteScreen.kt` | El enlace, su QR, compartir y regenerar | Nuevo (v1.1) |
 | `ui/Card.kt` | La tarjeta | Nuevo |
 | `ui/TodayScreen.kt`, `ui/YearScreen.kt`, `ui/SettingsScreen.kt`, `ui/FriendsScreen.kt` | Pantallas | Purl y nuevo |
 | `ui/DaySheet.kt`, `ui/ShareScreen.kt`, `ui/Pro.kt`, `ui/LockScreen.kt`, `ui/Icons.kt` | Capas y dibujos | Purl |
@@ -466,6 +468,18 @@ Enlace `https://color.baltajmn.dev/i/<code>`. Android: `intent-filter` con `auto
 `web/.well-known/assetlinks.json`. iOS: `applinks:color.baltajmn.dev` y
 `web/.well-known/apple-app-site-association`. La web (`web/404.html`, que GitHub Pages sirve para
 cualquier ruta) lee el código y enseña los botones de las tiendas.
+
+- El código son 10 caracteres hexadecimales; `inviteCodeOf` solo acepta ese host y esa forma.
+- Un enlace abierto sin sesión, o antes de elegir nombre, se guarda en memoria (`Friends.pendingCode`)
+  y se manda al llegar a Amigos con cuenta. No se guarda en disco: tras instalar, el enlace se vuelve a
+  abrir (SPEC 5).
+- `request_friend` contesta `blocked` igual que `not_found` en la app ("este enlace ya no vale"):
+  nadie averigua por un enlace que le han bloqueado.
+- Solo se listan las solicitudes recibidas. La enviada e ignorada se queda pendiente sin avisar.
+- Aceptar con alguno de los dos en 50 falla en el disparador (`friend_limit`) y la app lo dice con
+  `friendLimit`, sin sugerir a quién quitar.
+- Los marcadores de `assetlinks.json`, `apple-app-site-association` y `404.html` se rellenan como
+  dice `store/servidor.md` 5.
 
 ---
 

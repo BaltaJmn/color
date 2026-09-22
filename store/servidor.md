@@ -62,7 +62,30 @@ Edge Functions*, función `report-notify`, cabecera `x-webhook-secret` con el mi
 - *URL Configuration*: `Site URL` `https://color.baltajmn.dev` y, en *Redirect URLs*,
   `com.baltajmn.color://login`.
 
-## 5. Comprobarlo
+## 5. Los enlaces de invitación
+
+`https://color.baltajmn.dev/i/<code>` abre la app si está instalada; si no, GitHub Pages sirve
+`web/404.html`, que lleva a las tiendas. Para que el sistema confíe en el dominio hay que rellenar tres
+huecos de `web/`, que están con marcadores hasta que existan las cuentas:
+
+- `web/.well-known/assetlinks.json`: `PLAY_APP_SIGNING_SHA256` por el SHA-256 de la clave de firma
+  de apps de Play (*Play Console > Prueba y publicación > Integridad de la app*). Si se quiere probar
+  una build firmada con la clave de subida, se añade también la suya a la lista.
+- `web/.well-known/apple-app-site-association`: `TEAM_ID` por el Team ID de `Config.xcconfig`. El
+  App ID necesita la capacidad *Associated Domains* (el entitlement ya está en `iosApp.entitlements`).
+- `web/404.html`: `APP_STORE_ID` por el identificador numérico de la app en App Store Connect. Vacío,
+  la página solo enseña Google Play.
+
+Comprobación: `adb shell pm verify-app-links --re-verify com.baltajmn.color` y después
+`adb shell pm get-app-links com.baltajmn.color` dice `verified`. En iOS, el enlace pegado en Notas y
+pulsado abre la app.
+
+Riesgo conocido: GitHub Pages sirve `apple-app-site-association` sin extensión como
+`application/octet-stream`. La CDN de Apple lo acepta hoy, pero si algún día deja de hacerlo, el
+arreglo es servir ese fichero desde otro sitio o poner delante una regla de Cloudflare que fije
+`application/json`.
+
+## 6. Comprobarlo
 
 ```bash
 supabase test db        # supabase/tests: test 17 de docs/tecnico.md 10

@@ -24,6 +24,8 @@ Qué hay en cada sitio. Se actualiza en el mismo commit que añade o mueve algo.
 | Ruta | Qué es |
 |---|---|
 | `web/index.html` | Política de privacidad, en color.baltajmn.dev por GitHub Pages |
+| `web/404.html` | Cualquier ruta desconocida; para `/i/<code>`, la invitación sin la app, con las tiendas |
+| `web/.well-known/` | `assetlinks.json` y `apple-app-site-association`: los enlaces abren la app |
 | `store/formularios.md` | Respuestas de los formularios de las dos consolas y cómo se publica la web |
 | `store/listings/<idioma>/` | Ficha de Play: título, corta y larga, un párrafo por línea |
 | `store/app-store/<idioma>/` | Ficha de App Store: nombre, subtítulo, palabras clave, promo y descripción |

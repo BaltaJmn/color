@@ -36,7 +36,10 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.color.colorOf
+import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.i18n.S
+import com.baltajmn.color.social.Friends
+import com.baltajmn.color.social.InviteResult
 import com.baltajmn.color.social.Outbox
 import com.baltajmn.color.social.Social
 import com.baltajmn.color.social.isValidName
@@ -189,7 +192,78 @@ fun NameField(value: String, onChange: (String) -> Unit) {
 
 @Composable
 private fun FriendsHome(today: LocalDate) {
-    Column(Modifier.fillMaxWidth().padding(vertical = 24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Text(S.friendsEmpty, style = Styles.muted, textAlign = TextAlign.Center)
+    val scope = rememberCoroutineScope()
+    var message by remember { mutableStateOf<String?>(null) }
+    var failed by remember { mutableStateOf(false) }
+    var attempt by remember { mutableStateOf(0) }
+    var askShare by remember { mutableStateOf(false) }
+    val code = Friends.pendingCode
+
+    LaunchedEffect(code, attempt) {
+        failed = runCatching {
+            Friends.refresh()
+            // A link opened before there was an account goes out now, once.
+            code?.let {
+                message = inviteResultText(Friends.request(it))
+                Friends.pendingCode = null
+            }
+        }.isFailure
     }
+    // The default is asked when the first friend arrives, on whichever side of the request.
+    LaunchedEffect(Friends.friends.isNotEmpty()) {
+        if (Friends.friends.isNotEmpty() && !ChromaRepository.settings.shareAsked) askShare = true
+    }
+    fun act(block: suspend () -> Unit) {
+        scope.launch { if (runCatching { block() }.isFailure) failed = true }
+    }
+
+    if (failed) Notice(S.friendsOffline, S.retry to { attempt++ })
+    message?.let { Notice(it, S.ok to { message = null }) }
+
+    if (Friends.requests.isNotEmpty()) {
+        Spacer(Modifier.height(8.dp))
+        Text(S.requestsTitle, style = Styles.label)
+        Friends.requests.forEach { person ->
+            Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text(person.displayName, style = Styles.body, modifier = Modifier.weight(1f))
+                TextAction(S.ignore, { act { Friends.decline(person.id) } })
+                OutlinedAction(S.accept, { act { if (!Friends.accept(person.id)) message = S.friendLimit } })
+            }
+        }
+    }
+
+    Column(
+        Modifier.fillMaxWidth().padding(vertical = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        if (Friends.friends.isEmpty()) {
+            Text(S.friendsEmpty, style = Styles.muted, textAlign = TextAlign.Center)
+            PrimaryAction(S.inviteFriend, { Friends.inviteOpen = true })
+        } else {
+            TextAction(S.inviteFriend, { Friends.inviteOpen = true })
+        }
+    }
+
+    if (askShare) {
+        ShareChoiceDialog(
+            S.askDefaultShareTitle,
+            S.askDefaultShareText,
+            ChromaRepository.settings.defaultShare,
+            onPick = { share -> ChromaRepository.updateSettings { it.copy(defaultShare = share, shareAsked = true) } },
+            onDismiss = {
+                ChromaRepository.updateSettings { it.copy(shareAsked = true) }
+                askShare = false
+            },
+        )
+    }
+}
+
+private fun inviteResultText(result: InviteResult): String = when (result) {
+    InviteResult.Sent -> S.inviteSent
+    InviteResult.Accepted -> S.inviteAccepted
+    InviteResult.Already -> S.inviteAlready
+    InviteResult.Self -> S.inviteSelf
+    InviteResult.Invalid -> S.inviteInvalid
+    InviteResult.Limit -> S.friendLimit
 }

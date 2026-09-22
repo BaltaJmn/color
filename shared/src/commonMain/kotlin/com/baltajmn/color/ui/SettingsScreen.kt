@@ -51,6 +51,7 @@ import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.SIBLINGS
 import com.baltajmn.color.data.storeUrl
 import com.baltajmn.color.i18n.S
+import com.baltajmn.color.social.Friends
 import com.baltajmn.color.social.Social
 import com.baltajmn.color.social.isValidName
 import com.baltajmn.color.ui.theme.GUTTER
@@ -105,6 +106,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 Section(S.sectionFriends) {
                     SettingRow(S.nameRow, me.displayName, onClick = { renaming = true })
                     SettingRow(S.defaultShareRow, shareLabel(settings.defaultShare), onClick = { choosingShare = true })
+                    SettingRow(S.inviteRow, onClick = { Friends.inviteOpen = true })
                     SettingRow(S.signOut, onClick = { leaving = true })
                 }
             }

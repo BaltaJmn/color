@@ -31,6 +31,14 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="com.baltajmn.color" android:host="login" />
             </intent-filter>
+            <!-- Las invitaciones. autoVerify contra web/.well-known/assetlinks.json: sin verificar, Android
+                 abre el navegador y la pagina lleva a la tienda. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="color.baltajmn.dev" android:pathPrefix="/i/" />
+            </intent-filter>
         </activity>
 
         <receiver android:name="com.baltajmn.color.data.ReminderReceiver" android:exported="false" />

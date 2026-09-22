@@ -24,6 +24,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      # La v3 mete las carpetas ocultas en el artefacto, y web/.well-known tiene que ir. Antes de subir
+      # de versión, comprobar que siguen entrando: sin ellas los enlaces dejan de abrir la app.
       - uses: actions/upload-pages-artifact@v3
         with:
           path: web

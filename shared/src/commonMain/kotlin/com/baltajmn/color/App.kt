@@ -27,6 +27,7 @@ import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.Route
 import com.baltajmn.color.data.today
+import com.baltajmn.color.social.Friends
 import com.baltajmn.color.social.Outbox
 import com.baltajmn.color.social.Social
 import kotlinx.datetime.LocalDate
@@ -35,6 +36,7 @@ import com.baltajmn.color.ui.Glyph
 import com.baltajmn.color.ui.GlyphIcon
 import com.baltajmn.color.ui.DaySheet
 import com.baltajmn.color.ui.FriendsScreen
+import com.baltajmn.color.ui.InviteScreen
 import com.baltajmn.color.ui.Paywall
 import com.baltajmn.color.ui.PhotoViewer
 import com.baltajmn.color.ui.PosterScreen
@@ -94,6 +96,7 @@ fun App() {
             openDay = null
             sharing = null
             poster = null
+            Friends.inviteOpen = false
             Route.pending = null
         }
     }
@@ -123,15 +126,20 @@ fun App() {
             openDay?.let { DaySheet(it, onClose = { openDay = null }, onPhoto = { photo = it }, onShare = { sharing = it }) }
             sharing?.let { ShareScreen(it, onClose = { sharing = null }) }
             poster?.let { PosterScreen(it, onClose = { poster = null }) }
+            if (Friends.inviteOpen) InviteScreen { Friends.inviteOpen = false }
             photo?.let { PhotoViewer(it) { photo = null } }
             if (Paywall.open) ProDialog { Paywall.open = false }
 
-            BackHandler(Paywall.open || photo != null || sharing != null || poster != null || openDay != null || screen != Screen.Today) {
+            BackHandler(
+                Paywall.open || photo != null || sharing != null || poster != null || Friends.inviteOpen ||
+                    openDay != null || screen != Screen.Today,
+            ) {
                 when {
                     Paywall.open -> Paywall.open = false
                     photo != null -> photo = null
                     sharing != null -> sharing = null
                     poster != null -> poster = null
+                    Friends.inviteOpen -> Friends.inviteOpen = false
                     openDay != null -> openDay = null
                     else -> screen = Screen.Today
                 }
