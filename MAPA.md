@@ -19,6 +19,13 @@ Qué hay en cada sitio. Se actualiza en el mismo commit que añade o mueve algo.
 | `docs/pantallas.md` | Interfaz |
 | `docs/textos.md` | Tono y vocabulario |
 
+## Tienda y web
+
+| Ruta | Qué es |
+|---|---|
+| `web/index.html` | Política de privacidad, en color.baltajmn.dev por GitHub Pages |
+| `store/formularios.md` | Respuestas de los formularios de las dos consolas y cómo se publica la web |
+
 ## Código
 
 | Ruta | Qué es |
@@ -31,4 +38,6 @@ Qué hay en cada sitio. Se actualiza en el mismo commit que añade o mueve algo.
 | `iosApp/ChromaWidget` | Widgets de WidgetKit. Leen `widget.json` y nada más |
 | `iosApp/Configuration/Config.xcconfig` | Versión, identificador y Team ID de iOS |
 | `.github/workflows/tests.yml` | Tests comunes en cada push, en JVM y en Kotlin/Native |
+| `.github/workflows/pages.yml` | Publica `web/` en GitHub Pages cuando cambia |
+| `tools/icon.py` | Genera todos los iconos desde una geometría |
 | `gradle/libs.versions.toml` | Versiones, las de Purl sin tocar |
