@@ -1,5 +1,6 @@
 package com.baltajmn.color.ui
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -40,15 +42,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.color.colorOf
+import com.baltajmn.color.color.inkColorFor
 import com.baltajmn.color.data.AppInfo
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.TERMS_URL
@@ -59,6 +66,7 @@ import com.baltajmn.color.social.Friends
 import com.baltajmn.color.social.InviteResult
 import com.baltajmn.color.social.Outbox
 import com.baltajmn.color.social.Social
+import com.baltajmn.color.social.inTune
 import com.baltajmn.color.social.isValidName
 import com.baltajmn.color.ui.theme.GUTTER
 import com.baltajmn.color.ui.theme.MAX_CONTENT_WIDTH
@@ -394,7 +402,11 @@ private fun FeedCard(row: FeedRow, author: String, onPhoto: (ImageBitmap) -> Uni
         photo = photo,
         onPhoto = onPhoto,
         onAuthor = { Friends.viewing = person },
-    )
+    ) {
+        // Only on the same day, and only for the two of them: everyone else's color is different.
+        val mine = ChromaRepository.journal[row.day]?.color
+        if (mine != null && inTune(mine, row.color)) InTuneMark(inkColorFor(row.color))
+    }
 }
 
 private fun inviteResultText(result: InviteResult): String = when (result) {
@@ -405,3 +417,16 @@ private fun inviteResultText(result: InviteResult): String = when (result) {
     InviteResult.Invalid -> S.inviteInvalid
     InviteResult.Limit -> S.friendLimit
 }
+
+/** Two overlapping rings, 10 across: nothing to press, nothing to count (docs/pantallas.md 6). */
+@Composable
+private fun InTuneMark(ink: Color) {
+    val label = S.inTune
+    Canvas(Modifier.size(width = 16.dp, height = 10.dp).semantics { contentDescription = label }) {
+        val r = size.height / 2
+        val stroke = Stroke(1.5.dp.toPx())
+        drawCircle(ink, r - stroke.width / 2, Offset(r, r), style = stroke)
+        drawCircle(ink, r - stroke.width / 2, Offset(size.width - r, r), style = stroke)
+    }
+}
+

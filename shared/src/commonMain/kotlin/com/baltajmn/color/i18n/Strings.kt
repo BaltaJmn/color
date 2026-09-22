@@ -543,6 +543,7 @@ object S {
         "Dein Name, deine Freunde und alle geteilten Farben und Fotos werden vom Server gelöscht. Dein Tagebuch auf diesem Telefon bleibt, wie es ist.",
         "Ton nom, tes amis et toutes les couleurs et photos partagées sont effacés du serveur. Ton journal sur ce téléphone reste tel quel.",
     )
+    val inTune get() = t("In tune", "En sintonía", "Em sintonia", "Im Einklang", "En accord")
     val requestsTitle get() = t("Requests", "Solicitudes", "Pedidos", "Anfragen", "Demandes")
     val accept get() = t("Accept", "Aceptar", "Aceitar", "Annehmen", "Accepter")
     val ignore get() = t("Ignore", "Ignorar", "Ignorar", "Ignorieren", "Ignorer")

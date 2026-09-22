@@ -4,6 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
+import com.baltajmn.color.color.deltaE
+import com.baltajmn.color.color.labOf
 import com.baltajmn.color.data.Route
 import com.baltajmn.color.data.Storage
 import com.baltajmn.color.data.decodeImage
@@ -27,6 +29,12 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 const val INVITE_BASE = "https://color.baltajmn.dev/i/"
+
+/** A knob (docs/tecnico.md 6.11): low enough that being in tune feels like chance, not a daily thing. */
+const val SYNC_DELTA_E = 5.0
+
+/** Two people picked almost the same color on the same day. Worked out on the phone, never stored. */
+fun inTune(mine: String, theirs: String): Boolean = deltaE(labOf(mine), labOf(theirs)) < SYNC_DELTA_E
 
 fun inviteLink(code: String): String = INVITE_BASE + code
 

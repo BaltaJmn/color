@@ -137,7 +137,7 @@ Componente `ChromaCard(entry, date, author?, compact)`. Proporción 4:5, radio 2
 | Autor (feed) | Abajo izquierda, sobre la fecha | `body` Medium, tinta |
 | Fecha | Abajo izquierda, margen 24 | `label` en peso normal, tinta |
 | Miniatura | Abajo derecha, margen 20, lado 30 % del ancho | Radio 14, borde de 2 en tinta al 24 % |
-| Marca de sintonía (v1.1) | Arriba derecha | Dos círculos solapados de 10, tinta |
+| Marca de sintonía (v1.1) | Arriba derecha | Dos aros solapados de 10 (16 de ancho, trazo 1,5), tinta; se lee `inTune` |
 | Marca de la semana (v1.2) | Arriba derecha, a la izquierda de la sintonía | Un rombo de 10, tinta |
 
 Sin foto (día compartido solo con color, o foto caducada en el servidor), no hay miniatura.

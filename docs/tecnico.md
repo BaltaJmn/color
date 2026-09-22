@@ -298,8 +298,12 @@ conocidos (test 15).
 
 ### 6.11 Sintonía
 
-Para cada amigo con entrada hoy: `deltaE(miColor, suColor) < SYNC_DELTA_E`. Se calcula al pintar el
-feed. No se guarda.
+Para cada tarjeta del feed: `deltaE(miColor, suColor) < SYNC_DELTA_E`, con mi entrada del mismo día
+que la suya (`inTune` en `Friends.kt`). Se calcula al pintar el feed. No se guarda.
+
+Solo en el feed (hoy y ayer), nunca en el año de un amigo: ahí se convertiría en un historial de
+sintonías, que es justo lo que no puede existir. Mi día no necesita estar compartido para verla; el
+otro solo la ve si se lo compartí.
 
 ### 6.12 Color de la semana (v1.2)
 
