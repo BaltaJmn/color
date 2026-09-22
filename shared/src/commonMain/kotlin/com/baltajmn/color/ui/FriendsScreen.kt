@@ -2,6 +2,7 @@ package com.baltajmn.color.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,12 +42,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.onLongClick
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.color.colorOf
+import com.baltajmn.color.data.AppInfo
 import com.baltajmn.color.data.ChromaRepository
+import com.baltajmn.color.data.TERMS_URL
 import com.baltajmn.color.i18n.S
+import com.baltajmn.color.social.Acting
 import com.baltajmn.color.social.FeedRow
 import com.baltajmn.color.social.Friends
 import com.baltajmn.color.social.InviteResult
@@ -181,7 +188,11 @@ private fun NameAndAge() {
         )
         Text(S.age16, style = Styles.body)
     }
-    Spacer(Modifier.height(20.dp))
+    Spacer(Modifier.height(12.dp))
+    // Apple 1.2: the terms are accepted before anything shared by others is seen.
+    Text(S.termsAgree, style = Styles.caption)
+    TextAction(S.termsRow, { AppInfo.open(TERMS_URL) }, Modifier.padding(top = 4.dp))
+    Spacer(Modifier.height(12.dp))
     if (failed) Notice(S.friendsOffline, S.ok to { failed = false })
     PrimaryAction(
         if (busy) S.working else S.continueAction,
@@ -250,7 +261,8 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
     }
 
     val names = Friends.friends.associate { it.id to it.displayName }
-    val shown = Friends.feed.filter { it.author in names }
+    val hidden = ChromaRepository.settings.hiddenCards
+    val shown = Friends.feed.filter { it.author in names && it.key !in hidden }
     val todays = shown.filter { it.date == today }
     val yesterdays = shown.filter { it.date != today }
 
@@ -361,14 +373,27 @@ private fun LazyListScope.feedSection(
 @Composable
 private fun FeedCard(row: FeedRow, author: String, onPhoto: (ImageBitmap) -> Unit) {
     val photo by produceState<ImageBitmap?>(null, row.cacheName) { value = Friends.photo(row) }
+    val person = Friends.friends.find { it.id == row.author }
+    fun menu() {
+        person?.let { Friends.acting = Acting(it, row) }
+    }
     ChromaCard(
         row.entry(),
         row.date,
+        // Report, block and remove behind a long press: there, but never a button on the card.
+        modifier = Modifier
+            .pointerInput(row.key) { detectTapGestures(onLongPress = { menu() }) }
+            .semantics {
+                onLongClick(S.a11yMore) {
+                    menu()
+                    true
+                }
+            },
         author = author,
         compact = true,
         photo = photo,
         onPhoto = onPhoto,
-        onAuthor = { Friends.viewing = Friends.friends.find { it.id == row.author } },
+        onAuthor = { Friends.viewing = person },
     )
 }
 

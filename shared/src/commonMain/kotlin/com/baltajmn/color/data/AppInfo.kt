@@ -7,6 +7,7 @@ import com.baltajmn.color.i18n.S
  * URL, so it lives here and not in three places. Source of the page: web/index.html.
  */
 const val PRIVACY_URL = "https://color.baltajmn.dev/"
+const val TERMS_URL = "https://color.baltajmn.dev/terms.html"
 
 /** The few things about the build itself that the About section needs. */
 expect object AppInfo {

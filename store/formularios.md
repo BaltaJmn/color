@@ -156,6 +156,22 @@ Take a photo (or pick one taken today from the gallery) and choose one of the co
 Chroma Pro is a one-time non-consumable purchase (pro_lifetime). It opens when exporting the year poster (My year > Poster), from the locked year widget, and from Settings > Chroma Pro. Restore Purchase is in Settings and in the purchase dialog.
 ```
 
+## 6b. v1.1: contenido de usuarios
+
+Amigos convierte a Chroma en una app con contenido de usuarios, aunque solo lo vean amigos aceptados.
+Lo que cambia al publicar la v1.1 (los datos que salen, en #38):
+
+| Dónde | Cambio |
+|---|---|
+| Play, IARC | "¿Los usuarios pueden interactuar?": **sí**, con moderación (reportar y bloquear) |
+| Play, política de contenido generado por usuarios | Términos con tolerancia cero, reportar dentro de la app, bloquear, y actuación en 24 horas |
+| App Store, edad | Contenido generado por usuarios: **sí**. El resultado sube, previsiblemente a 12+ |
+| App Store, notas al revisor | Una cuenta de prueba con un amigo ya aceptado y días compartidos, y dónde están reportar (mantener pulsada una tarjeta), bloquear y los términos |
+| Términos | `https://color.baltajmn.dev/terms.html` (`web/terms.html`). Se aceptan al crear el nombre, antes de ver nada de nadie, y están en Ajustes > Privacidad |
+
+Apple 1.2 pide los cuatro a la vez: términos aceptados, filtro o reporte de contenido, bloquear, y
+actuar en 24 horas. Los reportes llegan por correo (`report-notify`, `store/servidor.md` 3).
+
 ## 7. La política: dónde se publica
 
 `web/index.html` se publica en **https://color.baltajmn.dev/** con GitHub Pages desde este mismo

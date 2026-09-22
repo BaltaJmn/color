@@ -51,6 +51,8 @@ data class Settings(
     val shareAsked: Boolean = false,
     val weekColorOn: Boolean = true,
     val watermark: Boolean = true,
+    /** Friends' days this person reported, "<author>/<day>": hidden from them for good. */
+    val hiddenCards: List<String> = emptyList(),
 )
 
 /** Local ISO date ("2026-09-22") of the logical day to its entry. */

@@ -84,7 +84,7 @@ Nada más. No hay librería de imágenes: las fotos se decodifican con el sistem
 | `social/Qr.kt` | Codificador QR | Nuevo (v1.1) |
 | `social/Friends.kt` | Amigos, solicitudes, enlaces de invitación | Nuevo (v1.1) |
 | `ui/InviteScreen.kt` | El enlace, su QR, compartir y regenerar | Nuevo (v1.1) |
-| `ui/FriendYear.kt` | Lista de amigos, el año de uno y uno de sus días | Nuevo (v1.1) |
+| `ui/FriendYear.kt` | Lista de amigos, el año de uno, uno de sus días, y su menú (reportar, bloquear, quitar) | Nuevo (v1.1) |
 | `ui/Card.kt` | La tarjeta | Nuevo |
 | `ui/TodayScreen.kt`, `ui/YearScreen.kt`, `ui/SettingsScreen.kt`, `ui/FriendsScreen.kt` | Pantallas | Purl y nuevo |
 | `ui/DaySheet.kt`, `ui/ShareScreen.kt`, `ui/Pro.kt`, `ui/LockScreen.kt`, `ui/Icons.kt` | Capas y dibujos | Purl |
@@ -145,7 +145,9 @@ data class ChromaEntry(
 - La clave es la fecha **local** del día lógico. Solo se crea o edita la entrada de hoy (6.1).
 - `Settings`: `reminderOn`, `reminderHour`, `reminderMinute`, `reminderOffered`, `lockOn`,
   `lastBackup`, `backupNoticeDone`, `pro` (como Purl), más `defaultShare: Share = Private`,
-  `shareAsked: Boolean`, `weekColorOn: Boolean = true`, `watermark: Boolean = true`.
+  `shareAsked: Boolean`, `weekColorOn: Boolean = true`, `watermark: Boolean = true`,
+  `hiddenCards: List<String>` (`<author>/<day>` de cada día reportado: oculto para siempre, porque
+  los reportes no se pueden leer desde la app).
 - `JournalJson`: `ignoreUnknownKeys`, sin valores por defecto ni nulos explícitos. Igual que Purl.
 - `entries.bak.json`, cuarentena en `corrupt/` y un único escritor con rebote de 800 ms: Purl 6.12.
 

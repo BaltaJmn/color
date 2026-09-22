@@ -53,9 +53,18 @@ data class FeedRow(
 
     fun entry() = ChromaEntry(color = color, name = name, word = word)
 
+    /** How a report remembers this day: `Settings.hiddenCards`. */
+    val key: String get() = "$author/$day"
+
     /** Changes with every edit, so a replaced photo is never served from the cache. */
     val cacheName: String get() = "$author-$day-${updatedAt.filter(Char::isDigit)}.jpg"
 }
+
+/** The menu of a friend, or of one of their days, open over everything. */
+data class Acting(val person: Profile, val day: FeedRow? = null)
+
+@Serializable
+private data class NewReport(val reporter: String, val author: String, val day: String)
 
 @Serializable
 private data class FriendshipRow(
@@ -90,6 +99,9 @@ object Friends {
     /** Whose year is open, and which of their days. */
     var viewing by mutableStateOf<Profile?>(null)
     var viewingDay by mutableStateOf<FeedRow?>(null)
+
+    /** Kept here and drawn by App, so closing the screen under it never cancels a report halfway. */
+    var acting by mutableStateOf<Acting?>(null)
 
     fun opened(code: String) {
         pendingCode = code
@@ -172,6 +184,33 @@ object Friends {
         refresh()
     }
 
+    /** Nobody is told: their days just stop arriving, and so do yours to them. */
+    suspend fun remove(id: String) {
+        Social.client.postgrest.rpc("remove_friend", buildJsonObject { put("other", id) })
+        forgetPerson(id)
+    }
+
+    /** Removes too, and the server refuses any request between the two from then on. */
+    suspend fun block(id: String) {
+        Social.client.postgrest.rpc("block_user", buildJsonObject { put("other", id) })
+        forgetPerson(id)
+    }
+
+    /** The report-notify function mails it on insert; the reader only ever inserts. */
+    suspend fun report(row: FeedRow) {
+        val me = Social.userId() ?: return
+        Social.client.from("reports").insert(NewReport(me, row.author, row.day))
+    }
+
+    private suspend fun forgetPerson(id: String) {
+        feed = feed.filter { it.author != id }
+        if (viewing?.id == id) {
+            viewing = null
+            viewingDay = null
+        }
+        refresh()
+    }
+
     /** The old link stops working at once; requests it already made stay. */
     suspend fun regenerate() {
         Social.client.postgrest.rpc("regenerate_code")
@@ -186,6 +225,7 @@ object Friends {
         listOpen = false
         viewing = null
         viewingDay = null
+        acting = null
         Storage.keepCached(emptySet())
     }
 }

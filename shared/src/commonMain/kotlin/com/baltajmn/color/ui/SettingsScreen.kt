@@ -47,6 +47,7 @@ import com.baltajmn.color.data.startExport
 import com.baltajmn.color.data.today
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.PRIVACY_URL
+import com.baltajmn.color.data.TERMS_URL
 import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.SIBLINGS
 import com.baltajmn.color.data.storeUrl
@@ -114,6 +115,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
             Section(S.sectionPrivacy) {
                 SettingRow(S.privacyRow, onClick = { AppInfo.open(PRIVACY_URL) })
+                if (Social.available) SettingRow(S.termsRow, onClick = { AppInfo.open(TERMS_URL) })
             }
 
             Section(S.sectionCard) {

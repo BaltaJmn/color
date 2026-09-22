@@ -151,7 +151,7 @@ Lista de secciones, como Purl:
 1. **Recordatorio**: interruptor y hora (`reminderRow`).
 2. **Amigos** (v1.1): cuenta y nombre visible, `defaultShareRow`, `friendsRow`, `inviteRow`, `signOut`,
    `deleteAccount`.
-3. **Privacidad**: bloqueo (v1.2), política.
+3. **Privacidad**: bloqueo (v1.2), política, y `termsRow` si hay servidor.
 4. **Tarjeta**: `watermarkRow`, `weekColorRow` (v1.2).
 5. **Copia**: exportar (con fecha de la última) e importar.
 6. **Chroma Pro**: comprar o "ya lo tienes", restaurar.
@@ -166,7 +166,8 @@ Lista de secciones, como Purl:
 
 Pantalla de presentación: tres líneas (`friendsIntro1` a `friendsIntro3`) sobre una tira de colores
 de ejemplo. Botones: Sign in with Apple y Google (los oficiales de cada uno). Tras iniciar sesión, si
-es la primera vez: nombre visible, casilla `age16` y `continue`.
+es la primera vez: nombre visible, casilla `age16`, `termsAgree` con el enlace `termsRow`, y
+`continue`. Los términos se aceptan ahí, antes de ver nada de nadie (Apple 1.2).
 
 ### 8.2 Con cuenta y sin amigos
 
@@ -185,8 +186,11 @@ es la primera vez: nombre visible, casilla `age16` y `continue`.
 - Al final, `caughtUp`. Nada debajo. Por eso, con amigos, `inviteFriend` va arriba a la derecha,
   junto al título, y no al final.
 - Tirar hacia abajo refresca.
-- Tocar el nombre del autor abre su mosaico. Mantener pulsada la tarjeta, o su menú, da `report`,
-  `block` y `removeFriend`.
+- Tocar el nombre del autor abre su mosaico. Mantener pulsada la tarjeta (o la acción de
+  accesibilidad equivalente) abre un diálogo con su nombre y `report`, `block` y `removeFriend`. Nada
+  de eso es un botón sobre la tarjeta, donde se leería como una reacción.
+- Cada una pide confirmación (`reportText`, `blockText`, `removeFriendText`). Reportar oculta la
+  tarjeta al momento, en el feed y en el año; si el reporte no llega a salir, vuelve y se dice.
 
 ### 8.4 Mosaico de un amigo
 

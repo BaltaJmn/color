@@ -24,6 +24,7 @@ Qué hay en cada sitio. Se actualiza en el mismo commit que añade o mueve algo.
 | Ruta | Qué es |
 |---|---|
 | `web/index.html` | Política de privacidad, en color.baltajmn.dev por GitHub Pages |
+| `web/terms.html` | Términos de uso de Amigos: tolerancia cero, reportar, bloquear |
 | `web/404.html` | Cualquier ruta desconocida; para `/i/<code>`, la invitación sin la app, con las tiendas |
 | `web/.well-known/` | `assetlinks.json` y `apple-app-site-association`: los enlaces abren la app |
 | `store/formularios.md` | Respuestas de los formularios de las dos consolas y cómo se publica la web |

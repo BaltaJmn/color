@@ -35,6 +35,7 @@ import com.baltajmn.color.i18n.S
 import com.baltajmn.color.ui.Glyph
 import com.baltajmn.color.ui.GlyphIcon
 import com.baltajmn.color.ui.DaySheet
+import com.baltajmn.color.ui.FriendActions
 import com.baltajmn.color.ui.FriendDay
 import com.baltajmn.color.ui.FriendList
 import com.baltajmn.color.ui.FriendYear
@@ -136,8 +137,9 @@ fun App() {
             if (Friends.listOpen) FriendList { Friends.listOpen = false }
             Friends.viewing?.let { FriendYear(it, day, onClose = { Friends.viewing = null }) }
             Friends.viewingDay?.let { row ->
-                FriendDay(row, Friends.viewing?.displayName.orEmpty(), onClose = { Friends.viewingDay = null }, onPhoto = { photo = it })
+                Friends.viewing?.let { FriendDay(row, it, onClose = { Friends.viewingDay = null }, onPhoto = { photo = it }) }
             }
+            Friends.acting?.let { FriendActions(it) { Friends.acting = null } }
             photo?.let { PhotoViewer(it) { photo = null } }
             if (Paywall.open) ProDialog { Paywall.open = false }
 

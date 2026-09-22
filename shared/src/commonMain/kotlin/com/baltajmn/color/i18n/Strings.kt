@@ -517,6 +517,24 @@ object S {
         "Dieses Jahr nichts geteilt.",
         "Rien de partagé cette année.",
     )
+    val report get() = t("Report", "Reportar", "Denunciar", "Melden", "Signaler")
+    val block get() = t("Block", "Bloquear", "Bloquear", "Blockieren", "Bloquer")
+    val removeFriend get() = t("Remove friend", "Quitar de amigos", "Remover amigo", "Freund entfernen", "Retirer des amis")
+    val reportText get() = t(
+        "The card is hidden for you now, and the report reaches Chroma, which acts within 24 hours. Nobody is told who reported it.",
+        "La tarjeta se te oculta ya, y el reporte llega a Chroma, que actúa en menos de 24 horas. Nadie sabrá quién lo hizo.",
+        "O cartão some para você agora, e a denúncia chega ao Chroma, que age em menos de 24 horas. Ninguém saberá quem denunciou.",
+        "Die Karte wird dir sofort ausgeblendet, und die Meldung geht an Chroma, das innerhalb von 24 Stunden handelt. Niemand erfährt, wer gemeldet hat.",
+        "La carte est masquée pour toi dès maintenant, et le signalement arrive à Chroma, qui agit en moins de 24 heures. Personne ne saura qui l'a signalée.",
+    )
+    val termsAgree get() = t(
+        "By continuing you accept the terms of use: zero tolerance for objectionable content and abusive users.",
+        "Al continuar aceptas los términos de uso: tolerancia cero con el contenido inaceptable y con quien abuse.",
+        "Ao continuar, você aceita os termos de uso: tolerância zero com conteúdo inaceitável e com abusos.",
+        "Wenn du fortfährst, akzeptierst du die Nutzungsbedingungen: null Toleranz für anstößige Inhalte und Missbrauch.",
+        "En continuant, tu acceptes les conditions d'utilisation : tolérance zéro pour les contenus inacceptables et les abus.",
+    )
+    val termsRow get() = t("Terms of use", "Términos de uso", "Termos de uso", "Nutzungsbedingungen", "Conditions d'utilisation")
     val requestsTitle get() = t("Requests", "Solicitudes", "Pedidos", "Anfragen", "Demandes")
     val accept get() = t("Accept", "Aceptar", "Aceitar", "Annehmen", "Accepter")
     val ignore get() = t("Ignore", "Ignorar", "Ignorar", "Ignorieren", "Ignorer")
@@ -585,6 +603,22 @@ object S {
         val date = abbrDateWithYear(d)
         return t("Last backup: $date", "Última copia: $date", "Última cópia: $date", "Letzte Sicherung: $date", "Dernière copie : $date")
     }
+
+    fun removeFriendText(name: String) = t(
+        "$name will not be told. You both stop seeing each other's days.",
+        "$name no recibirá ningún aviso. Dejaréis de ver vuestros días.",
+        "$name não será avisado. Vocês deixam de ver os dias um do outro.",
+        "$name erfährt nichts davon. Ihr seht eure Tage nicht mehr.",
+        "$name n'en saura rien. Vous ne verrez plus vos jours.",
+    )
+
+    fun blockText(name: String) = t(
+        "$name stops seeing you and cannot invite you again. Nobody is told.",
+        "$name deja de verte y no podrá volver a invitarte. Nadie recibe ningún aviso.",
+        "$name deixa de te ver e não poderá te convidar de novo. Ninguém é avisado.",
+        "$name sieht dich nicht mehr und kann dich nicht wieder einladen. Niemand wird benachrichtigt.",
+        "$name ne te verra plus et ne pourra plus t'inviter. Personne n'est prévenu.",
+    )
 
     fun inviteMessage(link: String) = t(
         "Add me on Chroma: $link",
