@@ -167,6 +167,8 @@ Lo que cambia al publicar la v1.1 (los datos que salen, en #38):
 | Play, política de contenido generado por usuarios | Términos con tolerancia cero, reportar dentro de la app, bloquear, y actuación en 24 horas |
 | App Store, edad | Contenido generado por usuarios: **sí**. El resultado sube, previsiblemente a 12+ |
 | App Store, notas al revisor | Una cuenta de prueba con un amigo ya aceptado y días compartidos, y dónde están reportar (mantener pulsada una tarjeta), bloquear y los términos |
+| Play, seguridad de los datos | "¿Los usuarios pueden pedir que se borren sus datos?": **sí**. URL de borrado de la cuenta: `https://color.baltajmn.dev/delete` (`web/delete.html`) |
+| App Store | Borrar la cuenta desde la app (5.1.1(v)): Ajustes > Amigos > Borrar cuenta |
 | Términos | `https://color.baltajmn.dev/terms.html` (`web/terms.html`). Se aceptan al crear el nombre, antes de ver nada de nadie, y están en Ajustes > Privacidad |
 
 Apple 1.2 pide los cuatro a la vez: términos aceptados, filtro o reporte de contenido, bloquear, y

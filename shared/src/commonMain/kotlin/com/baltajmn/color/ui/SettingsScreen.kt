@@ -76,6 +76,8 @@ fun SettingsScreen(onBack: () -> Unit) {
     var restored by remember { mutableStateOf<String?>(null) }
     var renaming by remember { mutableStateOf(false) }
     var leaving by remember { mutableStateOf(false) }
+    var erasing by remember { mutableStateOf(false) }
+    var erasingNow by remember { mutableStateOf(false) }
     var choosingShare by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     Column(
@@ -110,6 +112,12 @@ fun SettingsScreen(onBack: () -> Unit) {
                     SettingRow(S.friendsRow, onClick = { Friends.listOpen = true })
                     SettingRow(S.inviteRow, onClick = { Friends.inviteOpen = true })
                     SettingRow(S.signOut, onClick = { leaving = true })
+                    SettingRow(
+                        S.deleteAccount,
+                        if (erasingNow) S.working else null,
+                        enabled = !erasingNow,
+                        onClick = { erasing = true },
+                    )
                 }
             }
 
@@ -255,6 +263,23 @@ fun SettingsScreen(onBack: () -> Unit) {
                 scope.launch { Social.signOut() }
             },
             onDismiss = { leaving = false },
+        )
+    }
+
+    if (erasing) {
+        Ask(
+            S.deleteAccount,
+            S.deleteAccountText,
+            S.deleteAccount,
+            onConfirm = {
+                erasing = false
+                erasingNow = true
+                scope.launch {
+                    runCatching { Social.deleteAccount() }.onFailure { failure = S.deleteAccount to S.friendsOffline }
+                    erasingNow = false
+                }
+            },
+            onDismiss = { erasing = false },
         )
     }
 

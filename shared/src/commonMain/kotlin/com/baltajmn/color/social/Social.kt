@@ -12,9 +12,11 @@ import io.github.jan.supabase.compose.auth.appleNativeLogin
 import io.github.jan.supabase.compose.auth.googleNativeLogin
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.functions.Functions
+import io.github.jan.supabase.functions.functions
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.storage.Storage
+import io.ktor.http.isSuccess
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -93,6 +95,18 @@ object Social {
     /** Leaves the account where it is: signing in again brings the friends back. */
     suspend fun signOut() {
         runCatching { client.auth.signOut() }
+        forget()
+    }
+
+    /**
+     * Apple 5.1.1(v) and Play. The server erases the profile, the friendships, what was shared and
+     * its photos; the journal on this phone is not the server's to touch.
+     */
+    suspend fun deleteAccount() {
+        val answer = client.functions.invoke("delete-account")
+        if (!answer.status.isSuccess()) error("delete-account: ${answer.status}")
+        // No sign out call: the user no longer exists for the server to sign out of.
+        client.auth.clearSession()
         forget()
     }
 

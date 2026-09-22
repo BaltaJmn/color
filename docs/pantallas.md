@@ -150,7 +150,8 @@ Lista de secciones, como Purl:
 
 1. **Recordatorio**: interruptor y hora (`reminderRow`).
 2. **Amigos** (v1.1): cuenta y nombre visible, `defaultShareRow`, `friendsRow`, `inviteRow`, `signOut`,
-   `deleteAccount`.
+   `deleteAccount` (confirmación `deleteAccountText`; mientras borra, `working`; sin conexión, el aviso
+   de siempre y nada cambia).
 3. **Privacidad**: bloqueo (v1.2), política, y `termsRow` si hay servidor.
 4. **Tarjeta**: `watermarkRow`, `weekColorRow` (v1.2).
 5. **Copia**: exportar (con fecha de la última) e importar.

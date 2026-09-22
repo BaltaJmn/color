@@ -535,6 +535,14 @@ object S {
         "En continuant, tu acceptes les conditions d'utilisation : tolérance zéro pour les contenus inacceptables et les abus.",
     )
     val termsRow get() = t("Terms of use", "Términos de uso", "Termos de uso", "Nutzungsbedingungen", "Conditions d'utilisation")
+    val deleteAccount get() = t("Delete account", "Borrar cuenta", "Excluir conta", "Konto löschen", "Supprimer le compte")
+    val deleteAccountText get() = t(
+        "Your name, your friends, and every color and photo you shared are erased from the server. Your journal on this phone stays as it is.",
+        "Se borran del servidor tu nombre, tus amigos y todos los colores y fotos que compartiste. Tu diario en este teléfono se queda como está.",
+        "Seu nome, seus amigos e todas as cores e fotos que você compartilhou são apagados do servidor. Seu diário neste telefone fica como está.",
+        "Dein Name, deine Freunde und alle geteilten Farben und Fotos werden vom Server gelöscht. Dein Tagebuch auf diesem Telefon bleibt, wie es ist.",
+        "Ton nom, tes amis et toutes les couleurs et photos partagées sont effacés du serveur. Ton journal sur ce téléphone reste tel quel.",
+    )
     val requestsTitle get() = t("Requests", "Solicitudes", "Pedidos", "Anfragen", "Demandes")
     val accept get() = t("Accept", "Aceptar", "Aceitar", "Annehmen", "Accepter")
     val ignore get() = t("Ignore", "Ignorar", "Ignorar", "Ignorieren", "Ignorer")
