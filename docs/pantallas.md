@@ -223,6 +223,9 @@ Tocar abre Hoy o Mi año; el del año sin Pro abre el paywall, que explica más 
 
 ## 11. Icono
 
-Cuadrado redondeado con cinco franjas verticales de color (de cálido a frío) y una franja blanca
-estrecha. La capa monocroma de Android es la misma silueta en un solo color. Lo genera
-`tools/icon.py`.
+Sobre la tinta de la app (`#1C1B1A`), un bloque de radio 72 (sobre 1024) con cinco franjas
+verticales de cálido a frío y una franja estrecha de papel: el día que falta por pintar. Los cinco
+colores son los de una tarde junto al mar (`#E07A5F`, `#F2CC8F`, `#81B29A`, `#5B8DB8`, `#3D5A80`) y
+no un espectro, que se leería como una bandera. La capa monocroma de Android y el icono de
+notificación son la misma silueta en un solo color, con huecos entre franjas para que no quede una
+losa lisa. Todo lo genera `tools/icon.py` (necesita `rsvg-convert`).
