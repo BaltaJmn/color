@@ -18,14 +18,14 @@ La promesa en una frase: *un segundo al día para mirar alrededor; un año despu
 
 ## Documentos
 
-Este SPEC es el porqué del producto: qué hace la app, qué no hace y por qué. Lo que se programa irá
+Este SPEC es el porqué del producto: qué hace la app, qué no hace y por qué. Lo que se programa está
 escrito aparte, como en Purl.
 
 | Dónde | Qué contiene |
 |---|---|
-| `docs/tecnico.md` | El contrato de implementación: árbol de código, modelo, `entries.json`, `widget.json`, extracción de color, esquema del servidor, reglas RLS y tests. Pendiente (#2) |
-| `docs/pantallas.md` | La interfaz pantalla a pantalla, con tokens, medidas y estados. Pendiente (#2) |
-| `docs/textos.md` | Todos los textos en los cinco idiomas, incluida la tabla de nombres de color. Pendiente (#2) |
+| `docs/tecnico.md` | El contrato de implementación: árbol de código, modelo, `entries.json`, `widget.json`, extracción de color, esquema del servidor, reglas RLS y tests |
+| `docs/pantallas.md` | La interfaz pantalla a pantalla, con tokens, medidas y estados |
+| `docs/textos.md` | Tono y vocabulario. Los textos viven en `Strings.kt` y los nombres de color en `Names.kt` |
 | Issues del repo | `gh issue list -R BaltaJmn/color`: #1 a #44, una por pieza, en los hitos v1.0, v1.1 y v1.2 |
 
 Todo lo que dice este SPEC está decidido. Si un detalle de implementación de este SPEC no coincide con
@@ -401,8 +401,8 @@ Strings.kt             cinco idiomas por firma de función
 
 ### Nombres de color
 
-Una tabla de unos 150 colores, cada uno con su clave, su valor en CIELAB y su nombre en los cinco
-idiomas. Se asigna el más cercano. La tabla vive en `docs/textos.md` y se copia a `Names.kt`.
+Una tabla de unos 150 colores, cada uno con su clave, su color de referencia y su nombre en los cinco
+idiomas. Se asigna el más cercano. La tabla vive solo en `Names.kt`: dos copias acaban divergiendo.
 
 ### Servidor (v1.1)
 
