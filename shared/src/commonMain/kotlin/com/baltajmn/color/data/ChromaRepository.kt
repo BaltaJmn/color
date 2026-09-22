@@ -29,9 +29,11 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.daysUntil
 import kotlinx.datetime.toLocalDateTime
 
 const val SAVE_DEBOUNCE_MS = 800L
+const val BACKUP_NOTICE_AFTER_DAYS = 30
 
 /** "Today" everywhere in the app: the logical day, which ends at 03:00 local time. */
 @OptIn(ExperimentalTime::class)
@@ -187,8 +189,42 @@ object ChromaRepository {
         if (key in journal) edit { it.copy(entries = it.entries - key) }
     }
 
-    /** Replaces the whole journal, for an import that already merged and adopted its photos. */
-    internal fun replaceEntries(entries: Map<String, ChromaEntry>) = edit { it.copy(entries = entries) }
+    /** Asked once, a month in, and never again after a backup or after being waved away. */
+    fun needsBackupNotice(today: LocalDate): Boolean {
+        if (settings.backupNoticeDone || settings.lastBackup != null) return false
+        val first = journal.keys.minOrNull()?.let(LocalDate::parse) ?: return false
+        return first.daysUntil(today) >= BACKUP_NOTICE_AFTER_DAYS
+    }
+
+    /**
+     * Takes in a merge: the photos the backup brought move out of import/ first, under a free name
+     * if theirs was taken, and only then does the journal change. Nothing of this phone is touched.
+     */
+    fun applyImport(result: MergeResult, delivered: Set<String>, onDone: () -> Unit = {}) {
+        val before = journal
+        scope.launch {
+            // Only what the backup actually carried is adopted, never a leftover of an older import.
+            val adoptable = result.photosFromIncoming.filter { it in delivered && isSafePhotoName(it) }
+            val renamed = withContext(Dispatchers.IO) {
+                val taken = (Storage.listPhotos() + before.values.mapNotNull { it.photo }).toMutableSet()
+                adoptable.associateWith { name ->
+                    val target = if (name in taken) freePhotoName(taken) else name
+                    taken += target
+                    Storage.adoptImport(name, target)
+                    target
+                }
+            }
+            val merged = result.journal.mapValues { (key, entry) ->
+                val photo = entry.photo
+                // Named but not delivered: the color is kept, the photo that does not exist is not.
+                if (key in before || photo == null) entry else entry.copy(photo = renamed[photo])
+            }
+            edit { it.copy(entries = merged) }
+            flush()
+            withContext(Dispatchers.IO) { Storage.importDir() }
+            onDone()
+        }
+    }
 
     fun syncWidgets(f: JournalFile = file) {
         syncWidgets(widgetState(f.entries, f.settings, today(), nameOf = S::colorName))

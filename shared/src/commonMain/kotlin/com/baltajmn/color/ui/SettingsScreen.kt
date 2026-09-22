@@ -32,6 +32,17 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.data.AppInfo
+import com.baltajmn.color.data.Backup
+import com.baltajmn.color.data.FilePicker
+import com.baltajmn.color.data.ImportFailed
+import com.baltajmn.color.data.ImportProblem
+import com.baltajmn.color.data.MergeResult
+import com.baltajmn.color.data.PickResult
+import com.baltajmn.color.data.abandonImport
+import com.baltajmn.color.data.merge
+import com.baltajmn.color.data.readBackup
+import com.baltajmn.color.data.startExport
+import com.baltajmn.color.data.today
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.PRIVACY_URL
 import com.baltajmn.color.data.Reminder
@@ -41,12 +52,19 @@ import com.baltajmn.color.i18n.S
 import com.baltajmn.color.ui.theme.GUTTER
 import com.baltajmn.color.ui.theme.MAX_CONTENT_WIDTH
 import com.baltajmn.color.ui.theme.Styles
+import kotlinx.datetime.LocalDate
 
 /** Settings, as a list of sections in the order of docs/pantallas.md 7. */
 @Composable
 fun SettingsScreen(onBack: () -> Unit) {
     val settings = ChromaRepository.settings
     var pickTime by remember { mutableStateOf(false) }
+    var busy by remember { mutableStateOf(false) }
+    var applying by remember { mutableStateOf(false) }
+    var pending by remember { mutableStateOf<Pair<MergeResult, Set<String>>?>(null) }
+    // Title and text together: an export that fails is not an import that fails.
+    var failure by remember { mutableStateOf<Pair<String?, String>?>(null) }
+    var imported by remember { mutableStateOf<Int?>(null) }
     Column(
         Modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -77,6 +95,50 @@ fun SettingsScreen(onBack: () -> Unit) {
                 }
             }
 
+            Section(S.sectionBackup) {
+                val empty = ChromaRepository.journal.isEmpty()
+                SettingRow(
+                    title = S.exportRow,
+                    subtitle = if (empty) {
+                        S.exportNothing
+                    } else {
+                        settings.lastBackup?.let { S.lastBackup(LocalDate.parse(it)) } ?: S.lastBackupNever
+                    },
+                    enabled = !empty && FilePicker.available && !busy,
+                    onClick = {
+                        startExport(today()) { result -> if (result == PickResult.Failed) failure = null to S.exportFailed }
+                    },
+                )
+                SettingRow(
+                    title = S.importRow,
+                    subtitle = S.importSubtitle,
+                    enabled = FilePicker.available && !busy,
+                    onClick = {
+                        busy = true
+                        var read: Result<Backup>? = null
+                        FilePicker.importFile({ source -> read = runCatching { readBackup(source) } }) { result ->
+                            busy = false
+                            val answer = read
+                            when {
+                                result == PickResult.Cancelled -> abandonImport()
+                                answer == null -> {
+                                    abandonImport()
+                                    failure = S.importFailedTitle to S.importDamaged
+                                }
+                                else -> answer.fold(
+                                    onSuccess = { pending = merge(ChromaRepository.journal, it.journal) to it.photos },
+                                    onFailure = {
+                                        // The photos it had already parked go with the refusal.
+                                        abandonImport()
+                                        failure = S.importFailedTitle to importText(it)
+                                    },
+                                )
+                            }
+                        }
+                    },
+                )
+            }
+
             val siblings = SIBLINGS.filter { it.storeUrl != null }
             if (siblings.isNotEmpty()) {
                 Section(S.sectionMoreApps) {
@@ -92,6 +154,37 @@ fun SettingsScreen(onBack: () -> Unit) {
         }
     }
 
+    pending?.let { (result, delivered) ->
+        Ask(
+            title = S.importTitle,
+            text = S.importSummary(result.added, result.kept),
+            // The button says so while the photos are copied and the journal rewritten.
+            confirm = if (applying) S.working else S.importAction,
+            onConfirm = {
+                if (!applying) {
+                    applying = true
+                    ChromaRepository.applyImport(result, delivered) {
+                        applying = false
+                        imported = result.added
+                        pending = null
+                    }
+                }
+            },
+            onDismiss = if (applying) {
+                null
+            } else {
+                {
+                    abandonImport()
+                    pending = null
+                }
+            },
+        )
+    }
+
+    failure?.let { (title, text) -> Ask(title = title, text = text, confirm = S.ok, onConfirm = { failure = null }) }
+
+    imported?.let { n -> Ask(title = S.importTitle, text = S.importDone(n), confirm = S.ok, onConfirm = { imported = null }) }
+
     if (pickTime) {
         TimeDialog(settings.reminderHour, settings.reminderMinute, onDismiss = { pickTime = false }) { h, m ->
             ChromaRepository.updateSettings { it.copy(reminderHour = h, reminderMinute = m) }
@@ -99,6 +192,14 @@ fun SettingsScreen(onBack: () -> Unit) {
             pickTime = false
         }
     }
+}
+
+private fun importText(e: Throwable): String = when ((e as? ImportFailed)?.problem) {
+    ImportProblem.NotBackup -> S.importNotBackup
+    ImportProblem.TooNew -> S.importTooNew
+    ImportProblem.Empty -> S.importEmpty
+    // A file that broke while being read is damaged as far as the user is concerned.
+    ImportProblem.Damaged, null -> S.importDamaged
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

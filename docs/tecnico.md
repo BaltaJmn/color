@@ -164,6 +164,13 @@ Importar **fusiona**: un día que solo está en la copia entra; un día que est�
 con el del teléfono. Nunca se borra nada. `share` se importa siempre como `private`: un día no se
 publica por restaurar una copia.
 
+Antes de fusionar se comprueba la forma a mano: `version` numérica y no mayor que la nuestra,
+`entries` no vacío, fechas válidas y colores `#RRGGBB` (un color mal escrito rompería la primera
+pantalla que lo pinta). Un día sin `color` es una copia de Purl: se rechaza como "no es una copia de
+Chroma", no como dañada.
+
+Al mes del primer día, si nunca se hizo copia, Hoy lo ofrece una vez (`noticeBackup`).
+
 ---
 
 ## 5. Constantes
@@ -188,6 +195,7 @@ publica por restaurar una copia.
 | `MAX_FRIENDS` | 50 | Servidor (trigger) y cliente (mensaje) |
 | `PHOTO_TTL_DAYS` | 7 | Servidor (`purge-photos`) |
 | `SAVE_DEBOUNCE_MS` | 800 | `ChromaRepository.kt` |
+| `BACKUP_NOTICE_AFTER_DAYS` | 30 | `ChromaRepository.kt` |
 
 ---
 
@@ -296,7 +304,7 @@ expect object Capture {
     /** Abre el selector de fotos del sistema, sin permiso. */
     suspend fun gallery(): Picked?
 }
-data class Picked(val jpeg: ByteArray, val takenOn: LocalDateTime?, val sample: IntArray)
+class Picked(val jpeg: ByteArray, val takenOn: LocalDateTime?)
 ```
 
 - Android: `ActivityResultContracts.TakePicture` con un `FileProvider` en `cacheDir`, y
@@ -305,7 +313,8 @@ data class Picked(val jpeg: ByteArray, val takenOn: LocalDateTime?, val sample: 
 - iOS: `UIImagePickerController` con fuente cámara, y `PHPickerViewController` sin acceso a la
   fototeca. La fecha sale de `CGImageSourceCopyPropertiesAtIndex` (`{Exif}.DateTimeOriginal`).
 - Las dos: se aplica la orientación EXIF, se reduce a `PHOTO_SIDE` y se recodifica a JPEG 85 (así
-  se van los metadatos también en local), y se entrega la miniatura de `SAMPLE_SIDE` en ARGB.
+  se van los metadatos también en local). La miniatura de `SAMPLE_SIDE` en ARGB sale en común del
+  JPEG ya decodificado (`samplePixels`), así las dos plataformas analizan los mismos píxeles.
 - Regla de fecha: si `takenOn` existe y su `logicalDate` no es hoy, se rechaza con el aviso
   `galleryNotToday`. Sin fecha, se acepta.
 
