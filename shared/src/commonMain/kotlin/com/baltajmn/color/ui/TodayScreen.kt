@@ -48,6 +48,7 @@ import com.baltajmn.color.color.nearestName
 import com.baltajmn.color.data.Capture
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Picked
+import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.decodeImage
 import com.baltajmn.color.data.isFromToday
 import com.baltajmn.color.data.samplePixels
@@ -130,6 +131,18 @@ fun TodayScreen(
             if (ChromaRepository.saveFailed) Notice(S.noticeSaveFailed)
             if (ChromaRepository.corrupt) Notice(S.noticeCorrupt, S.ok to ChromaRepository::dismissCorrupt)
             notice?.let { Notice(it, S.ok to { notice = null }) }
+            // After the first color, and only once: waving it away counts as an answer.
+            val settings = ChromaRepository.settings
+            if (!settings.reminderOffered && entry != null && pending == null) {
+                Notice(
+                    S.offerReminder(settings.reminderHour, settings.reminderMinute),
+                    S.notNow to { ChromaRepository.updateSettings { it.copy(reminderOffered = true) } },
+                    S.yes to {
+                        ChromaRepository.updateSettings { it.copy(reminderOffered = true, reminderOn = true) }
+                        Reminder.sync(askPermission = true)
+                    },
+                )
+            }
             below()
 
             Spacer(Modifier.height(8.dp))

@@ -65,7 +65,7 @@ object ChromaRepository {
     var corrupt by mutableStateOf(false)
         private set
 
-    /** Runs after every successful write. The reminder and the outbox hang off it. */
+    /** Runs after every successful write. The outbox hangs off it. */
     val afterSave = mutableListOf<suspend (JournalFile) -> Unit>()
 
     private val scope by lazy { MainScope() }
@@ -207,6 +207,8 @@ object ChromaRepository {
             written = snapshot
             saveFailed = false
             withContext(Dispatchers.IO) { syncWidgets(snapshot) }
+            // A new color today moves the next nudge to tomorrow; iOS has to be told.
+            Reminder.sync(askPermission = false)
             afterSave.forEach { runCatching { it(snapshot) } }
             val gone = photosOf(previous) - photosOf(snapshot)
             if (gone.isNotEmpty()) withContext(Dispatchers.IO) { gone.forEach(Storage::deletePhoto) }

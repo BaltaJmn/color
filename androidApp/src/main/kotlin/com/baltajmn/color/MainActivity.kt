@@ -1,5 +1,7 @@
 package com.baltajmn.color
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -8,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 import com.baltajmn.color.data.AndroidContext
 import com.baltajmn.color.data.Capture
+import com.baltajmn.color.data.Reminder
 
 // FragmentActivity and not ComponentActivity: the biometric lock of v1.2 needs a fragment host.
 class MainActivity : FragmentActivity() {
@@ -20,10 +23,19 @@ class MainActivity : FragmentActivity() {
     private val pickPhoto =
         registerForActivityResult(ActivityResultContracts.PickVisualMedia(), Capture::onGallery)
 
+    private val askNotifications =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         AndroidContext.init(this)
+        // The permission is asked the moment the reminder is switched on and never before.
+        Reminder.onNeedsPermission = {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                askNotifications.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
         Capture.launchCamera = { uri -> takePicture.launch(uri) }
         // The photo picker asks for no permission: the user hands over one image and nothing else.
         Capture.launchGallery = {
@@ -37,6 +49,7 @@ class MainActivity : FragmentActivity() {
     override fun onDestroy() {
         Capture.launchCamera = null
         Capture.launchGallery = null
+        Reminder.onNeedsPermission = null
         super.onDestroy()
     }
 }

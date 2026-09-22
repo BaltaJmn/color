@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.baltajmn.color.data.ChromaRepository
+import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.today
 import kotlinx.datetime.LocalDate
 import com.baltajmn.color.i18n.S
@@ -53,6 +54,7 @@ fun App() {
         // Coming back after 03:00 is a new day, and the widgets are told before they are looked at.
         day = today()
         ChromaRepository.syncWidgets()
+        Reminder.sync(askPermission = false)
     }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
         // The debounce may still be waiting when the app leaves the screen: write now.
