@@ -1,1 +1,2 @@
 "CFBundleDisplayName" = "Chroma";
+"NSCameraUsageDescription" = "Para hacer la foto de la que sale el color de tu día.";

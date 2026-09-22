@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- La foto recien hecha, mientras la camara la escribe. -->
+    <cache-path name="capture" path="capture/" />
+    <!-- Solo la tarjeta recien pintada. El diario no vive aqui. -->
+    <cache-path name="share" path="share/" />
+</paths>
