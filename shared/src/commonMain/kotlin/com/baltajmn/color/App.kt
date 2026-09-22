@@ -33,6 +33,7 @@ import com.baltajmn.color.ui.GlyphIcon
 import com.baltajmn.color.ui.DaySheet
 import com.baltajmn.color.ui.Paywall
 import com.baltajmn.color.ui.PhotoViewer
+import com.baltajmn.color.ui.PosterScreen
 import com.baltajmn.color.ui.ProDialog
 import com.baltajmn.color.ui.SettingsScreen
 import com.baltajmn.color.ui.ShareScreen
@@ -58,6 +59,7 @@ fun App() {
     var photo by remember { mutableStateOf<ImageBitmap?>(null) }
     var openDay by remember { mutableStateOf<LocalDate?>(null) }
     var sharing by remember { mutableStateOf<LocalDate?>(null) }
+    var poster by remember { mutableStateOf<Int?>(null) }
     var proCheck by remember { mutableStateOf(0) }
 
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
@@ -85,7 +87,7 @@ fun App() {
                             onPhoto = { photo = it },
                             onShare = { sharing = it },
                         )
-                        Screen.Year -> YearScreen(day, onOpenDay = { openDay = it }, onPoster = null)
+                        Screen.Year -> YearScreen(day, onOpenDay = { openDay = it }, onPoster = { poster = it })
                         Screen.Settings -> SettingsScreen(onBack = { screen = Screen.Today })
                         // Arrives with v1.1.
                         Screen.Friends -> Unit
@@ -95,14 +97,16 @@ fun App() {
             }
             openDay?.let { DaySheet(it, onClose = { openDay = null }, onPhoto = { photo = it }, onShare = { sharing = it }) }
             sharing?.let { ShareScreen(it, onClose = { sharing = null }) }
+            poster?.let { PosterScreen(it, onClose = { poster = null }) }
             photo?.let { PhotoViewer(it) { photo = null } }
             if (Paywall.open) ProDialog { Paywall.open = false }
 
-            BackHandler(Paywall.open || photo != null || sharing != null || openDay != null || screen != Screen.Today) {
+            BackHandler(Paywall.open || photo != null || sharing != null || poster != null || openDay != null || screen != Screen.Today) {
                 when {
                     Paywall.open -> Paywall.open = false
                     photo != null -> photo = null
                     sharing != null -> sharing = null
+                    poster != null -> poster = null
                     openDay != null -> openDay = null
                     else -> screen = Screen.Today
                 }

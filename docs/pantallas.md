@@ -99,7 +99,9 @@ Tras la foto, en la misma pantalla:
 - **Tira**: el año como columnas de 1 día, sin separación, a toda la altura disponible (proporción
   4:5). Los días vacíos no se pintan: la tira se comprime.
 - Tocar un día con entrada abre el día (sección 5).
-- Abajo: botón `poster` (abre el póster; exportar es Pro).
+- Abajo: botón `poster`. Abre la misma capa que compartir (sección 5) con el póster del año y un
+  segmentado de tres: `posterGrid`, `posterStrip`, `posterWallpaper`. Mirarlo es gratis; sin Pro,
+  compartir y guardar abren el paywall.
 - Año sin entradas: `yearEmpty`.
 
 ---

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.widthIn
@@ -73,9 +74,18 @@ fun ShareScreen(date: LocalDate, onClose: () -> Unit) {
     }
 }
 
-/** A finished picture over the whole screen, with share and save under it. The poster uses it too. */
+/**
+ * A finished picture over the whole screen, with share and save under it. The poster uses it too:
+ * [locked] still shows the picture and sends both buttons to [onLocked].
+ */
 @Composable
-fun PictureScreen(picture: ImageBitmap, onClose: () -> Unit, options: @Composable () -> Unit) {
+fun PictureScreen(
+    picture: ImageBitmap,
+    onClose: () -> Unit,
+    locked: Boolean = false,
+    onLocked: () -> Unit = {},
+    options: @Composable () -> Unit,
+) {
     var saved by remember { mutableStateOf<String?>(null) }
     Column(
         Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).safeDrawingPadding()
@@ -92,15 +102,19 @@ fun PictureScreen(picture: ImageBitmap, onClose: () -> Unit, options: @Composabl
                     bitmap = picture,
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
-                    modifier = Modifier.widthIn(max = 320.dp).clip(shape).border(1.dp, MaterialTheme.colorScheme.outline, shape),
+                    modifier = Modifier.widthIn(max = 320.dp).heightIn(max = 520.dp).clip(shape).border(1.dp, MaterialTheme.colorScheme.outline, shape),
                 )
             }
             options()
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)) {
-                OutlinedAction(S.share, onClick = { Sharing.sharePng(picture.encodeToPng()) })
+                OutlinedAction(S.share, onClick = { if (locked) onLocked() else Sharing.sharePng(picture.encodeToPng()) })
                 if (Sharing.canSaveToPhotos) {
                     OutlinedAction(S.saveToPhotos, onClick = {
-                        Sharing.savePngToPhotos(picture.encodeToPng()) { ok -> saved = if (ok) S.saved else S.saveFailed }
+                        if (locked) {
+                            onLocked()
+                        } else {
+                            Sharing.savePngToPhotos(picture.encodeToPng()) { ok -> saved = if (ok) S.saved else S.saveFailed }
+                        }
                     })
                 }
             }

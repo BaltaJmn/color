@@ -272,8 +272,16 @@ bloqueado, o la fila de Ajustes.
   su base a 168 px del borde; hex a 40 px; palabra a 56 px en cursiva; fecha con año a 40 px abajo a
   la izquierda; miniatura cuadrada de 320 px con radio del 10 % abajo a la derecha. Con `watermark`,
   "Chroma" a 32 px en la última línea y la fecha sube 56 px.
-- Póster: rejilla (1080x1350, 7 filas de semanas en 53 columnas o 12 meses en 31 columnas, lo que
-  diga `pantallas.md`), tira (1080x1350, 365 columnas finas) y fondo de pantalla (1170x2532).
+- Póster, siempre sobre papel claro (`#F6F4F1`, tinta `#1C1B1A`) sea cual sea el tema, porque es
+  para imprimir:
+  - Rejilla, 1080x1350: el año a 72 px arriba; 12 columnas de meses y 31 filas de días, como Mi
+    año, con celdas rectangulares de radio 6 e iniciales de mes encima. Días sin color en
+    `#ECE9E4`; los que no existen, papel.
+  - Tira, 1080x1350: el año arriba y debajo una columna fina por día con color, en orden, sin los
+    días vacíos, dentro de un rectángulo de radio 28.
+  - Fondo de pantalla, 1170x2532: el año en bandas horizontales de arriba abajo, a sangre y sin
+    texto, para que el reloj vaya encima.
+  - Con `watermark`, "Chroma" abajo a la izquierda en la rejilla y la tira; nunca en el fondo.
 - Se pinta con `Canvas` sobre un `ImageBitmap` en común y se codifica a PNG en cada plataforma, como
   la tarjeta de Purl.
 

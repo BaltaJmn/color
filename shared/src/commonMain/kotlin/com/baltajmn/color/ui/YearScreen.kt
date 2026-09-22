@@ -41,7 +41,7 @@ import com.baltajmn.color.ui.theme.screenInsets
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun YearScreen(today: LocalDate, onOpenDay: (LocalDate) -> Unit, onPoster: ((Int) -> Unit)?) {
+fun YearScreen(today: LocalDate, onOpenDay: (LocalDate) -> Unit, onPoster: (Int) -> Unit) {
     val days = ChromaRepository.journal.mapValues { it.value.color }
     val years = remember(days.keys) { (days.keys.map { it.take(4).toInt() } + today.year).distinct().sorted() }
     var year by rememberSaveable { mutableStateOf(today.year) }
@@ -67,7 +67,7 @@ fun YearScreen(today: LocalDate, onOpenDay: (LocalDate) -> Unit, onPoster: ((Int
                 strip -> YearStrip(year, days)
                 else -> YearGrid(year, days, today, onOpenDay)
             }
-            if (inYear && onPoster != null) {
+            if (inYear) {
                 Spacer(Modifier.height(24.dp))
                 Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { OutlinedAction(S.poster, { onPoster(year) }) }
             }
