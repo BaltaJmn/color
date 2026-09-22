@@ -455,6 +455,10 @@ Comunes (`commonTest`) salvo que se diga.
 16. Color de la semana: semana 1 y semana 53.
 17. Servidor (`supabase/tests/`, pgTAP): sin amistad no se lee; un bloqueo corta; tope de 50.
 
+`ExtractPreview` (`androidHostTest`) no es un test: con `CHROMA_PHOTOS=<carpeta>` escribe
+`shared/build/extract-preview.png`, una hoja con cada foto y sus candidatos, para juzgar la extracción a ojo.
+Sin la variable no hace nada.
+
 ---
 
 ## 11. Qué gobierna cada issue
