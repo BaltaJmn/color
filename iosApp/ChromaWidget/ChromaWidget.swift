@@ -71,5 +71,6 @@ struct ChromaTodayWidget: Widget {
 struct ChromaWidgets: WidgetBundle {
     var body: some Widget {
         ChromaTodayWidget()
+        ChromaYearWidget()
     }
 }

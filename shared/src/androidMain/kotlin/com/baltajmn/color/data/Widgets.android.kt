@@ -2,6 +2,7 @@ package com.baltajmn.color.data
 
 import androidx.glance.appwidget.updateAll
 import com.baltajmn.color.widget.TodayWidget
+import com.baltajmn.color.widget.YearWidget
 import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,5 +27,6 @@ actual fun refreshWidgets() {
     val context = AndroidContext.value
     CoroutineScope(Dispatchers.Default).launch {
         TodayWidget().updateAll(context)
+        YearWidget().updateAll(context)
     }
 }

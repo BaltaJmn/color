@@ -3,4 +3,6 @@
     <string name="widget_today_description">Today\'s color</string>
     <string name="widget_preview_today">Today</string>
     <string name="widget_preview_name">Storm blue</string>
+    <string name="widget_year_description">Your year in colors</string>
+    <string name="widget_preview_year" translatable="false">2026</string>
 </resources>

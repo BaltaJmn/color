@@ -57,9 +57,16 @@ fun widgetState(
 
 /**
  * What the widget should paint right now, without the app having run. A widget that wakes up after
- * 03:00 holds yesterday's state, and yesterday's color is not today's.
+ * 03:00 holds yesterday's state, and yesterday's color is not today's, nor last year's grid this year's.
  */
-fun widgetView(st: WidgetState, today: LocalDate): WidgetState = when (st.date) {
-    today.toString() -> st
-    else -> st.copy(date = today.toString(), color = null, name = null, friends = emptyList())
+fun widgetView(st: WidgetState, today: LocalDate): WidgetState {
+    val sameDay = st.date == today.toString()
+    return st.copy(
+        date = today.toString(),
+        color = st.color.takeIf { sameDay },
+        name = st.name.takeIf { sameDay },
+        friends = if (sameDay) st.friends else emptyList(),
+        year = today.year,
+        days = if (st.year == today.year) st.days else emptyMap(),
+    )
 }
