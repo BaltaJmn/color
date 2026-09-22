@@ -25,12 +25,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.baltajmn.color.billing.Billing
 import com.baltajmn.color.data.AppInfo
 import com.baltajmn.color.data.Backup
 import com.baltajmn.color.data.FilePicker
@@ -52,6 +54,7 @@ import com.baltajmn.color.i18n.S
 import com.baltajmn.color.ui.theme.GUTTER
 import com.baltajmn.color.ui.theme.MAX_CONTENT_WIDTH
 import com.baltajmn.color.ui.theme.Styles
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
 /** Settings, as a list of sections in the order of docs/pantallas.md 7. */
@@ -65,6 +68,9 @@ fun SettingsScreen(onBack: () -> Unit) {
     // Title and text together: an export that fails is not an import that fails.
     var failure by remember { mutableStateOf<Pair<String?, String>?>(null) }
     var imported by remember { mutableStateOf<Int?>(null) }
+    var restoring by remember { mutableStateOf(false) }
+    var restored by remember { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
     Column(
         Modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,6 +93,10 @@ fun SettingsScreen(onBack: () -> Unit) {
                         Reminder.sync(askPermission = on)
                     }
                 }
+            }
+
+            Section(S.sectionPrivacy) {
+                SettingRow(S.privacyRow, onClick = { AppInfo.open(PRIVACY_URL) })
             }
 
             Section(S.sectionCard) {
@@ -139,6 +149,28 @@ fun SettingsScreen(onBack: () -> Unit) {
                 )
             }
 
+            Section(S.sectionPro) {
+                SettingRow(
+                    title = S.proRow,
+                    subtitle = if (settings.pro) S.proOwned else S.proSubtitle,
+                    enabled = !settings.pro,
+                    onClick = { Paywall.open = true },
+                )
+                // Both stores ask for this to be reachable without buying anything first.
+                SettingRow(
+                    title = S.restoreRow,
+                    enabled = !restoring,
+                    onClick = {
+                        restoring = true
+                        scope.launch {
+                            val found = Billing.restore()
+                            restoring = false
+                            restored = if (found) S.restoreDone else S.restoreNothing
+                        }
+                    },
+                )
+            }
+
             val siblings = SIBLINGS.filter { it.storeUrl != null }
             if (siblings.isNotEmpty()) {
                 Section(S.sectionMoreApps) {
@@ -147,7 +179,6 @@ fun SettingsScreen(onBack: () -> Unit) {
             }
 
             Section(S.sectionAbout) {
-                SettingRow(S.privacyRow, onClick = { AppInfo.open(PRIVACY_URL) })
                 SettingRow(S.version(AppInfo.version))
             }
             Spacer(Modifier.height(32.dp))
@@ -180,6 +211,8 @@ fun SettingsScreen(onBack: () -> Unit) {
             },
         )
     }
+
+    restored?.let { Ask(null, it, S.ok, onConfirm = { restored = null }) }
 
     failure?.let { (title, text) -> Ask(title = title, text = text, confirm = S.ok, onConfirm = { failure = null }) }
 

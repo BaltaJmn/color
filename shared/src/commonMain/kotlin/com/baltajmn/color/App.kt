@@ -11,6 +11,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +22,7 @@ import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import com.baltajmn.color.billing.Billing
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.today
@@ -29,7 +31,9 @@ import com.baltajmn.color.i18n.S
 import com.baltajmn.color.ui.Glyph
 import com.baltajmn.color.ui.GlyphIcon
 import com.baltajmn.color.ui.DaySheet
+import com.baltajmn.color.ui.Paywall
 import com.baltajmn.color.ui.PhotoViewer
+import com.baltajmn.color.ui.ProDialog
 import com.baltajmn.color.ui.SettingsScreen
 import com.baltajmn.color.ui.ShareScreen
 import com.baltajmn.color.ui.YearScreen
@@ -44,20 +48,27 @@ enum class Screen { Today, Year, Friends, Settings }
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun App() {
-    remember { ChromaRepository.load() }
+    remember {
+        ChromaRepository.load()
+        Billing.configure()
+    }
     var day by remember { mutableStateOf(today()) }
     var screen by remember { mutableStateOf(Screen.Today) }
     // The photo is an overlay over whichever screen opened it, so back closes it first.
     var photo by remember { mutableStateOf<ImageBitmap?>(null) }
     var openDay by remember { mutableStateOf<LocalDate?>(null) }
     var sharing by remember { mutableStateOf<LocalDate?>(null) }
+    var proCheck by remember { mutableStateOf(0) }
 
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
         // Coming back after 03:00 is a new day, and the widgets are told before they are looked at.
         day = today()
         ChromaRepository.syncWidgets()
         Reminder.sync(askPermission = false)
+        // A purchase or a refund may have happened on another device.
+        proCheck++
     }
+    LaunchedEffect(proCheck) { Billing.refresh() }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
         // The debounce may still be waiting when the app leaves the screen: write now.
         ChromaRepository.saveNow()
@@ -85,9 +96,11 @@ fun App() {
             openDay?.let { DaySheet(it, onClose = { openDay = null }, onPhoto = { photo = it }, onShare = { sharing = it }) }
             sharing?.let { ShareScreen(it, onClose = { sharing = null }) }
             photo?.let { PhotoViewer(it) { photo = null } }
+            if (Paywall.open) ProDialog { Paywall.open = false }
 
-            BackHandler(photo != null || sharing != null || openDay != null || screen != Screen.Today) {
+            BackHandler(Paywall.open || photo != null || sharing != null || openDay != null || screen != Screen.Today) {
                 when {
+                    Paywall.open -> Paywall.open = false
                     photo != null -> photo = null
                     sharing != null -> sharing = null
                     openDay != null -> openDay = null
