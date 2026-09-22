@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.baltajmn.color.data.ChromaRepository
+import com.baltajmn.color.ui.theme.ChromaTheme
 
 /** Four screens do not justify a navigation library. Friends stays hidden until v1.1. */
 enum class Screen { Today, Year, Friends, Settings }
@@ -21,7 +22,7 @@ enum class Screen { Today, Year, Friends, Settings }
 fun App() {
     remember { ChromaRepository.load() }
     var screen by remember { mutableStateOf(Screen.Today) }
-    MaterialTheme {
+    ChromaTheme {
         Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), Alignment.Center) {
             Text("Chroma: ${screen.name}")
         }
