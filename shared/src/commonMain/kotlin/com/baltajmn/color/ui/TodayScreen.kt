@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -40,11 +41,14 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.baltajmn.color.color.ColorName
+import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.color.extractSwatches
 import com.baltajmn.color.color.nearestName
+import com.baltajmn.color.color.weekColor
 import com.baltajmn.color.data.Capture
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.FilePicker
@@ -56,11 +60,11 @@ import com.baltajmn.color.data.isFromToday
 import com.baltajmn.color.data.samplePixels
 import com.baltajmn.color.data.startExport
 import com.baltajmn.color.i18n.S
-import com.baltajmn.color.social.Social
 import com.baltajmn.color.model.WORD_MAX
 import com.baltajmn.color.model.codePointCount
 import com.baltajmn.color.model.isoKey
 import com.baltajmn.color.model.limitEdit
+import com.baltajmn.color.social.Social
 import com.baltajmn.color.ui.theme.CARD_RADIUS
 import com.baltajmn.color.ui.theme.GUTTER
 import com.baltajmn.color.ui.theme.MAX_CONTENT_WIDTH
@@ -165,7 +169,7 @@ fun TodayScreen(
                     pending = null
                 }, onCancel = if (entry != null) ({ pending = null }) else null)
                 entry != null -> {
-                    ChromaCard(entry, today, onPhoto = onPhoto)
+                    ChromaCard(entry, today, onPhoto = onPhoto) { WeekMark(entry.color, today) }
                     Spacer(Modifier.height(20.dp))
                     SwatchRow(entry.swatches, entry.color, 40.dp) { hex ->
                         ChromaRepository.pick(hex, entry.swatches, nearestName(hex).key)
@@ -178,6 +182,7 @@ fun TodayScreen(
                     }
                 }
                 else -> Empty(
+                    week = weekColor(today).takeIf { ChromaRepository.settings.weekColorOn },
                     firstTime = journal.isEmpty(),
                     working = working,
                     onCamera = camera,
@@ -203,7 +208,7 @@ fun TodayScreen(
 }
 
 @Composable
-private fun Empty(firstTime: Boolean, working: Boolean, onCamera: () -> Unit, onGallery: () -> Unit) {
+private fun Empty(week: ColorName?, firstTime: Boolean, working: Boolean, onCamera: () -> Unit, onGallery: () -> Unit) {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Spacer(Modifier.height(48.dp))
         Box(
@@ -219,6 +224,15 @@ private fun Empty(firstTime: Boolean, working: Boolean, onCamera: () -> Unit, on
         if (firstTime) {
             Spacer(Modifier.height(8.dp))
             Text(S.firstHelp, style = Styles.muted, textAlign = TextAlign.Center)
+        }
+        // A suggestion to look for, not a task: no count, no streak, and it can be switched off.
+        week?.let {
+            Spacer(Modifier.height(12.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(12.dp).clip(CircleShape).background(colorOf(it.hex)))
+                Spacer(Modifier.width(8.dp))
+                Text(S.weekHint(S.colorName(it.key)), style = Styles.caption)
+            }
         }
         Spacer(Modifier.height(32.dp))
         if (Capture.cameraAvailable) PrimaryAction(S.takePhoto, onCamera, Modifier.fillMaxWidth(), enabled = !working)

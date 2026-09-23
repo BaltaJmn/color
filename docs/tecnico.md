@@ -310,6 +310,14 @@ otro solo la ve si se lo compartí.
 `WEEK_KEYS`: 52 claves de la tabla de nombres, elegidas vivas y variadas. Semana ISO `w` (1 a 53):
 `WEEK_KEYS[(w - 1) % 52]`. Hay acierto si `deltaE(colorDelDía, colorDeLaSemana) < WEEK_DELTA_E`.
 
+- `color/Week.kt`. El orden recorre el círculo cromático y, a grandes rasgos, las estaciones (azules
+  fríos en enero, verdes en primavera, cálidos en verano, tierras en otoño). Cambiar el orden cambia el
+  color de todos a la vez: solo entre versiones, nunca a mitad de semana.
+- La semana ISO se calcula a mano (`isoWeek`): kotlinx-datetime no la trae.
+- La marca sale en Hoy, en el día abierto desde Mi año y en las tarjetas del feed. No va en la
+  imagen que se comparte: fuera de la app no significa nada.
+- `weekColorOn` apaga la pista de Hoy y todas las marcas.
+
 ---
 
 ## 7. Captura

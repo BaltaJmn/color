@@ -157,7 +157,7 @@ val COLOR_NAMES: List<ColorName> = listOf(
     n("magenta", "#B3127A", "magenta", "magenta", "magenta", "Magenta", "magenta"),
 )
 
-private val BY_KEY: Map<String, ColorName> by lazy { COLOR_NAMES.associateBy { it.key } }
+internal val BY_KEY: Map<String, ColorName> by lazy { COLOR_NAMES.associateBy { it.key } }
 
 /** The closest named color, by deltaE. */
 fun nearestName(hex: String): ColorName {

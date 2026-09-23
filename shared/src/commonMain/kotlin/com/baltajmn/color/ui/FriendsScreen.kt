@@ -404,6 +404,7 @@ private fun FeedCard(row: FeedRow, author: String, onPhoto: (ImageBitmap) -> Uni
         onAuthor = { Friends.viewing = person },
     ) {
         // Only on the same day, and only for the two of them: everyone else's color is different.
+        WeekMark(row.color, row.date)
         val mine = ChromaRepository.journal[row.day]?.color
         if (mine != null && inTune(mine, row.color)) InTuneMark(inkColorFor(row.color))
     }

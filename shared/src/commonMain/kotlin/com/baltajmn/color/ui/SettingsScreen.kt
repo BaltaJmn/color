@@ -33,24 +33,25 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.billing.Billing
+import com.baltajmn.color.color.weekColor
 import com.baltajmn.color.data.AppInfo
 import com.baltajmn.color.data.Backup
+import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.FilePicker
 import com.baltajmn.color.data.ImportFailed
 import com.baltajmn.color.data.ImportProblem
 import com.baltajmn.color.data.MergeResult
+import com.baltajmn.color.data.PRIVACY_URL
 import com.baltajmn.color.data.PickResult
+import com.baltajmn.color.data.Reminder
+import com.baltajmn.color.data.SIBLINGS
+import com.baltajmn.color.data.TERMS_URL
 import com.baltajmn.color.data.abandonImport
 import com.baltajmn.color.data.merge
 import com.baltajmn.color.data.readBackup
 import com.baltajmn.color.data.startExport
-import com.baltajmn.color.data.today
-import com.baltajmn.color.data.ChromaRepository
-import com.baltajmn.color.data.PRIVACY_URL
-import com.baltajmn.color.data.TERMS_URL
-import com.baltajmn.color.data.Reminder
-import com.baltajmn.color.data.SIBLINGS
 import com.baltajmn.color.data.storeUrl
+import com.baltajmn.color.data.today
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.social.Friends
 import com.baltajmn.color.social.Social
@@ -129,6 +130,9 @@ fun SettingsScreen(onBack: () -> Unit) {
             Section(S.sectionCard) {
                 SettingRow(S.watermarkRow) {
                     SoftSwitch(settings.watermark) { on -> ChromaRepository.updateSettings { it.copy(watermark = on) } }
+                }
+                SettingRow(S.weekColorRow, S.colorName(weekColor(today()).key)) {
+                    SoftSwitch(settings.weekColorOn) { on -> ChromaRepository.updateSettings { it.copy(weekColorOn = on) } }
                 }
             }
 

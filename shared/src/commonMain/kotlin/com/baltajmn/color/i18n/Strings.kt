@@ -189,6 +189,7 @@ object S {
     val reminderRow get() = t("Daily reminder", "Recordatorio diario", "Lembrete diário", "Tägliche Erinnerung", "Rappel quotidien")
     val reminderOff get() = t("Off", "Apagado", "Desativado", "Aus", "Désactivé")
     val openSystemSettings get() = t("Open settings", "Abrir ajustes", "Abrir ajustes", "Einstellungen öffnen", "Ouvrir les réglages")
+    val weekColorRow get() = t("Color of the week", "Color de la semana", "Cor da semana", "Farbe der Woche", "Couleur de la semaine")
     val watermarkRow get() = t(
         "\"Chroma\" on shared cards",
         "\"Chroma\" en las tarjetas compartidas",
@@ -627,6 +628,14 @@ object S {
         "$name deixa de te ver e não poderá te convidar de novo. Ninguém é avisado.",
         "$name sieht dich nicht mehr und kann dich nicht wieder einladen. Niemand wird benachrichtigt.",
         "$name ne te verra plus et ne pourra plus t'inviter. Personne n'est prévenu.",
+    )
+
+    fun weekHint(name: String) = t(
+        "Color of the week: $name",
+        "Color de la semana: $name",
+        "Cor da semana: $name",
+        "Farbe der Woche: $name",
+        "Couleur de la semaine : $name",
     )
 
     fun inviteMessage(link: String) = t(

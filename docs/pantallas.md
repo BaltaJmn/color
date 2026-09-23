@@ -63,7 +63,9 @@ paywall y el bloqueo.
 - Centro: un círculo de 160 con borde `outline` de 2 y un icono de cámara; debajo, `todayPrompt`
   ("¿De qué color es hoy?").
 - Botón principal a lo ancho: `takePhoto`. Debajo, botón de texto: `fromGallery`.
-- Primera sesión: bajo el prompt, `firstHelp` en `onMuted`. Nada más.
+- Primera sesión: bajo el prompt, `firstHelp` en `onMuted`.
+- Con el color de la semana encendido (v1.2): un punto de 12 con ese color y `weekHint(nombre)` en
+  `caption`. Una pista, no una tarea. Nada más.
 
 ### Eligiendo color
 
@@ -138,7 +140,7 @@ Componente `ChromaCard(entry, date, author?, compact)`. Proporción 4:5, radio 2
 | Fecha | Abajo izquierda, margen 24 | `label` en peso normal, tinta |
 | Miniatura | Abajo derecha, margen 20, lado 30 % del ancho | Radio 14, borde de 2 en tinta al 24 % |
 | Marca de sintonía (v1.1) | Arriba derecha | Dos aros solapados de 10 (16 de ancho, trazo 1,5), tinta; se lee `inTune` |
-| Marca de la semana (v1.2) | Arriba derecha, a la izquierda de la sintonía | Un rombo de 10, tinta |
+| Marca de la semana (v1.2) | Arriba derecha, a la izquierda de la sintonía | Un rombo de 10 relleno, tinta; se lee `weekColorRow` |
 
 Sin foto (día compartido solo con color, o foto caducada en el servidor), no hay miniatura.
 
@@ -153,7 +155,8 @@ Lista de secciones, como Purl:
    `deleteAccount` (confirmación `deleteAccountText`; mientras borra, `working`; sin conexión, el aviso
    de siempre y nada cambia).
 3. **Privacidad**: bloqueo (v1.2), política, y `termsRow` si hay servidor.
-4. **Tarjeta**: `watermarkRow`, `weekColorRow` (v1.2).
+4. **Tarjeta**: `watermarkRow`, `weekColorRow` (v1.2, interruptor con el nombre del color de esta
+   semana debajo).
 5. **Copia**: exportar (con fecha de la última) e importar.
 6. **Chroma Pro**: comprar o "ya lo tienes", restaurar.
 7. **Más apps**: una fila por hermana publicada en esa tienda.

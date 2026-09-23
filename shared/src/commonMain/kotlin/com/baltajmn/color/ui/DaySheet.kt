@@ -59,7 +59,7 @@ fun DaySheet(
                 }
             }
             Spacer(Modifier.height(8.dp))
-            entry?.let { ChromaCard(it, date, onPhoto = onPhoto) }
+            entry?.let { ChromaCard(it, date, onPhoto = onPhoto) { WeekMark(it.color, date) } }
             Spacer(Modifier.height(32.dp))
         }
     }

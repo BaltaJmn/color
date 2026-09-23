@@ -1,5 +1,6 @@
 package com.baltajmn.color.ui
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -30,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.color.inkColorFor
+import com.baltajmn.color.color.weekHit
+import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Photos
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.model.ChromaEntry
@@ -112,3 +116,24 @@ fun ChromaCard(
         }
     }
 }
+
+/** The color of the week showed up in this day (docs/pantallas.md 6): a small diamond, never a score. */
+@Composable
+fun WeekMark(color: String, date: LocalDate) {
+    if (!ChromaRepository.settings.weekColorOn || !weekHit(color, date)) return
+    val ink = inkColorFor(color)
+    val label = S.weekColorRow
+    Canvas(Modifier.size(10.dp).semantics { contentDescription = label }) {
+        drawPath(
+            Path().apply {
+                moveTo(size.width / 2, 0f)
+                lineTo(size.width, size.height / 2)
+                lineTo(size.width / 2, size.height)
+                lineTo(0f, size.height / 2)
+                close()
+            },
+            ink,
+        )
+    }
+}
+
