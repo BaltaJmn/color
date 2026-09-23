@@ -28,6 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
@@ -58,7 +59,7 @@ internal fun Overlay(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
-            Row(Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
                 GlyphButton(Glyph.CLOSE, S.a11yClose, onClose)
                 Text(title, style = Styles.title, modifier = Modifier.weight(1f).padding(start = 4.dp))
                 action?.invoke()
@@ -135,16 +136,17 @@ fun FriendDay(row: FeedRow, person: Profile, onClose: () -> Unit, onPhoto: (Imag
     }
 }
 
+/** [tint] lets a caller on a colored background (a card) match its ink instead of the default gray. */
 @Composable
-private fun MoreButton(acting: Acting) {
-    GlyphButton(Glyph.MORE, S.a11yMore, { Friends.acting = acting })
+internal fun MoreButton(acting: Acting, tint: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
+    GlyphButton(Glyph.MORE, S.a11yMore, { Friends.acting = acting }, tint = tint)
 }
 
 private enum class Step { Menu, Remove, Block, Report, Busy, Failed }
 
 /**
  * docs/pantallas.md 8.3: what can be done about a friend or one of their days. Quiet on purpose:
- * the other person is never told, and none of it sits on the card where a reaction would.
+ * the other person is never told.
  */
 @Composable
 fun FriendActions(acting: Acting, onDone: () -> Unit) {
@@ -174,8 +176,14 @@ fun FriendActions(acting: Acting, onDone: () -> Unit) {
             confirmButton = { TextAction(S.cancel, onDone) },
             containerColor = MaterialTheme.colorScheme.surface,
         )
-        Step.Remove -> Ask(S.removeFriend, S.removeFriendText(person.displayName), S.removeFriend, { perform { Friends.remove(person.id) } }, onDone)
-        Step.Block -> Ask(S.block, S.blockText(person.displayName), S.block, { perform { Friends.block(person.id) } }, onDone)
+        Step.Remove -> Ask(
+            S.removeFriend, S.removeFriendText(person.displayName), S.removeFriend,
+            { perform { Friends.remove(person.id) } }, onDone, destructive = true,
+        )
+        Step.Block -> Ask(
+            S.block, S.blockText(person.displayName), S.block,
+            { perform { Friends.block(person.id) } }, onDone, destructive = true,
+        )
         Step.Report -> Ask(S.report, S.reportText, S.report, {
             val row = day ?: return@Ask onDone()
             // Hidden at once, as Apple asks; shown again only if the report never left.

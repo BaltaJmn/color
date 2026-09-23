@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -52,28 +53,29 @@ fun YearScreen(today: LocalDate, onOpenDay: (LocalDate) -> Unit, onPoster: (Int)
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
-            Row(Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
                 val i = years.indexOf(year)
                 if (years.size > 1) GlyphButton(Glyph.BACK, S.a11yPreviousYear, { year = years[i - 1] }, enabled = i > 0)
                 Text(year.toString(), style = Styles.title, modifier = Modifier.weight(1f), textAlign = if (years.size > 1) TextAlign.Center else TextAlign.Start)
                 if (years.size > 1) GlyphButton(Glyph.FORWARD, S.a11yNextYear, { year = years[i + 1] }, enabled = i < years.lastIndex)
             }
-            Segmented(listOf(S.viewGrid, S.viewStrip), if (strip) 1 else 0) { strip = it == 1 }
-            Spacer(Modifier.height(20.dp))
 
             val inYear = days.keys.any { it.startsWith("$year-") }
+            if (inYear) {
+                Segmented(listOf(S.viewGrid, S.viewStrip), if (strip) 1 else 0) { strip = it == 1 }
+                Spacer(Modifier.height(16.dp))
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)) {
+                    OutlinedAction(S.poster, { onPoster(year) })
+                    // Pro, and asked for honestly: the button is there, the phrases open after buying.
+                    OutlinedAction(S.stats, { if (ChromaRepository.settings.pro) onStats(year) else Paywall.open = true }, pro = !ChromaRepository.settings.pro)
+                }
+                Spacer(Modifier.height(16.dp))
+            }
+
             when {
                 !inYear -> Text(S.yearEmpty, style = Styles.muted, modifier = Modifier.padding(vertical = 24.dp))
                 strip -> YearStrip(year, days)
                 else -> YearGrid(year, days, today, onOpenDay)
-            }
-            if (inYear) {
-                Spacer(Modifier.height(24.dp))
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)) {
-                    OutlinedAction(S.poster, { onPoster(year) })
-                    // Pro, and asked for honestly: the button is there, the phrases open after buying.
-                    OutlinedAction(S.stats, { if (ChromaRepository.settings.pro) onStats(year) else Paywall.open = true })
-                }
             }
             Spacer(Modifier.height(32.dp))
         }
@@ -92,6 +94,7 @@ fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
             val on = i == selected
             Box(
                 Modifier.weight(1f)
+                    .heightIn(min = 48.dp)
                     .clip(RoundedCornerShape(18.dp))
                     .background(if (on) colors.surface else colors.surfaceVariant)
                     .semantics { this.selected = on }

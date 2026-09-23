@@ -34,28 +34,51 @@ fun PrimaryAction(label: String, onClick: () -> Unit, modifier: Modifier = Modif
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .padding(horizontal = 24.dp),
         contentAlignment = Alignment.Center,
-    ) { Text(label, style = Styles.body.copy(color = colors.onPrimary, fontWeight = FontWeight.Medium)) }
+    ) {
+        Text(
+            label,
+            style = Styles.body.copy(
+                color = if (enabled) colors.onPrimary else colors.onSurfaceVariant,
+                fontWeight = FontWeight.Medium,
+            ),
+        )
+    }
 }
 
-/** A button with a border: 44 high, a pill, 1 dp of outline. */
+/**
+ * A button with a border: 48 high, a pill, 1 dp of outline. [pro] says before the tap that it opens
+ * the paywall, instead of a Share that turns out to be a purchase.
+ */
 @Composable
-fun OutlinedAction(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun OutlinedAction(label: String, onClick: () -> Unit, modifier: Modifier = Modifier, pro: Boolean = false) {
     Box(
-        modifier.heightIn(min = 44.dp)
-            .clip(RoundedCornerShape(22.dp))
-            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(22.dp))
+        modifier.heightIn(min = 48.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(24.dp))
             .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 20.dp),
         contentAlignment = Alignment.Center,
-    ) { Text(label, style = Styles.body.copy(fontWeight = FontWeight.Medium)) }
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(label, style = Styles.body.copy(fontWeight = FontWeight.Medium))
+            if (pro) Text(S.proTag, style = Styles.label, modifier = Modifier.padding(start = 8.dp))
+        }
+    }
 }
 
-/** A text button: 44 high, no background. */
+/** A text button: 48 high, no background. [destructive] marks what cannot be undone. */
 @Composable
-fun TextAction(label: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
+fun TextAction(
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    destructive: Boolean = false,
+) {
+    val colors = MaterialTheme.colorScheme
     Box(
-        modifier.heightIn(min = 44.dp)
-            .clip(RoundedCornerShape(22.dp))
+        modifier.heightIn(min = 48.dp)
+            .clip(RoundedCornerShape(24.dp))
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center,
@@ -64,7 +87,11 @@ fun TextAction(label: String, onClick: () -> Unit, modifier: Modifier = Modifier
             label,
             style = Styles.body.copy(
                 fontWeight = FontWeight.Medium,
-                color = if (enabled) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
+                color = when {
+                    !enabled -> colors.onSurfaceVariant
+                    destructive -> colors.error
+                    else -> colors.onBackground
+                },
             ),
         )
     }
@@ -77,12 +104,13 @@ fun Ask(
     confirm: String,
     onConfirm: () -> Unit,
     onDismiss: (() -> Unit)? = null,
+    destructive: Boolean = false,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss ?: onConfirm,
         title = title?.let { { Text(it, style = Styles.title) } },
         text = { Text(text, style = Styles.body) },
-        confirmButton = { TextAction(confirm, onClick = onConfirm) },
+        confirmButton = { TextAction(confirm, onClick = onConfirm, destructive = destructive) },
         dismissButton = onDismiss?.let { { TextAction(S.cancel, onClick = it) } },
         containerColor = MaterialTheme.colorScheme.surface,
     )

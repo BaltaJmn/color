@@ -385,6 +385,9 @@ object S {
     val share get() = t("Share", "Compartir", "Compartilhar", "Teilen", "Partager")
     val shareColorOnly get() = t("Color only", "Solo el color", "Só a cor", "Nur die Farbe", "La couleur seule")
     val shareWithPhoto get() = t("With the photo", "Con la foto", "Com a foto", "Mit dem Foto", "Avec la photo")
+    /** The picture about to leave the app, a different thing from what friends see. */
+    val includePhoto get() = t("Include the photo", "Incluir la foto", "Incluir a foto", "Mit Foto", "Inclure la photo")
+    val proTag get() = t("Pro", "Pro", "Pro", "Pro", "Pro")
     val saveToPhotos get() = t("Save to Photos", "Guardar en fotos", "Salvar nas fotos", "In Fotos speichern", "Enregistrer la photo")
     val saved get() = t("Saved to your photos.", "Guardada en tus fotos.", "Salva nas suas fotos.", "In deinen Fotos gespeichert.", "Enregistrée dans tes photos.")
     val saveFailed get() = t("Couldn't save.", "No se ha podido guardar.", "Não foi possível salvar.", "Konnte nicht gespeichert werden.", "Impossible d'enregistrer.")
@@ -505,7 +508,6 @@ object S {
         "Tes amis restent sur le compte. En te reconnectant, ils reviennent.",
     )
     val inviteFriend get() = t("Invite a friend", "Invitar a un amigo", "Convidar um amigo", "Freund einladen", "Inviter un ami")
-    val inviteRow get() = t("Your invite link", "Tu enlace de invitación", "Seu link de convite", "Dein Einladungslink", "Ton lien d'invitation")
     val inviteText get() = t(
         "Whoever opens it sends you a request. Nothing changes until you accept it.",
         "Quien lo abra te envía una solicitud. Nada cambia hasta que la aceptas.",
@@ -596,6 +598,15 @@ object S {
     val a11yShare get() = t("Share", "Compartir", "Compartilhar", "Teilen", "Partager")
     val a11ySettings get() = t("Settings", "Ajustes", "Ajustes", "Einstellungen", "Réglages")
     val a11yClose get() = t("Close", "Cerrar", "Fechar", "Schließen", "Fermer")
+    val a11yInviteQr get() = t(
+        "QR code with your invite link", "Código QR con tu enlace de invitación", "Código QR com seu link de convite",
+        "QR-Code mit deinem Einladungslink", "QR code avec ton lien d'invitation",
+    )
+    val a11yFriendsToday get() = t(
+        "Colors your friends picked today", "Los colores que tus amigos eligieron hoy", "As cores que seus amigos escolheram hoje",
+        "Die Farben, die deine Freunde heute gewählt haben", "Les couleurs choisies aujourd'hui par tes amis",
+    )
+    val a11yYearWidget get() = t("Your year in color", "Tu año en color", "Seu ano em cores", "Dein Jahr in Farben", "Ton année en couleurs")
     val a11yMore get() = t("More options", "Más opciones", "Mais opções", "Weitere Optionen", "Plus d'options")
     val a11yPhoto get() = t("Open the photo", "Abrir la foto", "Abrir a foto", "Foto öffnen", "Ouvrir la photo")
     val a11ySelected get() = t("selected", "elegido", "escolhida", "ausgewählt", "choisie")

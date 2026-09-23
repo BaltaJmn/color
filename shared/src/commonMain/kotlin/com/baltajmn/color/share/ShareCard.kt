@@ -74,9 +74,9 @@ const val WALL_W = 1170
 const val WALL_H = 2532
 
 // Always the light paper, whatever the theme: a poster is for printing and a wall.
-private val PAPER = Color(0xFFF6F4F1)
-private val PAPER_INK = Color(0xFF1C1B1A)
-private val PAPER_EMPTY = Color(0xFFECE9E4)
+private val PAPER = Color(0xFFF3F3F3)
+private val PAPER_INK = Color(0xFF111111)
+private val PAPER_EMPTY = Color(0xFFE5E5E5)
 
 fun renderPoster(style: PosterStyle, year: Int, days: Map<String, String>, watermark: Boolean, measurer: TextMeasurer): ImageBitmap {
     val colors = days.filterKeys { it.startsWith("$year-") }.entries.sortedBy { it.key }.map { colorOf(it.value) }

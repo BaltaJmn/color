@@ -123,4 +123,7 @@ enum L {
     static var unlock: String {
         t("Tap to turn it on", "Toca para activarlo", "Toque para ativar", "Tippen zum Aktivieren", "Touche pour l'activer")
     }
+    static var yearLabel: String {
+        t("Your year in color", "Tu año en color", "Seu ano em cores", "Dein Jahr in Farben", "Ton année en couleurs")
+    }
 }

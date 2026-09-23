@@ -1,10 +1,13 @@
 package com.baltajmn.color
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -16,14 +19,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.baltajmn.color.billing.Billing
+import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Lock
 import com.baltajmn.color.data.Reminder
@@ -146,7 +152,7 @@ fun App() {
                         Screen.Friends -> FriendsScreen(day, onPhoto = { photo = it })
                     }
                 }
-                if (screen != Screen.Settings) BottomBar(screen) { screen = it }
+                if (screen != Screen.Settings) BottomBar(screen, ChromaRepository.entryOn(day)?.color) { screen = it }
             }
             openDay?.let { DaySheet(it, onClose = { openDay = null }, onPhoto = { photo = it }, onShare = { sharing = it }) }
             sharing?.let { ShareScreen(it, onClose = { sharing = null }) }
@@ -191,7 +197,7 @@ fun App() {
 }
 
 @Composable
-private fun BottomBar(current: Screen, onSelect: (Screen) -> Unit) {
+private fun BottomBar(current: Screen, todayColor: String?, onSelect: (Screen) -> Unit) {
     val colors = MaterialTheme.colorScheme
     NavigationBar(containerColor = colors.background, tonalElevation = 0.dp) {
         // Friends only exists once there is a server to be friends on.
@@ -206,7 +212,21 @@ private fun BottomBar(current: Screen, onSelect: (Screen) -> Unit) {
             NavigationBarItem(
                 selected = s == current,
                 onClick = { onSelect(s) },
-                icon = { GlyphIcon(glyph, tint = tint) },
+                icon = {
+                    // The one place the chrome takes a color: once picked, Today's dot is the day's own.
+                    if (s == Screen.Today && todayColor != null) {
+                        Box(Modifier.size(20.dp), contentAlignment = Alignment.Center) {
+                            Box(
+                                Modifier.size(14.dp)
+                                    .clip(CircleShape)
+                                    .background(colorOf(todayColor))
+                                    .border(1.dp, colors.outline, CircleShape),
+                            )
+                        }
+                    } else {
+                        GlyphIcon(glyph, tint = tint)
+                    }
+                },
                 label = { Text(label, style = Styles.caption.copy(color = tint)) },
                 colors = NavigationBarItemDefaults.colors(indicatorColor = colors.surfaceVariant),
             )

@@ -101,7 +101,7 @@ private fun Year(state: WidgetState?) {
         )
         Spacer(GlanceModifier.height(8.dp))
         Box(GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Image(ImageProvider(grid), contentDescription = null)
+            Image(ImageProvider(grid), contentDescription = S.a11yYearWidget)
             if (!pro) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(S.proTitle, style = TextStyle(color = ColorProvider(scheme.onBackground), fontSize = 13.sp, fontWeight = FontWeight.Medium))

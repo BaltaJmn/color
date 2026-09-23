@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.widthIn
@@ -50,7 +51,7 @@ fun DaySheet(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
-            Row(Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
                 GlyphButton(Glyph.CLOSE, S.a11yClose, onClose)
                 Text(S.longDateWithYear(date), style = Styles.title, modifier = Modifier.weight(1f).padding(start = 4.dp))
                 if (entry != null) {
@@ -75,6 +76,7 @@ fun DaySheet(
                 onClose()
             },
             onDismiss = { confirmDelete = false },
+            destructive = true,
         )
     }
 }

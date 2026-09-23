@@ -68,7 +68,7 @@ fun ShareScreen(date: LocalDate, onClose: () -> Unit) {
 
     PictureScreen(card, onClose) {
         if (photo != null) {
-            Segmented(listOf(S.shareColorOnly, S.shareWithPhoto), if (withPhoto) 1 else 0) { withPhoto = it == 1 }
+            ToggleRow(S.includePhoto, checked = withPhoto) { withPhoto = it }
             Spacer(Modifier.height(16.dp))
         }
     }
@@ -93,7 +93,7 @@ fun PictureScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
-            Row(Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
                 GlyphButton(Glyph.CLOSE, S.a11yClose, onClose)
             }
             Box(Modifier.fillMaxWidth().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
@@ -107,15 +107,19 @@ fun PictureScreen(
             }
             options()
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)) {
-                OutlinedAction(S.share, onClick = { if (locked) onLocked() else Sharing.sharePng(picture.encodeToPng()) })
+                OutlinedAction(S.share, onClick = { if (locked) onLocked() else Sharing.sharePng(picture.encodeToPng()) }, pro = locked)
                 if (Sharing.canSaveToPhotos) {
-                    OutlinedAction(S.saveToPhotos, onClick = {
-                        if (locked) {
-                            onLocked()
-                        } else {
-                            Sharing.savePngToPhotos(picture.encodeToPng()) { ok -> saved = if (ok) S.saved else S.saveFailed }
-                        }
-                    })
+                    OutlinedAction(
+                        S.saveToPhotos,
+                        onClick = {
+                            if (locked) {
+                                onLocked()
+                            } else {
+                                Sharing.savePngToPhotos(picture.encodeToPng()) { ok -> saved = if (ok) S.saved else S.saveFailed }
+                            }
+                        },
+                        pro = locked,
+                    )
                 }
             }
             Spacer(Modifier.height(32.dp))

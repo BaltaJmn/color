@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -87,22 +88,25 @@ fun SettingsScreen(onBack: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
-            Row(Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
                 GlyphButton(Glyph.BACK, S.a11yBack, onBack, Modifier.padding(end = 8.dp))
                 Text(S.settingsTitle, style = Styles.title)
             }
 
             Section(S.sectionReminder) {
+                val setReminder: (Boolean) -> Unit = { on ->
+                    ChromaRepository.updateSettings { it.copy(reminderOn = on, reminderOffered = true) }
+                    // Turning it on is the one moment the permission question makes sense.
+                    Reminder.sync(askPermission = on)
+                }
                 SettingRow(
                     title = S.reminderRow,
                     subtitle = if (settings.reminderOn) S.reminderAt(settings.reminderHour, settings.reminderMinute) else S.reminderOff,
-                    onClick = if (settings.reminderOn) ({ pickTime = true }) else null,
+                    // Off: tapping the row turns it on, the same path as the switch. On: it opens the
+                    // time picker, and only the switch itself turns it back off.
+                    onClick = if (settings.reminderOn) ({ pickTime = true }) else ({ setReminder(true) }),
                 ) {
-                    SoftSwitch(settings.reminderOn) { on ->
-                        ChromaRepository.updateSettings { it.copy(reminderOn = on, reminderOffered = true) }
-                        // Turning it on is the one moment the permission question makes sense.
-                        Reminder.sync(askPermission = on)
-                    }
+                    SoftSwitch(settings.reminderOn, onChange = setReminder)
                 }
             }
 
@@ -112,7 +116,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                     SettingRow(S.nameRow, me.displayName, onClick = { renaming = true })
                     SettingRow(S.defaultShareRow, shareLabel(settings.defaultShare), onClick = { choosingShare = true })
                     SettingRow(S.friendsRow, onClick = { Friends.listOpen = true })
-                    SettingRow(S.inviteRow, onClick = { Friends.inviteOpen = true })
+                    SettingRow(S.inviteFriend, onClick = { Friends.inviteOpen = true })
                     SettingRow(S.signOut, onClick = { leaving = true })
                     SettingRow(
                         S.deleteAccount,
@@ -125,28 +129,27 @@ fun SettingsScreen(onBack: () -> Unit) {
 
             Section(S.sectionPrivacy) {
                 val canLock = remember { Lock.isAvailable() }
-                SettingRow(
+                ToggleRow(
                     title = S.lockRow,
                     subtitle = if (canLock) S.lockSubtitle else S.lockUnavailable,
+                    checked = settings.lockOn,
                     enabled = canLock,
-                ) {
-                    SoftSwitch(settings.lockOn, enabled = canLock) { on ->
-                        // Turning it on proves who is asking: otherwise whoever has the phone in their
-                        // hand could lock the owner out of their own year.
-                        val store = { ChromaRepository.updateSettings { it.copy(lockOn = on) } }
-                        if (on) Lock.authenticate { if (it) store() } else store()
-                    }
+                ) { on ->
+                    // Turning it on proves who is asking: otherwise whoever has the phone in their
+                    // hand could lock the owner out of their own year.
+                    val store = { ChromaRepository.updateSettings { it.copy(lockOn = on) } }
+                    if (on) Lock.authenticate { if (it) store() } else store()
                 }
                 SettingRow(S.privacyRow, onClick = { AppInfo.open(PRIVACY_URL) })
                 if (Social.available) SettingRow(S.termsRow, onClick = { AppInfo.open(TERMS_URL) })
             }
 
             Section(S.sectionCard) {
-                SettingRow(S.watermarkRow) {
-                    SoftSwitch(settings.watermark) { on -> ChromaRepository.updateSettings { it.copy(watermark = on) } }
+                ToggleRow(S.watermarkRow, checked = settings.watermark) { on ->
+                    ChromaRepository.updateSettings { it.copy(watermark = on) }
                 }
-                SettingRow(S.weekColorRow, S.colorName(weekColor(today()).key)) {
-                    SoftSwitch(settings.weekColorOn) { on -> ChromaRepository.updateSettings { it.copy(weekColorOn = on) } }
+                ToggleRow(S.weekColorRow, S.colorName(weekColor(today()).key), checked = settings.weekColorOn) { on ->
+                    ChromaRepository.updateSettings { it.copy(weekColorOn = on) }
                 }
             }
 
@@ -298,6 +301,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 }
             },
             onDismiss = { erasing = false },
+            destructive = true,
         )
     }
 
@@ -395,7 +399,7 @@ fun SettingRow(
 }
 
 @Composable
-fun SoftSwitch(checked: Boolean, enabled: Boolean = true, onChange: (Boolean) -> Unit) {
+fun SoftSwitch(checked: Boolean, enabled: Boolean = true, onChange: ((Boolean) -> Unit)?) {
     Switch(
         checked = checked,
         onCheckedChange = onChange,
@@ -406,4 +410,31 @@ fun SoftSwitch(checked: Boolean, enabled: Boolean = true, onChange: (Boolean) ->
             uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
     )
+}
+
+/**
+ * A row whose only action is a switch: like a native settings list, the whole row toggles.
+ * The switch gets `onCheckedChange = null` so there is a single control for screen readers.
+ */
+@Composable
+fun ToggleRow(
+    title: String,
+    subtitle: String? = null,
+    checked: Boolean,
+    enabled: Boolean = true,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    Row(
+        Modifier.fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .toggleable(value = checked, enabled = enabled, role = Role.Switch, onValueChange = onCheckedChange)
+            .alpha(if (enabled) 1f else 0.4f),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
+            Text(title, style = Styles.body)
+            if (subtitle != null) Text(subtitle, style = Styles.caption)
+        }
+        SoftSwitch(checked, enabled = enabled, onChange = null)
+    }
 }

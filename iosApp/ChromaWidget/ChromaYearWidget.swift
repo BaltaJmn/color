@@ -71,6 +71,8 @@ private struct YearView: View {
             Text(String(ChromaStore.year(day))).font(.system(size: 13, weight: .medium))
             ZStack {
                 YearGrid(days: pro ? entry.state?.days ?? [:] : [:], year: ChromaStore.year(day), today: ChromaStore.key(day))
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(Text(L.yearLabel))
                 if !pro {
                     VStack(spacing: 2) {
                         Text(L.proTitle).font(.system(size: 13, weight: .semibold))

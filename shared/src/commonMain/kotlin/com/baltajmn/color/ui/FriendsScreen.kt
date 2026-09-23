@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -49,6 +50,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.semantics
@@ -117,16 +119,21 @@ private fun Page(content: @Composable ColumnScope.() -> Unit) {
 
 @Composable
 private fun Header(action: (@Composable () -> Unit)? = null) {
-    Row(Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(S.navFriends, style = Styles.title, modifier = Modifier.weight(1f))
         action?.invoke()
     }
 }
 
-/** One segment per color, no names: the intro's example week, and the circle's today. */
+/**
+ * One segment per color, no names: the intro's example week, and the circle's today. [description]
+ * announces the strip as one thing when it carries meaning; null keeps a purely decorative one
+ * (like the intro's made-up example) silent for a screen reader.
+ */
 @Composable
-private fun PaletteStrip(colors: List<String>) {
-    Row(Modifier.fillMaxWidth().height(24.dp).clip(RoundedCornerShape(12.dp))) {
+private fun PaletteStrip(colors: List<String>, description: String? = null) {
+    val base = Modifier.fillMaxWidth().height(24.dp).clip(RoundedCornerShape(12.dp))
+    Row(if (description != null) base.semantics { contentDescription = description } else base.clearAndSetSemantics {}) {
         colors.forEach { Box(Modifier.weight(1f).height(24.dp).background(colorOf(it))) }
     }
 }
@@ -148,8 +155,8 @@ private fun Intro() {
     }
     Spacer(Modifier.height(20.dp))
     if (failed) Notice(S.signInFailed, S.ok to { failed = false })
-    // Apple first and as prominent as any other: App Store guideline 4.8.
-    PrimaryAction(S.signInApple, { apple.startFlow() }, Modifier.fillMaxWidth())
+    // Apple first, and identical to Google: App Store guideline 4.8, equally prominent.
+    OutlinedAction(S.signInApple, { apple.startFlow() }, Modifier.fillMaxWidth())
     Spacer(Modifier.height(8.dp))
     OutlinedAction(S.signInGoogle, { google.startFlow() }, Modifier.fillMaxWidth())
 }
@@ -216,22 +223,31 @@ private fun NameAndAge() {
     )
 }
 
-/** One line, the name, with the server's limit of 30 kept on the way in. */
+/** One line, the name, with the server's limit of 30 kept on the way in, and a counter under it. */
 @Composable
 fun NameField(value: String, onChange: (String) -> Unit) {
-    Box(
-        Modifier.fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-    ) {
-        BasicTextField(
-            value = value,
-            onValueChange = { onChange(it.take(30)) },
-            singleLine = true,
-            textStyle = Styles.body,
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
-            modifier = Modifier.fillMaxWidth(),
+    // A Column of its own: the dialog's text slot is a Box and would stack the counter on the field.
+    Column(Modifier.fillMaxWidth()) {
+        Box(
+            Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(20.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+        ) {
+            BasicTextField(
+                value = value,
+                onValueChange = { onChange(it.take(30)) },
+                singleLine = true,
+                textStyle = Styles.body,
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        Text(
+            S.counter(value.length, 30),
+            style = Styles.caption,
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+            textAlign = TextAlign.End,
         )
     }
 }
@@ -300,7 +316,7 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
             // In order of the hour, earliest first, like the day itself went.
             if (todays.isNotEmpty()) {
                 block {
-                    PaletteStrip(todays.asReversed().map { it.color })
+                    PaletteStrip(todays.asReversed().map { it.color }, S.a11yFriendsToday)
                     Spacer(Modifier.height(8.dp))
                 }
             }
@@ -388,7 +404,7 @@ private fun FeedCard(row: FeedRow, author: String, onPhoto: (ImageBitmap) -> Uni
     ChromaCard(
         row.entry(),
         row.date,
-        // Report, block and remove behind a long press: there, but never a button on the card.
+        // Report, block and remove: a long press, and the MORE button below for the same menu.
         modifier = Modifier
             .pointerInput(row.key) { detectTapGestures(onLongPress = { menu() }) }
             .semantics {
@@ -407,6 +423,8 @@ private fun FeedCard(row: FeedRow, author: String, onPhoto: (ImageBitmap) -> Uni
         WeekMark(row.color, row.date)
         val mine = ChromaRepository.journal[row.day]?.color
         if (mine != null && inTune(mine, row.color)) InTuneMark(inkColorFor(row.color))
+        // Three dots, the platforms' own sign for more options: visible, and nothing like a reaction.
+        if (person != null) MoreButton(Acting(person, row), tint = inkColorFor(row.color))
     }
 }
 

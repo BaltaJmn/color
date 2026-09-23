@@ -82,7 +82,12 @@ fun ChromaCard(
                 )
             }
         }
-        Row(Modifier.align(Alignment.TopEnd).padding(pad), horizontalArrangement = Arrangement.spacedBy(6.dp), content = marks)
+        Row(
+            Modifier.align(Alignment.TopEnd).padding(pad),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            content = marks,
+        )
         Column(Modifier.align(Alignment.BottomStart).padding(pad).padding(end = thumb)) {
             author?.let {
                 Text(

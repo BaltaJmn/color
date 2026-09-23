@@ -2,8 +2,6 @@ package com.baltajmn.color.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +10,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -37,9 +36,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -124,7 +120,7 @@ fun TodayScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
-            Row(Modifier.fillMaxWidth().height(56.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text(S.longDate(today), style = Styles.title, modifier = Modifier.weight(1f))
                 if (entry != null && pending == null) {
                     CardMenu(
@@ -136,13 +132,15 @@ fun TodayScreen(
                 GlyphButton(Glyph.SETTINGS, S.a11ySettings, onSettings)
             }
 
-            if (ChromaRepository.saveFailed) Notice(S.noticeSaveFailed)
-            if (ChromaRepository.corrupt) Notice(S.noticeCorrupt, S.ok to ChromaRepository::dismissCorrupt)
-            notice?.let { Notice(it, S.ok to { notice = null }) }
-            // One offer at a time, and each only once: waving it away counts as an answer.
             val settings = ChromaRepository.settings
+            val activeNotice = notice
+            // At most one Notice on screen at a time, most urgent first.
             when {
+                ChromaRepository.saveFailed -> Notice(S.noticeSaveFailed)
+                ChromaRepository.corrupt -> Notice(S.noticeCorrupt, S.ok to ChromaRepository::dismissCorrupt)
+                activeNotice != null -> Notice(activeNotice, S.ok to { notice = null })
                 entry == null || pending != null -> Unit
+                // One offer at a time, and each only once: waving it away counts as an answer.
                 !settings.reminderOffered -> Notice(
                     S.offerReminder(settings.reminderHour, settings.reminderMinute),
                     S.notNow to { ChromaRepository.updateSettings { it.copy(reminderOffered = true) } },
@@ -167,7 +165,7 @@ fun TodayScreen(
                 waiting != null -> Picking(waiting, onPick = { hex ->
                     ChromaRepository.pick(hex, waiting.swatches, nearestName(hex).key, waiting.jpeg)
                     pending = null
-                }, onCancel = if (entry != null) ({ pending = null }) else null)
+                }, onCancel = { pending = null })
                 entry != null -> {
                     ChromaCard(entry, today, onPhoto = onPhoto) { WeekMark(entry.color, today) }
                     Spacer(Modifier.height(20.dp))
@@ -203,6 +201,7 @@ fun TodayScreen(
                 ChromaRepository.delete(today)
             },
             onDismiss = { confirmDelete = false },
+            destructive = true,
         )
     }
 }
@@ -210,17 +209,8 @@ fun TodayScreen(
 @Composable
 private fun Empty(week: ColorName?, firstTime: Boolean, working: Boolean, onCamera: () -> Unit, onGallery: () -> Unit) {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Spacer(Modifier.height(48.dp))
-        Box(
-            Modifier.size(160.dp)
-                .clip(CircleShape)
-                .border(2.dp, MaterialTheme.colorScheme.outline, CircleShape)
-                .semantics { contentDescription = S.takePhoto }
-                .clickable(role = Role.Button, enabled = !working) { if (Capture.cameraAvailable) onCamera() else onGallery() },
-            contentAlignment = Alignment.Center,
-        ) { GlyphIcon(Glyph.CAMERA, size = 44.dp) }
-        Spacer(Modifier.height(24.dp))
-        Text(S.todayPrompt, style = Styles.title)
+        Spacer(Modifier.height(64.dp))
+        Text(S.todayPrompt, style = Styles.display, textAlign = TextAlign.Center)
         if (firstTime) {
             Spacer(Modifier.height(8.dp))
             Text(S.firstHelp, style = Styles.muted, textAlign = TextAlign.Center)
@@ -243,7 +233,7 @@ private fun Empty(week: ColorName?, firstTime: Boolean, working: Boolean, onCame
 }
 
 @Composable
-private fun Picking(pending: Pending, onPick: (String) -> Unit, onCancel: (() -> Unit)?) {
+private fun Picking(pending: Pending, onPick: (String) -> Unit, onCancel: () -> Unit) {
     Image(
         pending.image,
         null,
@@ -254,10 +244,8 @@ private fun Picking(pending: Pending, onPick: (String) -> Unit, onCancel: (() ->
     Text(S.pickColor, style = Styles.label, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
     Spacer(Modifier.height(12.dp))
     SwatchRow(pending.swatches, null, 48.dp, onPick)
-    onCancel?.let {
-        Spacer(Modifier.height(8.dp))
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { TextAction(S.cancel, it) }
-    }
+    Spacer(Modifier.height(8.dp))
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { TextAction(S.cancel, onCancel) }
 }
 
 /** The optional word: closed until asked for, a single line, with the limit in sight. */
@@ -272,7 +260,7 @@ private fun WordField(today: LocalDate, word: String?) {
     Row(
         Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -303,7 +291,10 @@ private fun CardMenu(onRetake: () -> Unit, onShare: () -> Unit, onDelete: () -> 
         DropdownMenu(open, onDismissRequest = { open = false }, containerColor = MaterialTheme.colorScheme.surface) {
             DropdownMenuItem(text = { Text(S.retakePhoto, style = Styles.body) }, onClick = { open = false; onRetake() })
             DropdownMenuItem(text = { Text(S.share, style = Styles.body) }, onClick = { open = false; onShare() })
-            DropdownMenuItem(text = { Text(S.deleteDay, style = Styles.body) }, onClick = { open = false; onDelete() })
+            DropdownMenuItem(
+                text = { Text(S.deleteDay, style = Styles.body, color = MaterialTheme.colorScheme.error) },
+                onClick = { open = false; onDelete() },
+            )
         }
     }
 }
