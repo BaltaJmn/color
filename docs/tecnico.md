@@ -14,7 +14,7 @@ La plantilla es **Purl** (`../line`): casi todo lo que no es color ni amigos sal
 | Qué | Valor |
 |---|---|
 | Nombre bajo el icono | `Chroma` (los cinco idiomas) |
-| Nombre de ficha | `Chroma: color del día` y su traducción (`store/listings/`) |
+| Nombre de ficha | `Chroma: diario de color` y su versión en cada idioma (`store/listings/`): "diario" es lo que se busca, y separa a Chroma de Razer Chroma o Chroma DB |
 | `applicationId` y `namespace` de `androidApp` | `com.baltajmn.color` |
 | `namespace` de `shared` | `com.baltajmn.color.shared` |
 | Paquete Kotlin | `com.baltajmn.color` |

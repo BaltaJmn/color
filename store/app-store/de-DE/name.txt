@@ -1,1 +1,1 @@
-Chroma: Farbe des Tages
+Chroma: Farbtagebuch

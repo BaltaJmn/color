@@ -2,7 +2,7 @@
 
 Una foto al día, un color que eliges, y un año pintado en una rejilla. Amigos opcionales, sin
 métricas. Android + iOS, Compose Multiplatform sobre Kotlin Multiplatform. Nombre bajo el icono
-**Chroma**; ficha **Chroma: color del día**. Identificador en las dos tiendas: `com.baltajmn.color`.
+**Chroma**; ficha **Chroma: diario de color**. Identificador en las dos tiendas: `com.baltajmn.color`.
 Repositorio `BaltaJmn/color`, **público**.
 
 Este fichero lo carga Claude Code solo en cualquier sesión abierta sobre este repositorio. Es el

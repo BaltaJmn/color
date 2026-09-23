@@ -32,7 +32,7 @@ Espera dentro `01_hoy.png` a `06_poster.png` y deja el resultado en
 | `01_hoy` | Hoy, con color | La tarjeta de hoy con la foto en la esquina y la fila de candidatos debajo. La foto, una propia de hoy elegida desde la galería (el simulador no tiene cámara) |
 | `02_ano` | Mi año, rejilla | La rejilla llena hasta hoy, con huecos sueltos |
 | `03_tira` | Mi año, tira | La tira del año, del gris del invierno al verano |
-| `04_tarjeta` | Compartir | La tarjeta de 1080x1350 en la vista previa con "Solo el color" a la vista |
+| `04_tarjeta` | Compartir | La tarjeta de 1080x1350 en la vista previa con "Incluir la foto" apagado |
 | `05_widgets` | Pantalla de inicio | El widget de hoy (2x2) y el del año (4x2) sobre un fondo liso del sistema |
 | `06_poster` | Póster | La rejilla del póster en la vista previa |
 

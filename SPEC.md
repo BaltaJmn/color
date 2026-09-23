@@ -1,4 +1,4 @@
-# Chroma: color del día, spec de producto
+# Chroma: diario de color, spec de producto
 
 App Compose Multiplatform (Android + iOS) en la que cada día haces una foto, la app te ofrece los
 colores que hay en ella y tú eliges uno. Ese color es tu día. Al final del año tienes tu vida pintada
@@ -7,7 +7,7 @@ el suyo.
 
 Cuarta de la familia. Hermana de **Quilt** (`../HabitTracker`, `com.baltajmn.habit`), de
 **MoodTraker** (`../MoodTraker`, `com.baltajmn.mood`) y de **Purl** (`../line`, `com.baltajmn.line`):
-misma arquitectura, mismo almacén local, pago único. Nombre de tienda **Chroma: color del día**,
+misma arquitectura, mismo almacén local, pago único. Nombre de tienda **Chroma: diario de color**,
 nombre bajo el icono **Chroma**. Identificador en las dos tiendas: `com.baltajmn.color`. El
 repositorio y el código se llaman `color`.
 
@@ -310,8 +310,11 @@ desde el primer día; sección "Más apps" discreta en Ajustes.
 ### El nombre
 
 "Chroma" es corto, internacional y dice color en todos los idiomas de la ficha. Es también una palabra
-muy usada (Razer Chroma, Chroma DB), así que la ficha lleva apellido: **Chroma: color del día**,
-traducido en cada idioma. Reservas, en orden: **Chromaday** y **Hueday** (#1).
+muy usada (Razer Chroma, Chroma DB), así que la ficha lleva apellido: **Chroma: diario de color**,
+con su versión en cada idioma (Daily Color Diary, diário de cores, Farbtagebuch, journal de couleurs).
+Antes era "color del día"; se cambió antes de publicar porque "diario" es lo que la gente escribe al
+buscar este tipo de app y es como la propia ficha presenta a Chroma en su primera línea. Reservas, en
+orden: **Chromaday** y **Hueday** (#1).
 
 ### El icono
 
@@ -320,7 +323,7 @@ Un cuadrado redondeado partido en franjas de color, como la tira del año. Lo ge
 
 ### ASO
 
-Palabras que la gente busca: diario de fotos, foto diaria, paleta de colores, color del día, año en
+Palabras que la gente busca: diario de color, diario de fotos, foto diaria, paleta de colores, color del día, año en
 píxeles, diario visual. Las capturas se hacen con un año de demostración: una rejilla llena vende la
 app sola.
 
