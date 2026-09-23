@@ -14,6 +14,7 @@ import com.baltajmn.color.model.withWord
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
@@ -75,6 +76,6 @@ class ModelTest {
         val f = JournalFile(entries = mapOf("2026-09-22" to ChromaEntry(color = "#3A6EA5", name = "storm_blue", share = Share.Photo)))
         val text = JournalJson.encodeToString(JournalFile.serializer(), f)
         assertEquals(f, JournalJson.decodeFromString(JournalFile.serializer(), text))
-        assert("\"share\":\"photo\"" in text)
+        assertTrue("\"share\":\"photo\"" in text)
     }
 }
