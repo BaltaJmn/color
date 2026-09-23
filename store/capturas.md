@@ -33,7 +33,7 @@ Espera dentro `01_hoy.png` a `06_poster.png` y deja el resultado en
 | `02_ano` | Mi año, rejilla | La rejilla llena hasta hoy, con huecos sueltos |
 | `03_tira` | Mi año, tira | La tira del año, del gris del invierno al verano |
 | `04_tarjeta` | Compartir | La tarjeta de 1080x1350 en la vista previa con "Incluir la foto" apagado |
-| `05_widgets` | Pantalla de inicio | El widget de hoy (2x2) y el del año (4x2) sobre un fondo liso del sistema |
+| `05_widgets` | Pantalla de inicio | El widget de hoy (2x2) y el del año (4x2), recortados de la pantalla de inicio y puestos sobre gris liso (C4C4C4), el año arriba y hoy debajo. El launcher del emulador no deja quitar su relleno (Calendario, reloj, carpeta de Google, dock) por adb, y los widgets son los de verdad |
 | `06_poster` | Póster | La rejilla del póster en la vista previa |
 
 ## 3. Titulares

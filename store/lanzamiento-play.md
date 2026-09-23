@@ -314,7 +314,7 @@ subir.
 |---|---|---|
 | Icono | `store/play/icon-512.png` | 512x512, PNG, máx. 1 MB |
 | Gráfico de funciones | `store/play/feature-1024x500.png` | 1024x500, PNG o JPG sin transparencia |
-| Capturas de teléfono | `store/screenshots/play/<idioma>/01_hoy.png` a `06_poster.png` | De 2 a 8, 1200x2100 |
+| Capturas de teléfono | `store/screenshots/play/<idioma>/01.png` a `06.png` | De 2 a 8, 1200x2100 |
 
 Los dos primeros ya están hechos y cumplen (sin canal alfa). Las capturas en-US van en la ficha
 principal; las es-ES en la traducción al español. pt, de y fr heredan las inglesas.

@@ -14,11 +14,13 @@ import pathlib
 import subprocess
 import sys
 
-TINTA = "#1C1B1A"
-PAPEL = "#F6F4F1"
+TINTA = "#111111"
+PAPEL = "#F3F3F3"
+# The app's outline token: the screens share the paper color, so only this edge tells them apart.
+BORDE = "#D0D0D0"
 
-# Los colores del icono, aclarados hasta que el titular se lea encima; el ultimo, el papel.
-FONDOS = ["#FBE9E4", "#FCF4E6", "#E8F2EC", "#E7EFF7", "#E5E9F0", "#F6F4F1"]
+# Neutral like the app itself: the color in the strip comes from the screenshots, never the frame.
+FONDOS = [PAPEL] * 6
 
 CAPTURAS = ["01_hoy", "02_ano", "03_tira", "04_tarjeta", "05_widgets", "06_poster"]
 
@@ -89,8 +91,9 @@ def marco(png, lineas, fondo, salida, destino):
   <g clip-path="url(#r)">
     <image xlink:href="{png}" x="{ix}" y="{iy}" width="{iw}" height="{ih}"/>
   </g>
+  <rect x="{x}" y="{y}" width="{aw}" height="{ah}" rx="{rx}" ry="{rx}" fill="none" stroke="{borde}" stroke-width="2"/>
 </svg>""".format(
-        W=ancho, H=alto, fondo=fondo, papel=PAPEL, texto=texto, png=incrustar(png),
+        W=ancho, H=alto, fondo=fondo, papel=PAPEL, borde=BORDE, texto=texto, png=incrustar(png),
         x=x, y=y, aw=ancho_movil, ah=alto_movil, rx=round(46 * k),
         ix=x, iy=round(y - arriba * escala),
         iw=ancho_movil, ih=round(crudo_h * escala),
@@ -112,6 +115,9 @@ def main():
     salida.mkdir(parents=True, exist_ok=True)
     for i, nombre in enumerate(CAPTURAS):
         final = salida / ("%02d.png" % (i + 1))
+        if not (crudas / (nombre + ".png")).exists():
+            print("falta", nombre)
+            continue
         marco(crudas / (nombre + ".png"), TITULARES[idioma][i], FONDOS[i], final, destino)
         print(final)
 
