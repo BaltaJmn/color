@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.data.ChromaRepository
+import com.baltajmn.color.data.today
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.model.isoKey
 import com.baltajmn.color.ui.theme.GUTTER
@@ -53,7 +54,11 @@ fun DaySheet(
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
                 GlyphButton(Glyph.CLOSE, S.a11yClose, onClose)
-                Text(S.longDateWithYear(date), style = Styles.title, modifier = Modifier.weight(1f).padding(start = 4.dp))
+                Text(
+                    // The year only when it is not this one, as Today says it: two lines of date
+                    // over a card that already carries its date is too much header.
+                    if (date.year == today().year) S.longDate(date) else S.longDateWithYear(date),
+                    style = Styles.title, modifier = Modifier.weight(1f).padding(start = 4.dp))
                 if (entry != null) {
                     GlyphButton(Glyph.SHARE, S.a11yShare, { onShare(date) })
                     GlyphButton(Glyph.TRASH, S.deleteDay, { confirmDelete = true })

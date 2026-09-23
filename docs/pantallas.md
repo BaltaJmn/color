@@ -81,6 +81,8 @@ pasan una vez; un tic ligero al cambiar el color después. Nada más vibra.
 - **Siempre hay salida.** Cada paso tiene su Cancelar o su cerrar; ninguno obliga a elegir.
 - Una fila con interruptor se cambia tocando cualquier parte de la fila, como en los ajustes del
   sistema.
+- El teclado nunca tapa lo que se escribe, y el hueco que deja no se descuenta dos veces sobre la
+  barra inferior, que el teclado ya cubre.
 - Lo que solo es forma lleva descripción para el lector de pantalla (el QR, la tira de amigos, el
   widget del año) o se calla si es de adorno (la tira de ejemplo).
 
@@ -132,7 +134,9 @@ Tras la foto, en la misma pantalla:
 
 - La tarjeta (sección 6) ocupa el ancho, proporción 4:5.
 - Debajo, la fila de candidatos, más pequeña (círculos de 40), para cambiar de color durante el día.
-- Debajo, `addWord` como botón de texto; tocarlo abre un campo de una línea con tope visible (`n/24`).
+- Debajo, `addWord` como botón de texto; tocarlo abre un campo de una línea con tope visible (`n/24`)
+  y el teclado a la vez: un toque, no dos. El campo entero sube por encima del teclado, no solo la
+  línea del cursor. Una palabra ya escrita no abre el teclado al volver a Hoy.
 - En v1.1, el control de compartir (sección 8.5).
 - Menú de la tarjeta (tres puntos): `retakePhoto`, `share`, `deleteDay` (este en `error`).
 
@@ -149,7 +153,8 @@ Tras la foto, en la misma pantalla:
   unos 24, que se tocan bien; girada saldrían de 10. Celdas cuadradas con 3 de separación y radio 3;
   inicial del mes arriba y los días 1, 10, 20 y 30 a la izquierda, en `caption`. Días sin color en
   `surfaceVariant` (los futuros, más claros); días que no existen (31 de febrero), vacíos. Hoy lleva
-  un borde de 1,5 en `onBackground`.
+  un borde de 1,5 en `onBackground`. Las celdas no pasan de 24: en un móvil ancho sobra sitio y el bloque
+  (números de día incluidos) va centrado, no pegado a la izquierda.
 - **Tira**: el año como columnas de 1 día, sin separación, a toda la altura disponible (proporción
   4:5). Los días vacíos no se pintan: la tira se comprime.
 - Tocar un día con entrada abre el día (sección 5). El lector de pantalla recorre los días en orden
@@ -167,7 +172,9 @@ Tras la foto, en la misma pantalla:
 
 ## 5. El día abierto
 
-Hoja modal con la tarjeta a lo ancho. Acciones: `share` y `deleteDay` (con confirmación). Un día
+Hoja modal con la tarjeta a lo ancho. Título: la fecha larga, con el año solo si no es el actual
+(como Hoy; dos líneas de fecha sobre una tarjeta que ya lleva la suya pesan demasiado). Acciones:
+`share` y `deleteDay` (con confirmación). Un día
 pasado no se edita.
 
 Tocar la miniatura abre la foto a pantalla completa, sobre negro, con cerrar arriba a la izquierda

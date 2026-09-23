@@ -65,7 +65,10 @@ fun YearGrid(year: Int, days: Map<String, String>, today: LocalDate, onOpenDay: 
         val cell = min(CELL_MAX.value, (maxWidth.value - LEFT.value - 11 * GAP.value) / 12).dp
         val head = 20.dp
         val step = cell + GAP
-        fun x(month: Int) = LEFT + step * (month - 1)
+        // On a wide phone the cells hit CELL_MAX before the width runs out: center the block
+        // (day numbers included) instead of leaving the spare width on the right.
+        val inset = ((maxWidth - LEFT - step * 12 + GAP) / 2).coerceAtLeast(0.dp)
+        fun x(month: Int) = inset + LEFT + step * (month - 1)
         fun y(day: Int) = head + step * (day - 1)
 
         // Font scale fixed to 1: the grid geometry is fixed dp, so labels that grew with the
@@ -82,7 +85,7 @@ fun YearGrid(year: Int, days: Map<String, String>, today: LocalDate, onOpenDay: 
                 }
                 listOf(1, 10, 20, 30).forEach { day ->
                     val laid = measurer.measure(day.toString(), caption)
-                    drawText(laid, topLeft = Offset(LEFT.toPx() - 4.dp.toPx() - laid.size.width, y(day).toPx() + (side - laid.size.height) / 2))
+                    drawText(laid, topLeft = Offset((inset + LEFT).toPx() - 4.dp.toPx() - laid.size.width, y(day).toPx() + (side - laid.size.height) / 2))
                 }
                 for (month in 1..12) {
                     for (day in 1..monthDays[month - 1]) {

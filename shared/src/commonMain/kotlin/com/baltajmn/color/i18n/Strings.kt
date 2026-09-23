@@ -224,11 +224,11 @@ object S {
     )
     val proRow get() = t("Chroma Pro", "Chroma Pro", "Chroma Pro", "Chroma Pro", "Chroma Pro")
     val proSubtitle get() = t(
-        "Year poster and year widget. One-time payment",
-        "Póster y widget del año. Pago único",
-        "Pôster e widget do ano. Pagamento único",
-        "Jahresposter und Jahres-Widget. Einmalzahlung",
-        "Affiche et widget de l'année. Paiement unique",
+        "Year poster, year widget and your year in words. One-time payment",
+        "Póster, widget del año y tu año en palabras. Pago único",
+        "Pôster, widget do ano e seu ano em palavras. Pagamento único",
+        "Jahresposter, Jahres-Widget und dein Jahr in Worten. Einmalzahlung",
+        "Affiche, widget de l'année et ton année en mots. Paiement unique",
     )
     val proOwned get() = t("Purchased. Thank you.", "Comprado. Gracias.", "Comprado. Obrigado.", "Gekauft. Danke.", "Acheté. Merci.")
     val restoreRow get() = t("Restore purchase", "Restaurar compra", "Restaurar compra", "Kauf wiederherstellen", "Restaurer l'achat")

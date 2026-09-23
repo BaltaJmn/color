@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -25,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -90,6 +94,7 @@ fun App() {
     var locked by remember { mutableStateOf(ChromaRepository.settings.lockOn) }
     var leftAt by remember { mutableStateOf<TimeSource.Monotonic.ValueTimeMark?>(null) }
     var proCheck by remember { mutableStateOf(0) }
+    var barHeight by remember { mutableStateOf(0.dp) }
 
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
         // Coming back after 03:00 is a new day, and the widgets are told before they are looked at.
@@ -139,7 +144,10 @@ fun App() {
     ChromaTheme {
         Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
             Column(Modifier.fillMaxSize()) {
-                Box(Modifier.weight(1f).fillMaxWidth()) {
+                // The keyboard rises over the bottom bar as well; the screens pad for it with
+                // imePadding, so what the bar already takes is consumed here, not padded twice.
+                val bar = if (screen != Screen.Settings) barHeight else 0.dp
+                Box(Modifier.weight(1f).fillMaxWidth().consumeWindowInsets(PaddingValues(bottom = bar))) {
                     when (screen) {
                         Screen.Today -> TodayScreen(
                             today = day,
@@ -152,7 +160,14 @@ fun App() {
                         Screen.Friends -> FriendsScreen(day, onPhoto = { photo = it })
                     }
                 }
-                if (screen != Screen.Settings) BottomBar(screen, ChromaRepository.entryOn(day)?.color) { screen = it }
+                if (screen != Screen.Settings) {
+                    val density = LocalDensity.current
+                    BottomBar(
+                        screen,
+                        ChromaRepository.entryOn(day)?.color,
+                        Modifier.onSizeChanged { barHeight = with(density) { it.height.toDp() } },
+                    ) { screen = it }
+                }
             }
             openDay?.let { DaySheet(it, onClose = { openDay = null }, onPhoto = { photo = it }, onShare = { sharing = it }) }
             sharing?.let { ShareScreen(it, onClose = { sharing = null }) }
@@ -197,9 +212,9 @@ fun App() {
 }
 
 @Composable
-private fun BottomBar(current: Screen, todayColor: String?, onSelect: (Screen) -> Unit) {
+private fun BottomBar(current: Screen, todayColor: String?, modifier: Modifier = Modifier, onSelect: (Screen) -> Unit) {
     val colors = MaterialTheme.colorScheme
-    NavigationBar(containerColor = colors.background, tonalElevation = 0.dp) {
+    NavigationBar(modifier, containerColor = colors.background, tonalElevation = 0.dp) {
         // Friends only exists once there is a server to be friends on.
         val tabs = listOfNotNull(
             Screen.Today to (Glyph.TODAY to S.navToday),
