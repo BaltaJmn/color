@@ -261,6 +261,30 @@ object S {
         "Eine Zeile am Tag, Jahre später gelesen",
         "Une ligne par jour, relue des années après",
     )
+    val lockRow get() = t("Lock Chroma", "Bloquear Chroma", "Bloquear o Chroma", "Chroma sperren", "Verrouiller Chroma")
+    val lockSubtitle get() = t(
+        "Asks for your face, your fingerprint or your phone code",
+        "Pide tu cara, tu huella o el código del teléfono",
+        "Pede seu rosto, sua digital ou o código do telefone",
+        "Fragt nach deinem Gesicht, deinem Fingerabdruck oder dem Code des Handys",
+        "Demande ton visage, ton empreinte ou le code du téléphone",
+    )
+    val lockUnavailable get() = t(
+        "Set a screen lock on your phone to use this.",
+        "Pon un bloqueo de pantalla en el teléfono para usarlo.",
+        "Configure um bloqueio de tela no telefone para usar isso.",
+        "Richte eine Bildschirmsperre auf dem Handy ein, um das zu nutzen.",
+        "Active un verrouillage d'écran sur ton téléphone pour l'utiliser.",
+    )
+    val unlock get() = t("Unlock", "Desbloquear", "Desbloquear", "Entsperren", "Déverrouiller")
+    val lockPromptTitle get() = t("Open Chroma", "Abrir Chroma", "Abrir o Chroma", "Chroma öffnen", "Ouvrir Chroma")
+    val lockPromptSubtitle get() = t(
+        "Chroma is locked",
+        "Chroma está bloqueado",
+        "O Chroma está bloqueado",
+        "Chroma ist gesperrt",
+        "Chroma est verrouillé",
+    )
     val privacyRow get() = t("Privacy policy", "Política de privacidad", "Política de privacidade", "Datenschutz", "Confidentialité")
 
     // 7. Dialogs and notices

@@ -1,3 +1,4 @@
 "CFBundleDisplayName" = "Chroma";
 "NSCameraUsageDescription" = "Para tirar a foto de onde sai a cor do seu dia.";
 "NSPhotoLibraryAddUsageDescription" = "Para salvar seus cartões e pôsteres nas suas fotos.";
+"NSFaceIDUsageDescription" = "Para abrir o Chroma com Face ID quando o bloqueio estiver ativado.";

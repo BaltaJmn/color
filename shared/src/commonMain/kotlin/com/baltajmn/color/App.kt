@@ -25,6 +25,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.baltajmn.color.billing.Billing
 import com.baltajmn.color.data.ChromaRepository
+import com.baltajmn.color.data.Lock
 import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.Route
 import com.baltajmn.color.data.today
@@ -41,6 +42,7 @@ import com.baltajmn.color.ui.FriendsScreen
 import com.baltajmn.color.ui.Glyph
 import com.baltajmn.color.ui.GlyphIcon
 import com.baltajmn.color.ui.InviteScreen
+import com.baltajmn.color.ui.LockScreen
 import com.baltajmn.color.ui.Paywall
 import com.baltajmn.color.ui.PhotoViewer
 import com.baltajmn.color.ui.PosterScreen
@@ -52,10 +54,15 @@ import com.baltajmn.color.ui.TodayScreen
 import com.baltajmn.color.ui.YearScreen
 import com.baltajmn.color.ui.theme.ChromaTheme
 import com.baltajmn.color.ui.theme.Styles
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 import kotlinx.datetime.LocalDate
 
 /** Four screens do not justify a navigation library. Friends stays hidden until v1.1. */
 enum class Screen { Today, Year, Friends, Settings }
+
+/** A minute in the background. Short enough to protect, long enough to answer the door. */
+val RELOCK_AFTER = 60.seconds
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -74,6 +81,8 @@ fun App() {
     var sharing by remember { mutableStateOf<LocalDate?>(null) }
     var poster by remember { mutableStateOf<Int?>(null) }
     var stats by remember { mutableStateOf<Int?>(null) }
+    var locked by remember { mutableStateOf(ChromaRepository.settings.lockOn) }
+    var leftAt by remember { mutableStateOf<TimeSource.Monotonic.ValueTimeMark?>(null) }
     var proCheck by remember { mutableStateOf(0) }
 
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
@@ -84,6 +93,9 @@ fun App() {
         Outbox.kick()
         // A purchase or a refund may have happened on another device.
         proCheck++
+        // A minute away locks it again; stepping out to the camera or a share sheet does not.
+        val away = leftAt?.elapsedNow()
+        if (ChromaRepository.settings.lockOn && away != null && away >= RELOCK_AFTER) locked = true
     }
     LaunchedEffect(proCheck) { Billing.refresh() }
     // A widget asked for a screen, maybe before the app existed.
@@ -113,7 +125,10 @@ fun App() {
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
         // The debounce may still be waiting when the app leaves the screen: write now.
         ChromaRepository.saveNow()
+        leftAt = TimeSource.Monotonic.markNow()
     }
+    // The task switcher takes its picture without asking, so the window is told in advance.
+    LaunchedEffect(ChromaRepository.settings.lockOn) { Lock.setHidesPreview(ChromaRepository.settings.lockOn) }
 
     ChromaTheme {
         Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
@@ -146,11 +161,16 @@ fun App() {
             Friends.acting?.let { FriendActions(it) { Friends.acting = null } }
             photo?.let { PhotoViewer(it) { photo = null } }
             if (Paywall.open) ProDialog { Paywall.open = false }
+            // Last, so it covers every other layer, dialogs included.
+            if (locked) LockScreen { locked = false }
 
+            // Locked, back does nothing: the layers under the lock are not the user's to close yet.
             BackHandler(
-                Paywall.open || photo != null || sharing != null || poster != null || stats != null || Friends.inviteOpen ||
-                    Friends.listOpen || Friends.viewing != null || Friends.viewingDay != null ||
-                    openDay != null || screen != Screen.Today,
+                !locked && (
+                    Paywall.open || photo != null || sharing != null || poster != null || stats != null ||
+                        Friends.inviteOpen || Friends.listOpen || Friends.viewing != null || Friends.viewingDay != null ||
+                        openDay != null || screen != Screen.Today
+                    ),
             ) {
                 when {
                     Paywall.open -> Paywall.open = false

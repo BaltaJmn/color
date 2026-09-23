@@ -160,6 +160,15 @@ Lista de secciones, como Purl:
    `deleteAccount` (confirmación `deleteAccountText`; mientras borra, `working`; sin conexión, el aviso
    de siempre y nada cambia).
 3. **Privacidad**: bloqueo (v1.2), política, y `termsRow` si hay servidor.
+   - `lockRow` con `lockSubtitle`, o `lockUnavailable` y desactivado si el teléfono no tiene bloqueo
+     de pantalla. Apagado por defecto. Encenderlo pide antes la cara, la huella o el código: quien
+     tenga el móvil en la mano no puede dejar fuera a su dueño.
+   - Con el bloqueo puesto: al abrir, y al volver tras `RELOCK_AFTER` (60 s) fuera, una capa con
+     "Chroma" en `display` y `unlock`, por encima de todo, diálogos incluidos. Atrás no hace nada. El
+     diálogo del sistema sale solo. La multitarea queda tapada (Android 13+ sin captura de recientes;
+     iOS con una capa del color del papel pintada desde `iOSApp.swift`).
+   - Los widgets siguen enseñando colores: están en la pantalla de inicio porque el usuario los puso,
+     y nunca llevan fotos ni palabras.
 4. **Tarjeta**: `watermarkRow`, `weekColorRow` (v1.2, interruptor con el nombre del color de esta
    semana debajo).
 5. **Copia**: exportar (con fecha de la última) e importar.

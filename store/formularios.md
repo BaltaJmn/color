@@ -92,8 +92,9 @@ Con Amigos (v1.1), al publicar la primera versión con servidor:
 | Grupos de edad | 16-17, 18 y más. La cuenta exige 16 declarados (`SPEC.md`), y Play mira la app entera |
 | Acceso a la app | Parte de la funcionalidad necesita iniciar sesión: una cuenta de Google de prueba, ya con nombre y un amigo aceptado, y los pasos para llegar a Amigos |
 
-Permisos del manifiesto fusionado: `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED`, y del SDK de
-RevenueCat `INTERNET`, `ACCESS_NETWORK_STATE` y `com.android.vending.BILLING`. Ninguno pide
+Permisos del manifiesto fusionado: `POST_NOTIFICATIONS`, `RECEIVE_BOOT_COMPLETED`, del SDK de
+RevenueCat `INTERNET`, `ACCESS_NETWORK_STATE` y `com.android.vending.BILLING`, y de androidx.biometric
+`USE_BIOMETRIC` (el bloqueo de v1.2; la comprobación la hace el sistema). Ninguno pide
 declaración. No se usa `SCHEDULE_EXACT_ALARM` (el recordatorio va con `setAndAllowWhileIdle`), ni
 `CAMERA`, ni `READ_MEDIA_IMAGES`. `FOREGROUND_SERVICE` y `WAKE_LOCK` los trae WorkManager a través de
 Glance, igual que en Purl. Comprobar la lista sobre el AAB:

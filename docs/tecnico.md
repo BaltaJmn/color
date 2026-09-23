@@ -75,7 +75,7 @@ Nada más. No hay librería de imágenes: las fotos se decodifican con el sistem
 | `data/Zip.kt`, `data/Export.kt`, `data/Merge.kt` | Copia en zip | Purl, adaptados al modelo |
 | `data/Reminder.kt`, `data/ReminderPlan.kt` | Recordatorio | Purl tal cual |
 | `data/WidgetState.kt`, `data/Widgets.kt` | `widget.json` | Purl, otro contenido |
-| `data/Lock.kt` | Biometría (v1.2) | Purl |
+| `data/Lock.kt`, `ui/LockScreen.kt` | Biometría (v1.2): el bloqueo del teléfono, nunca un PIN propio | Purl, sin el efecto en el recordatorio (el de Chroma nunca cita nada) |
 | `data/FilePicker.kt`, `data/AppInfo.kt`, `data/Route.kt` | Selector de ficheros, versión y enlaces | Purl |
 | `share/ShareCard.kt`, `share/Sharing.kt` | Tarjeta y póster a PNG, hoja de compartir | Purl, otro dibujo |
 | `social/Social.kt` | Cliente de Supabase y sesión | Nuevo (v1.1) |

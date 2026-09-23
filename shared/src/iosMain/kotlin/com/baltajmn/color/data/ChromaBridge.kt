@@ -13,6 +13,9 @@ object ChromaBridge {
     /** Assigned by iOSApp.swift: WidgetCenter belongs to Swift, and Kotlin only asks. */
     var reloadWidgets: (() -> Unit)? = null
 
+    /** Read by iOSApp.swift to cover the task switcher picture, which Compose cannot repaint in time. */
+    fun isLockOn(): Boolean = ChromaRepository.settings.lockOn
+
     /**
      * com.baltajmn.color://today from a widget, ://login back from the web sign in, or an invite as
      * a universal link. Anything else is left alone rather than guessed.

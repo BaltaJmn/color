@@ -40,6 +40,7 @@ import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.FilePicker
 import com.baltajmn.color.data.ImportFailed
 import com.baltajmn.color.data.ImportProblem
+import com.baltajmn.color.data.Lock
 import com.baltajmn.color.data.MergeResult
 import com.baltajmn.color.data.PRIVACY_URL
 import com.baltajmn.color.data.PickResult
@@ -123,6 +124,19 @@ fun SettingsScreen(onBack: () -> Unit) {
             }
 
             Section(S.sectionPrivacy) {
+                val canLock = remember { Lock.isAvailable() }
+                SettingRow(
+                    title = S.lockRow,
+                    subtitle = if (canLock) S.lockSubtitle else S.lockUnavailable,
+                    enabled = canLock,
+                ) {
+                    SoftSwitch(settings.lockOn, enabled = canLock) { on ->
+                        // Turning it on proves who is asking: otherwise whoever has the phone in their
+                        // hand could lock the owner out of their own year.
+                        val store = { ChromaRepository.updateSettings { it.copy(lockOn = on) } }
+                        if (on) Lock.authenticate { if (it) store() } else store()
+                    }
+                }
                 SettingRow(S.privacyRow, onClick = { AppInfo.open(PRIVACY_URL) })
                 if (Social.available) SettingRow(S.termsRow, onClick = { AppInfo.open(TERMS_URL) })
             }

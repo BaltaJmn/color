@@ -9,6 +9,8 @@
 	<key>CFBundleDisplayName</key>
 	<string>Chroma</string>
 	<!-- Sin esta clave la camara del sistema no abre. Traducciones en <lang>.lproj. -->
+	<key>NSFaceIDUsageDescription</key>
+	<string>To open Chroma with Face ID when the lock is on.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>To take the photo your color of the day comes from.</string>
 	<!-- Guardar una tarjeta o el poster pide acceso solo para añadir; sin la clave iOS cierra la app. -->
