@@ -1,8 +1,9 @@
--- Test 17 (docs/tecnico.md 10): without friendship nothing is read, a block cuts at once, and the
--- limit of 50 holds. Run with: supabase test db
+-- Test 17 (docs/tecnico.md 10): without friendship nothing is read, a block cuts at once, the
+-- limit of 50 holds, invite codes stay with their owner, and a card only shows its author's photo.
+-- Run with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(13);
+select plan(17);
 
 -- Four people. auth.users is the only table the test writes as its owner.
 insert into auth.users (id, email) values
@@ -19,6 +20,15 @@ set local role authenticated;
 set local request.jwt.claims to '{"sub": "00000000-0000-0000-0000-00000000000a", "role": "authenticated"}';
 insert into public.shared_entries (author, day, color, name) values
   ('00000000-0000-0000-0000-00000000000a', current_date, '#3A6EA5', 'storm_blue');
+select is((select invite_code from public.my_profile()), 'aaaaaaaaaa', 'the owner reads their own code');
+select lives_ok(
+  $$ update public.shared_entries set photo_path = '00000000-0000-0000-0000-00000000000a/2026-01-01.jpg' where author = auth.uid() $$,
+  'a card may point at its own photo'
+);
+select throws_ok(
+  $$ update public.shared_entries set photo_path = '00000000-0000-0000-0000-00000000000b/2026-01-01.jpg' where author = auth.uid() $$,
+  '23514', null, 'a card cannot point at someone else''s photo'
+);
 
 -- Bea is nobody to Ana yet.
 set local role authenticated;
@@ -37,6 +47,7 @@ select throws_ok(
 -- Bea opens Ana's link: a request, still nothing to read.
 select is(public.request_friend('aaaaaaaaaa'), 'sent', 'a link makes a request');
 select is((select count(*) from public.shared_entries)::int, 0, 'a request reads nothing');
+select throws_ok($$ select invite_code from public.profiles $$, '42501', null, 'nobody reads another''s invite code');
 
 -- Ana accepts.
 set local role authenticated;

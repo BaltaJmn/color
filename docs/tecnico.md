@@ -401,7 +401,8 @@ create table shared_entries (
   color text not null check (color ~ '^#[0-9A-F]{6}$'),
   name text not null,
   word text check (char_length(word) <= 24),
-  photo_path text,
+  -- Solo un fichero de su propia carpeta: <author>/<día>.jpg (20260923130000_hardening.sql).
+  photo_path text check (photo_path is null or photo_path like author::text || '/%'),
   updated_at timestamptz not null default now(),
   primary key (author, day)
 );
@@ -431,6 +432,10 @@ create table reports (
   últimos borran la fila sin avisar.
 - `block_user(other uuid)`: borra la amistad o la solicitud y crea el bloqueo.
 - `regenerate_code() returns text`.
+- `my_profile() returns table (id, display_name, invite_code)`: la única forma de leer un código de
+  invitación, y solo el propio. En `profiles` el cliente solo puede leer `id` y `display_name`: con la
+  tabla entera, un amigo o alguien con una solicitud abierta podría leer tu código y repartirlo, que
+  es justo lo que regenerarlo tiene que cortar.
 - Trigger en `friendships`: al pasar a `accepted`, si cualquiera de los dos ya tiene
   `MAX_FRIENDS` aceptados, lanza `friend_limit`.
 
@@ -550,7 +555,8 @@ Comunes (`commonTest`) salvo que se diga.
 14. Sintonía: justo por debajo y justo por encima del umbral.
 15. QR: la matriz de un texto conocido coincide con la de referencia.
 16. Color de la semana: semana 1 y semana 53.
-17. Servidor (`supabase/tests/`, pgTAP): sin amistad no se lee; un bloqueo corta; tope de 50.
+17. Servidor (`supabase/tests/`, pgTAP): sin amistad no se lee; un bloqueo corta; tope de 50; nadie
+    lee el código de invitación de otro; una tarjeta no puede apuntar a la foto de otra persona.
 18. Estadísticas: calidez ordenada, mes más cálido y más frío, color repetido, estación más gris, pocos
     días no dicen nada, y la comparación con el año anterior en los tres sentidos.
 

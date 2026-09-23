@@ -148,11 +148,7 @@ object Friends {
             order("updated_at", Order.DESCENDING)
         }.decodeList<FeedRow>()
         withContext(Dispatchers.IO) { Storage.keepCached(feed.map { it.cacheName }.toSet()) }
-        // The widget's strip: the same colors as the circle's palette, earliest first, and no names.
-        val shown = friends.map { it.id }.toSet()
-        val hidden = ChromaRepository.settings.hiddenCards
-        val colors = feed.filter { it.date == today && it.author in shown && it.key !in hidden }.asReversed().map { it.color }
-        ChromaRepository.updateFriendsToday(FriendsToday(today.toString(), colors))
+        syncWidgetStrip(today.toString())
     }
 
     /** Downloaded once and kept in the cache; null without a photo or when it cannot be fetched. */
@@ -224,6 +220,22 @@ object Friends {
             viewingDay = null
         }
         refresh()
+        resyncWidgetStrip()
+    }
+
+    /**
+     * The widget's strip: the same colors as the circle's palette, earliest first, and no names.
+     * Someone removed, blocked or reported leaves it at once, not at the next load.
+     */
+    private fun syncWidgetStrip(day: String) {
+        val shown = friends.map { it.id }.toSet()
+        val hidden = ChromaRepository.settings.hiddenCards
+        val colors = feed.filter { it.day == day && it.author in shown && it.key !in hidden }.asReversed().map { it.color }
+        ChromaRepository.updateFriendsToday(FriendsToday(day, colors))
+    }
+
+    fun resyncWidgetStrip() {
+        ChromaRepository.file.friendsToday?.let { syncWidgetStrip(it.date) }
     }
 
     /** The old link stops working at once; requests it already made stay. */
@@ -232,7 +244,7 @@ object Friends {
         Social.loadMe()
     }
 
-    internal fun forget() {
+    internal suspend fun forget() {
         friends = emptyList()
         requests = emptyList()
         feed = emptyList()
@@ -241,7 +253,7 @@ object Friends {
         viewing = null
         viewingDay = null
         acting = null
-        Storage.keepCached(emptySet())
+        withContext(Dispatchers.IO) { Storage.keepCached(emptySet()) }
         ChromaRepository.updateFriendsToday(null)
     }
 }

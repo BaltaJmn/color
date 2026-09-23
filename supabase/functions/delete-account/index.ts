@@ -14,7 +14,10 @@ Deno.serve(async (req) => {
   const id = user.user.id;
 
   while (true) {
-    const { data: files } = await admin.storage.from("photos").list(id, { limit: 100 });
+    const { data: files, error: listed } = await admin.storage.from("photos").list(id, { limit: 100 });
+    // A failed listing is not an empty folder: saying the account is gone with its photos still in
+    // the bucket would break the promise of the deletion page.
+    if (listed) return new Response(listed.message, { status: 500 });
     if (!files?.length) break;
     const removed = await admin.storage.from("photos").remove(files.map((f) => `${id}/${f.name}`));
     if (removed.error) return new Response(removed.error.message, { status: 500 });

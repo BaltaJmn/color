@@ -15,8 +15,12 @@ import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.functions.functions
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.storage.Storage
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -74,8 +78,9 @@ object Social {
 
     /** Throws when offline; the caller says so and offers to retry. */
     suspend fun loadMe() {
-        val id = userId() ?: return
-        val row = client.from("profiles").select { filter { eq("id", id) } }.decodeSingleOrNull<Profile>()
+        userId() ?: return
+        // Through a function: the invite code is not readable from the table, not even one's own.
+        val row = client.postgrest.rpc("my_profile").decodeList<Profile>().firstOrNull()
         me = row
         needsName = row == null
     }
@@ -93,7 +98,7 @@ object Social {
     }
 
     /** Leaves the account where it is: signing in again brings the friends back. */
-    suspend fun signOut() {
+    suspend fun signOut() = withContext(NonCancellable) {
         runCatching { client.auth.signOut() }
         forget()
     }
@@ -105,12 +110,16 @@ object Social {
     suspend fun deleteAccount() {
         val answer = client.functions.invoke("delete-account")
         if (!answer.status.isSuccess()) error("delete-account: ${answer.status}")
-        // No sign out call: the user no longer exists for the server to sign out of.
-        client.auth.clearSession()
-        forget()
+        // Past this point the account is gone whatever happens to the screen that asked: leaving
+        // Settings mid-request must not leave a session to an account that no longer exists.
+        withContext(NonCancellable) {
+            // No sign out call: the user no longer exists for the server to sign out of.
+            client.auth.clearSession()
+            forget()
+        }
     }
 
-    internal fun forget() {
+    internal suspend fun forget() {
         me = null
         needsName = false
         Friends.forget()

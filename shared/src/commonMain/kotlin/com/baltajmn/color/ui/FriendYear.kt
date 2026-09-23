@@ -155,8 +155,9 @@ fun FriendActions(acting: Acting, onDone: () -> Unit) {
         step = Step.Busy
         scope.launch { if (runCatching { block() }.isSuccess) onDone() else step = Step.Failed }
     }
-    fun hide(key: String, on: Boolean) = ChromaRepository.updateSettings {
-        it.copy(hiddenCards = if (on) it.hiddenCards + key else it.hiddenCards - key)
+    fun hide(key: String, on: Boolean) {
+        ChromaRepository.updateSettings { it.copy(hiddenCards = if (on) it.hiddenCards + key else it.hiddenCards - key) }
+        Friends.resyncWidgetStrip()
     }
 
     when (step) {
