@@ -46,7 +46,7 @@ import kotlinx.datetime.LocalDate
 
 /** A full screen over the app with a close button and a title, like the day sheet. */
 @Composable
-private fun Overlay(
+internal fun Overlay(
     title: String,
     onClose: () -> Unit,
     action: (@Composable () -> Unit)? = null,

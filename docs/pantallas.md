@@ -105,6 +105,11 @@ Tras la foto, en la misma pantalla:
   segmentado de tres: `posterGrid`, `posterStrip`, `posterWallpaper`. Mirarlo es gratis; sin Pro,
   compartir y guardar abren el paywall.
 - Año sin entradas: `yearEmpty`.
+- Bajo la rejilla, `poster` y `stats` (v1.2) lado a lado. Sin Pro, `stats` abre el paywall.
+- **En palabras** (`statsTitle`): pantalla completa con frases cortas, una por línea en `body`
+  (`statsWarmest`, `statsColdest`, `statsRepeated` con un punto de 14 de ese color, `statsGreyest`,
+  `statsWarmer`/`statsCooler`/`statsAlike`). Sin gráficas ni números más allá del año. Con pocos días,
+  solo `statsEmpty`.
 
 ---
 

@@ -162,6 +162,14 @@ object S {
         "Dein Jahr füllt sich, Farbe für Farbe.",
         "Ton année se remplira, couleur après couleur.",
     )
+    val stats get() = t("In words", "En palabras", "Em palavras", "In Worten", "En mots")
+    val statsEmpty get() = t(
+        "Too few days yet to tell anything.",
+        "Aún hay pocos días para contar nada.",
+        "Ainda há poucos dias para contar algo.",
+        "Noch zu wenige Tage, um etwas zu erzählen.",
+        "Encore trop peu de jours pour raconter quoi que ce soit.",
+    )
     val poster get() = t("Poster", "Póster", "Pôster", "Poster", "Affiche")
 
     // 5. Open day
@@ -316,6 +324,13 @@ object S {
         "Seu ano em pôster, em três estilos",
         "Dein Jahr als Poster, in drei Stilen",
         "Ton année en affiche, en trois styles",
+    )
+    val proStats get() = t(
+        "Your year told in short sentences",
+        "Tu año contado en frases cortas",
+        "Seu ano contado em frases curtas",
+        "Dein Jahr in kurzen Sätzen erzählt",
+        "Ton année racontée en phrases courtes",
     )
     val proYearWidget get() = t("The year widget", "El widget del año", "O widget do ano", "Das Jahres-Widget", "Le widget de l'année")
     val proOnce get() = t(
@@ -636,6 +651,64 @@ object S {
         "Cor da semana: $name",
         "Farbe der Woche: $name",
         "Couleur de la semaine : $name",
+    )
+
+    fun statsTitle(year: Int) = t("$year in words", "$year en palabras", "$year em palavras", "$year in Worten", "$year en mots")
+
+    fun statsWarmest(month: String) = t(
+        "The warmest month was $month.",
+        "El mes más cálido fue $month.",
+        "O mês mais quente foi $month.",
+        "Der wärmste Monat war der $month.",
+        "Le mois le plus chaud a été $month.",
+    )
+
+    fun statsColdest(month: String) = t(
+        "The coldest was $month.",
+        "El más frío, $month.",
+        "O mais frio, $month.",
+        "Der kälteste war der $month.",
+        "Le plus froid, $month.",
+    )
+
+    fun statsRepeated(name: String) = t(
+        "The color that came back most: $name.",
+        "El color que más volvió: $name.",
+        "A cor que mais voltou: $name.",
+        "Die Farbe, die am öftesten wiederkam: $name.",
+        "La couleur qui est le plus revenue : $name.",
+    )
+
+    fun statsGreyest(from: String, to: String) = t(
+        "The greyest stretch: $from to $to.",
+        "La estación más gris: de $from a $to.",
+        "A estação mais cinzenta: de $from a $to.",
+        "Die grauste Jahreszeit: $from bis $to.",
+        "La saison la plus grise : de $from à $to.",
+    )
+
+    fun statsWarmer(year: Int, before: Int) = t(
+        "$year was warmer than $before.",
+        "$year fue más cálido que $before.",
+        "$year foi mais quente que $before.",
+        "$year war wärmer als $before.",
+        "$year a été plus chaud que $before.",
+    )
+
+    fun statsCooler(year: Int, before: Int) = t(
+        "$year was cooler than $before.",
+        "$year fue más frío que $before.",
+        "$year foi mais frio que $before.",
+        "$year war kühler als $before.",
+        "$year a été plus froid que $before.",
+    )
+
+    fun statsAlike(year: Int, before: Int) = t(
+        "$year looked a lot like $before.",
+        "$year se pareció mucho a $before.",
+        "$year foi muito parecido com $before.",
+        "$year ähnelte $before sehr.",
+        "$year a beaucoup ressemblé à $before.",
     )
 
     fun inviteMessage(link: String) = t(

@@ -49,7 +49,7 @@ fun ProDialog(onDismiss: () -> Unit) {
         title = { Text(S.proTitle, style = Styles.title) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(S.proPoster, S.proYearWidget).forEach { Text("- $it", style = Styles.body) }
+                listOf(S.proPoster, S.proYearWidget, S.proStats).forEach { Text("- $it", style = Styles.body) }
                 Text(S.proOnce, style = Styles.body)
                 note?.let { Text(it, style = Styles.muted) }
             }

@@ -20,6 +20,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.backhandler.BackHandler
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.baltajmn.color.billing.Billing
@@ -27,19 +28,18 @@ import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.Route
 import com.baltajmn.color.data.today
+import com.baltajmn.color.i18n.S
 import com.baltajmn.color.social.Friends
 import com.baltajmn.color.social.Outbox
 import com.baltajmn.color.social.Social
-import kotlinx.datetime.LocalDate
-import com.baltajmn.color.i18n.S
-import com.baltajmn.color.ui.Glyph
-import com.baltajmn.color.ui.GlyphIcon
 import com.baltajmn.color.ui.DaySheet
 import com.baltajmn.color.ui.FriendActions
 import com.baltajmn.color.ui.FriendDay
 import com.baltajmn.color.ui.FriendList
 import com.baltajmn.color.ui.FriendYear
 import com.baltajmn.color.ui.FriendsScreen
+import com.baltajmn.color.ui.Glyph
+import com.baltajmn.color.ui.GlyphIcon
 import com.baltajmn.color.ui.InviteScreen
 import com.baltajmn.color.ui.Paywall
 import com.baltajmn.color.ui.PhotoViewer
@@ -47,11 +47,12 @@ import com.baltajmn.color.ui.PosterScreen
 import com.baltajmn.color.ui.ProDialog
 import com.baltajmn.color.ui.SettingsScreen
 import com.baltajmn.color.ui.ShareScreen
-import com.baltajmn.color.ui.YearScreen
+import com.baltajmn.color.ui.StatsScreen
 import com.baltajmn.color.ui.TodayScreen
+import com.baltajmn.color.ui.YearScreen
 import com.baltajmn.color.ui.theme.ChromaTheme
 import com.baltajmn.color.ui.theme.Styles
-import androidx.compose.ui.unit.dp
+import kotlinx.datetime.LocalDate
 
 /** Four screens do not justify a navigation library. Friends stays hidden until v1.1. */
 enum class Screen { Today, Year, Friends, Settings }
@@ -72,6 +73,7 @@ fun App() {
     var openDay by remember { mutableStateOf<LocalDate?>(null) }
     var sharing by remember { mutableStateOf<LocalDate?>(null) }
     var poster by remember { mutableStateOf<Int?>(null) }
+    var stats by remember { mutableStateOf<Int?>(null) }
     var proCheck by remember { mutableStateOf(0) }
 
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
@@ -100,6 +102,7 @@ fun App() {
             openDay = null
             sharing = null
             poster = null
+            stats = null
             Friends.inviteOpen = false
             Friends.listOpen = false
             Friends.viewing = null
@@ -123,7 +126,7 @@ fun App() {
                             onPhoto = { photo = it },
                             onShare = { sharing = it },
                         )
-                        Screen.Year -> YearScreen(day, onOpenDay = { openDay = it }, onPoster = { poster = it })
+                        Screen.Year -> YearScreen(day, onOpenDay = { openDay = it }, onPoster = { poster = it }, onStats = { stats = it })
                         Screen.Settings -> SettingsScreen(onBack = { screen = Screen.Today })
                         Screen.Friends -> FriendsScreen(day, onPhoto = { photo = it })
                     }
@@ -133,6 +136,7 @@ fun App() {
             openDay?.let { DaySheet(it, onClose = { openDay = null }, onPhoto = { photo = it }, onShare = { sharing = it }) }
             sharing?.let { ShareScreen(it, onClose = { sharing = null }) }
             poster?.let { PosterScreen(it, onClose = { poster = null }) }
+            stats?.let { StatsScreen(it, onClose = { stats = null }) }
             if (Friends.inviteOpen) InviteScreen { Friends.inviteOpen = false }
             if (Friends.listOpen) FriendList { Friends.listOpen = false }
             Friends.viewing?.let { FriendYear(it, day, onClose = { Friends.viewing = null }) }
@@ -144,7 +148,7 @@ fun App() {
             if (Paywall.open) ProDialog { Paywall.open = false }
 
             BackHandler(
-                Paywall.open || photo != null || sharing != null || poster != null || Friends.inviteOpen ||
+                Paywall.open || photo != null || sharing != null || poster != null || stats != null || Friends.inviteOpen ||
                     Friends.listOpen || Friends.viewing != null || Friends.viewingDay != null ||
                     openDay != null || screen != Screen.Today,
             ) {
@@ -153,6 +157,7 @@ fun App() {
                     photo != null -> photo = null
                     sharing != null -> sharing = null
                     poster != null -> poster = null
+                    stats != null -> stats = null
                     Friends.inviteOpen -> Friends.inviteOpen = false
                     Friends.viewingDay != null -> Friends.viewingDay = null
                     Friends.viewing != null -> Friends.viewing = null

@@ -84,6 +84,8 @@ Nada más. No hay librería de imágenes: las fotos se decodifican con el sistem
 | `social/Qr.kt` | Codificador QR | Nuevo (v1.1) |
 | `social/Friends.kt` | Amigos, solicitudes, enlaces de invitación | Nuevo (v1.1) |
 | `ui/InviteScreen.kt` | El enlace, su QR, compartir y regenerar | Nuevo (v1.1) |
+| `color/Week.kt`, `color/Stats.kt` | Color de la semana y estadísticas | Nuevo (v1.2) |
+| `ui/StatsScreen.kt` | El año en frases | Nuevo (v1.2) |
 | `ui/FriendYear.kt` | Lista de amigos, el año de uno, uno de sus días, y su menú (reportar, bloquear, quitar) | Nuevo (v1.1) |
 | `ui/Card.kt` | La tarjeta | Nuevo |
 | `ui/TodayScreen.kt`, `ui/YearScreen.kt`, `ui/SettingsScreen.kt`, `ui/FriendsScreen.kt` | Pantallas | Purl y nuevo |
@@ -318,6 +320,25 @@ otro solo la ve si se lo compartí.
   imagen que se comparte: fuera de la app no significa nada.
 - `weekColorOn` apaga la pista de Hoy y todas las marcas.
 
+### 6.13 Estadísticas (v1.2, Pro)
+
+`color/Stats.kt`, función pura `yearStats(año, diario)`. Cada dato es nulo si no hay días para
+decirlo con honradez:
+
+- **Calidez** de un color: su croma proyectada sobre el tono cálido de Lab (50 grados, entre rojo y
+  naranja): `C * cos(h - 50)`. Un gris da casi cero, sea claro u oscuro; un azul, negativo.
+- **Mes más cálido y más frío**: media de calidez de los meses con `STATS_MIN_DAYS` (3) días o más,
+  y al menos dos meses así.
+- **Color que más volvió**: la clave de nombre más repetida, con dos días como mínimo. Empates, al
+  primero del año.
+- **Estación más gris**: la de menor croma media entre las de 3 días o más (al menos dos). Estaciones
+  meteorológicas por meses (diciembre a febrero, etc.), nombradas por sus meses y no por verano o
+  invierno, que dependen del hemisferio.
+- **Comparación**: con `STATS_MIN_YEAR_DAYS` (20) días en los dos años, la diferencia de calidez
+  media; por debajo de `STATS_ALIKE` (3) es "se pareció mucho".
+
+Se enseña en frases (`StatsScreen`), sin números ni gráficas.
+
 ---
 
 ## 7. Captura
@@ -526,6 +547,8 @@ Comunes (`commonTest`) salvo que se diga.
 15. QR: la matriz de un texto conocido coincide con la de referencia.
 16. Color de la semana: semana 1 y semana 53.
 17. Servidor (`supabase/tests/`, pgTAP): sin amistad no se lee; un bloqueo corta; tope de 50.
+18. Estadísticas: calidez ordenada, mes más cálido y más frío, color repetido, estación más gris, pocos
+    días no dicen nada, y la comparación con el año anterior en los tres sentidos.
 
 `ExtractPreview` (`androidHostTest`) no es un test: con `CHROMA_PHOTOS=<carpeta>` escribe
 `shared/build/extract-preview.png`, una hoja con cada foto y sus candidatos, para juzgar la extracción a ojo.
@@ -562,3 +585,4 @@ Sin la variable no hace nada.
 | #36, #37 Seguridad y cuenta | 8.2, 8.4 |
 | #39 Sintonía | 6.11; test 14 |
 | #40 Color de la semana | 6.12; test 16 |
+| #41 Estadísticas | 6.13; test 18 |

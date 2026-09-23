@@ -41,7 +41,7 @@ import com.baltajmn.color.ui.theme.screenInsets
 import kotlinx.datetime.LocalDate
 
 @Composable
-fun YearScreen(today: LocalDate, onOpenDay: (LocalDate) -> Unit, onPoster: (Int) -> Unit) {
+fun YearScreen(today: LocalDate, onOpenDay: (LocalDate) -> Unit, onPoster: (Int) -> Unit, onStats: (Int) -> Unit) {
     val days = ChromaRepository.journal.mapValues { it.value.color }
     val years = remember(days.keys) { (days.keys.map { it.take(4).toInt() } + today.year).distinct().sorted() }
     var year by rememberSaveable { mutableStateOf(today.year) }
@@ -69,7 +69,11 @@ fun YearScreen(today: LocalDate, onOpenDay: (LocalDate) -> Unit, onPoster: (Int)
             }
             if (inYear) {
                 Spacer(Modifier.height(24.dp))
-                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { OutlinedAction(S.poster, { onPoster(year) }) }
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)) {
+                    OutlinedAction(S.poster, { onPoster(year) })
+                    // Pro, and asked for honestly: the button is there, the phrases open after buying.
+                    OutlinedAction(S.stats, { if (ChromaRepository.settings.pro) onStats(year) else Paywall.open = true })
+                }
             }
             Spacer(Modifier.height(32.dp))
         }
