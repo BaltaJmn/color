@@ -66,7 +66,8 @@ fun ShareScreen(date: LocalDate, onClose: () -> Unit) {
         renderDayCard(entry, date, photo.takeIf { withPhoto }, watermark, measurer)
     }
 
-    PictureScreen(card, onClose) {
+    val description = S.colorName(entry.name) + ", " + entry.color + ", " + S.shortDate(date)
+    PictureScreen(card, description, onClose) {
         if (photo != null) {
             ToggleRow(S.includePhoto, checked = withPhoto) { withPhoto = it }
             Spacer(Modifier.height(16.dp))
@@ -76,11 +77,13 @@ fun ShareScreen(date: LocalDate, onClose: () -> Unit) {
 
 /**
  * A finished picture over the whole screen, with share and save under it. The poster uses it too:
- * [locked] still shows the picture and sends both buttons to [onLocked].
+ * [locked] still shows the picture and sends both buttons to [onLocked]. [description] speaks the
+ * picture for a screen reader, since it is the whole content of the screen.
  */
 @Composable
 fun PictureScreen(
     picture: ImageBitmap,
+    description: String,
     onClose: () -> Unit,
     locked: Boolean = false,
     onLocked: () -> Unit = {},
@@ -96,11 +99,11 @@ fun PictureScreen(
             Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
                 GlyphButton(Glyph.CLOSE, S.a11yClose, onClose)
             }
-            Box(Modifier.fillMaxWidth().padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
+            Box(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 16.dp), contentAlignment = Alignment.Center) {
                 val shape = RoundedCornerShape(14.dp)
                 Image(
                     bitmap = picture,
-                    contentDescription = null,
+                    contentDescription = description,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.widthIn(max = 320.dp).heightIn(max = 520.dp).clip(shape).border(1.dp, MaterialTheme.colorScheme.outline, shape),
                 )

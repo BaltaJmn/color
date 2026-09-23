@@ -126,4 +126,11 @@ enum L {
     static var yearLabel: String {
         t("Your year in color", "Tu año en color", "Seu ano em cores", "Dein Jahr in Farben", "Ton année en couleurs")
     }
+    static var friendsToday: String {
+        t(
+            "Colors your friends picked today", "Los colores que tus amigos eligieron hoy",
+            "As cores que seus amigos escolheram hoje", "Die Farben, die deine Freunde heute gewählt haben",
+            "Les couleurs choisies aujourd'hui par tes amis"
+        )
+    }
 }

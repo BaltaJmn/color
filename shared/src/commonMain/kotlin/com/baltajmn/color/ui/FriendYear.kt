@@ -81,9 +81,9 @@ fun FriendList(onClose: () -> Unit) {
             Text(
                 person.displayName,
                 style = Styles.body,
-                modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)
                     .clickable(role = Role.Button) { Friends.viewing = person }
-                    .padding(vertical = 15.dp),
+                    .padding(vertical = 12.dp),
             )
         }
     }
@@ -108,12 +108,13 @@ fun FriendYear(person: Profile, today: LocalDate, onClose: () -> Unit) {
     var year by remember(person.id) { mutableStateOf(today.year) }
 
     Overlay(person.displayName, onClose, { MoreButton(Acting(person)) }) {
+        Spacer(Modifier.height(8.dp))
         if (failed) Notice(S.friendsOffline, S.retry to { attempt++ })
         if (years.size > 1) {
             val i = years.indexOf(year)
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
                 GlyphButton(Glyph.BACK, S.a11yPreviousYear, { year = years[i - 1] }, enabled = i > 0)
-                Text(year.toString(), style = Styles.body, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
+                Text(year.toString(), style = Styles.title, modifier = Modifier.weight(1f), textAlign = TextAlign.Center)
                 GlyphButton(Glyph.FORWARD, S.a11yNextYear, { year = years[i + 1] }, enabled = i < years.lastIndex)
             }
         }
@@ -206,6 +207,6 @@ private fun MenuRow(label: String, onClick: () -> Unit) {
     Text(
         label,
         style = Styles.body,
-        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClick = onClick).padding(vertical = 13.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(role = Role.Button, onClick = onClick).padding(vertical = 12.dp),
     )
 }

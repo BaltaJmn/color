@@ -75,8 +75,8 @@ private struct YearView: View {
                     .accessibilityLabel(Text(L.yearLabel))
                 if !pro {
                     VStack(spacing: 2) {
-                        Text(L.proTitle).font(.system(size: 13, weight: .semibold))
-                        Text(L.unlock).font(.system(size: 12)).foregroundStyle(.secondary)
+                        Text(L.proTitle).font(.system(size: 13, weight: .medium))
+                        Text(L.unlock).font(.system(size: 13)).foregroundStyle(Color("WidgetMuted"))
                     }
                 }
             }

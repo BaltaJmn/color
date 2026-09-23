@@ -47,6 +47,7 @@ fun InviteScreen(onClose: () -> Unit) {
     val scope = rememberCoroutineScope()
 
     Overlay(S.inviteFriend, onClose) {
+        Spacer(Modifier.height(8.dp))
         Text(S.inviteText, style = Styles.muted, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(24.dp))
         if (code.isEmpty() || qr == null) {

@@ -11,7 +11,9 @@ La interfaz pantalla a pantalla. Medidas en dp (pt en iOS). Los textos se nombra
 
 La interfaz es gris sin tinte, como una cabina de ver color: un gris cálido o frío cambia cómo se ve
 el color que tiene encima, y este es el único producto de la app. El único color vivo lo pone el
-usuario. La excepción es `error`, reservado a lo que no se deshace.
+usuario. La excepción es `error`, reservado a lo que no se deshace. Las imágenes que salen de la app
+(la tarjeta y el póster, `tecnico.md` 6.9) van siempre sobre el papel claro, sea cual sea el tema: se
+imprimen, se ponen de fondo o se ven en el móvil de otro.
 
 | Token | Claro | Oscuro | Uso |
 |---|---|---|---|
@@ -50,6 +52,20 @@ de miniatura 14. Tocables de 48 como mínimo, sin excepción de estilo: el botó
 de borde, el de texto y cada opción de un segmentado, 48. La única excepción es la celda de la
 rejilla del año (unos 22), porque el año entero tiene que caber de un vistazo; cada día se puede
 abrir igual con el lector de pantalla.
+
+### Movimiento y tacto
+
+Un solo momento se mueve de verdad: **al elegir el color del día, el color brota de la miniatura de la
+foto** y se extiende hasta cubrir la tarjeta (700 ms, frenando al final), porque de ahí ha salido. El
+nombre, el hex y la fecha llegan al final, nunca sobre el fondo vacío. Solo justo tras elegir: en Mi
+año, en el feed o al volver a Hoy, la tarjeta está sin más.
+
+Cambiar el color durante el día funde el viejo en el nuevo (400 ms). Nada más se anima: una app que
+se mueve por todas partes deja de enseñar el color. Con "Reducir movimiento" (iOS) o las animaciones
+apagadas (Android) todo esto se salta solo, porque Compose lo respeta.
+
+El tacto, igual de escaso: un toque de hecho al guardar el color del día y al aceptar a un amigo, que
+pasan una vez; un tic ligero al cambiar el color después. Nada más vibra.
 
 ### Reglas de uso
 
@@ -108,8 +124,8 @@ Tras la foto, en la misma pantalla:
 - Tocar un candidato lo elige y guarda al momento. No hay botón de confirmar.
 - Debajo, siempre, `cancel`: vuelve a lo que había antes de la foto, también con la primera del día.
   Nada se guarda hasta tocar un color.
-- Mientras se analiza la foto, los círculos se pintan en `surfaceVariant` (menos de 100 ms, casi
-  nunca se ve).
+- Sobre los círculos, `pickColor` en `label`: la primera vez no es obvio que hay que tocar uno.
+- Mientras se analiza la foto (menos de 100 ms), los botones se desactivan y sale `working`.
 - Si la foto de galería no es de hoy: aviso `galleryNotToday` y se vuelve al estado sin entrada.
 
 ### Con entrada
@@ -159,7 +175,9 @@ sobre un círculo negro al 40 %: sin él, una foto de cielo o de nieve se comía
 
 ### Compartir
 
-Capa a pantalla completa desde el menú de Hoy o desde el día abierto. Arriba, cerrar. En medio, la
+Capa a pantalla completa desde el menú de Hoy o desde el día abierto. Arriba, cerrar; a 8, como en
+el resto de capas, la imagen. El lector de pantalla la lee como el color, su hex y la fecha (el póster,
+como el año y su estilo): es todo lo que hay en la pantalla. En medio, la
 tarjeta de 1080x1350 (`tecnico.md` 6.9) a 320 de ancho como mucho, con radio 14 y borde `outline`.
 Debajo, si el día tiene foto, una fila con interruptor, `includePhoto` (empieza encendido): apagarlo
 quita la miniatura de la imagen, no del día. No usa las palabras de compartir con amigos
@@ -172,15 +190,16 @@ decide el ajuste `watermarkRow`, no esta pantalla.
 
 ## 6. La tarjeta
 
-Componente `ChromaCard(entry, date, author?, compact)`. Proporción 4:5, radio 28.
+Componente `ChromaCard(entry, date, author?, compact, reveal)`. Proporción 4:5, radio 28. En `compact`,
+margen 16 y miniatura a 12 del borde (rejilla de 4).
 
 | Elemento | Posición | Estilo |
 |---|---|---|
 | Fondo | Todo | El color |
 | Nombre del color | Arriba izquierda, margen 24 | `display` (`title` si `compact`), tinta |
-| Hex | Bajo el nombre | `label` en peso normal, tinta |
+| Hex | Bajo el nombre | `label` en peso normal, con 0,5 de espaciado entre letras (se lee como el código de una muestra de pintura), tinta |
 | Palabra | Bajo el hex, a 12 | `body` en cursiva, tinta |
-| Autor (feed) | Abajo izquierda, sobre la fecha | `body` Medium, tinta |
+| Autor (feed) | Abajo izquierda, sobre la fecha | `body` Medium, tinta; tocable de 48 de alto |
 | Fecha | Abajo izquierda, margen 24 | `label` en peso normal, tinta |
 | Miniatura | Abajo derecha, margen 20, lado 30 % del ancho | Radio 14, borde de 2 en tinta al 24 % |
 | Marca de sintonía (v1.1) | Arriba derecha | Dos aros solapados de 10 (16 de ancho, trazo 1,5), tinta; se lee `inTune` |
@@ -210,7 +229,7 @@ Lista de secciones, como Purl:
    - Los widgets siguen enseñando colores: están en la pantalla de inicio porque el usuario los puso,
      y nunca llevan fotos ni palabras.
 4. **Tarjeta**: `watermarkRow`, `weekColorRow` (v1.2, interruptor con el nombre del color de esta
-   semana debajo).
+   semana debajo, precedido de un punto de 12 de ese color: el nombre solo no dice qué violeta es).
 5. **Copia**: exportar (con fecha de la última) e importar.
 6. **Chroma Pro**: comprar o "ya lo tienes", restaurar.
 7. **Más apps**: una fila por hermana publicada en esa tienda.
@@ -303,7 +322,9 @@ El `ProDialog` de Purl: título `proTitle`, lo que incluye (`proPoster`, `proYea
 | Año | Mediano (4x2) | El año arriba y la rejilla tumbada: 12 filas de meses por 31 columnas, porque el widget es más ancho que alto. Días futuros más tenues. Sin Pro: la rejilla vacía con `proTitle` y `widgetUnlock` encima |
 
 Tocar abre Hoy o Mi año; el del año sin Pro abre el paywall, que explica más que una rejilla vacía.
-La rejilla del año es una imagen: el lector de pantalla la anuncia como `a11yYearWidget`.
+La rejilla del año es una imagen: el lector de pantalla la anuncia como `a11yYearWidget`, y la tira de
+amigos como `a11yFriendsToday`. Margen interior 12. En los widgets rige el mismo suelo de 13 y el gris
+secundario es el token (`WidgetMuted` en iOS, `widget_muted` en Android), no el del sistema.
 
 ---
 

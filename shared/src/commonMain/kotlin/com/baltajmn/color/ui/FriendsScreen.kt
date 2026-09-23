@@ -48,7 +48,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -257,6 +259,7 @@ fun NameField(value: String, onChange: (String) -> Unit) {
 @Composable
 private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
     val scope = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
     var message by remember { mutableStateOf<String?>(null) }
     var failed by remember { mutableStateOf(false) }
     var attempt by remember { mutableStateOf(0) }
@@ -311,8 +314,13 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
                     if (names.isEmpty()) null else ({ TextAction(S.inviteFriend, { Friends.inviteOpen = true }) }),
                 )
             }
-            if (failed) block { Notice(S.friendsOffline, S.retry to { attempt++ }) }
-            message?.let { text -> block { Notice(text, S.ok to { message = null }) } }
+            // One notice at a time (docs/pantallas.md 1): a failed refresh explains why nothing
+            // else updates, so it outranks the message.
+            if (failed) {
+                block { Notice(S.friendsOffline, S.retry to { attempt++ }) }
+            } else {
+                message?.let { text -> block { Notice(text, S.ok to { message = null }) } }
+            }
             // In order of the hour, earliest first, like the day itself went.
             if (todays.isNotEmpty()) {
                 block {
@@ -328,7 +336,16 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
                         Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text(person.displayName, style = Styles.body, modifier = Modifier.weight(1f))
                             TextAction(S.ignore, { act { Friends.decline(person.id) } })
-                            OutlinedAction(S.accept, { act { if (!Friends.accept(person.id)) message = S.friendLimit } })
+                            OutlinedAction(
+                                S.accept,
+                                {
+                                    act {
+                                        // Once per friendship: the moment a request turns into a friend.
+                                        if (Friends.accept(person.id)) haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                                        else message = S.friendLimit
+                                    }
+                                },
+                            )
                         }
                     }
                 }

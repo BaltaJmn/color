@@ -99,7 +99,7 @@ fun Segmented(options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
                     .background(if (on) colors.surface else colors.surfaceVariant)
                     .semantics { this.selected = on }
                     .clickable(role = Role.Tab) { onSelect(i) }
-                    .padding(vertical = 10.dp),
+                    .padding(vertical = 12.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(label, style = Styles.label.copy(color = colors.onBackground, fontWeight = if (on) FontWeight.Medium else FontWeight.Normal))

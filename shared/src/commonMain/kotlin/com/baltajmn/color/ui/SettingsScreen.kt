@@ -1,6 +1,9 @@
 package com.baltajmn.color.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,9 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,9 +36,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.billing.Billing
+import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.color.weekColor
 import com.baltajmn.color.data.AppInfo
 import com.baltajmn.color.data.Backup
@@ -148,7 +155,8 @@ fun SettingsScreen(onBack: () -> Unit) {
                 ToggleRow(S.watermarkRow, checked = settings.watermark) { on ->
                     ChromaRepository.updateSettings { it.copy(watermark = on) }
                 }
-                ToggleRow(S.weekColorRow, S.colorName(weekColor(today()).key), checked = settings.weekColorOn) { on ->
+                val week = weekColor(today())
+                ToggleRow(S.weekColorRow, S.colorName(week.key), checked = settings.weekColorOn, swatch = week.hex) { on ->
                     ChromaRepository.updateSettings { it.copy(weekColorOn = on) }
                 }
             }
@@ -422,6 +430,8 @@ fun ToggleRow(
     subtitle: String? = null,
     checked: Boolean,
     enabled: Boolean = true,
+    // The hex of a color to show as a dot before the subtitle, e.g. this week's color.
+    swatch: String? = null,
     onCheckedChange: (Boolean) -> Unit,
 ) {
     Row(
@@ -433,7 +443,21 @@ fun ToggleRow(
     ) {
         Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
             Text(title, style = Styles.body)
-            if (subtitle != null) Text(subtitle, style = Styles.caption)
+            if (subtitle != null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (swatch != null) {
+                        // Decorative next to the name it sits beside: no semantics of its own.
+                        Box(
+                            Modifier.size(12.dp)
+                                .clip(CircleShape)
+                                .background(colorOf(swatch))
+                                .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape)
+                                .padding(end = 8.dp),
+                        )
+                    }
+                    Text(subtitle, style = Styles.caption)
+                }
+            }
         }
         SoftSwitch(checked, enabled = enabled, onChange = null)
     }

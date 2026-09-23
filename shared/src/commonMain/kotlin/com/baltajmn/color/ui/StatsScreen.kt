@@ -56,10 +56,10 @@ fun StatsScreen(year: Int, onClose: () -> Unit) {
 
 @Composable
 private fun Line(text: String, swatch: String? = null) {
-    Row(Modifier.fillMaxWidth().padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
         swatch?.let {
             Box(Modifier.size(14.dp).clip(CircleShape).background(colorOf(it)))
-            Spacer(Modifier.width(10.dp))
+            Spacer(Modifier.width(12.dp))
         }
         Text(text, style = Styles.body)
     }

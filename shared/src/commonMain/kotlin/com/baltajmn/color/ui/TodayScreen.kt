@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -88,6 +89,8 @@ fun TodayScreen(
     var notice by remember { mutableStateOf<String?>(null) }
     var working by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
+    // Only the card that follows a pick is revealed; coming back to Today later just shows it.
+    var justPicked by remember(today) { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     fun capture(from: suspend () -> Picked?) {
@@ -165,9 +168,10 @@ fun TodayScreen(
                 waiting != null -> Picking(waiting, onPick = { hex ->
                     ChromaRepository.pick(hex, waiting.swatches, nearestName(hex).key, waiting.jpeg)
                     pending = null
+                    justPicked = true
                 }, onCancel = { pending = null })
                 entry != null -> {
-                    ChromaCard(entry, today, onPhoto = onPhoto) { WeekMark(entry.color, today) }
+                    ChromaCard(entry, today, onPhoto = onPhoto, reveal = justPicked) { WeekMark(entry.color, today) }
                     Spacer(Modifier.height(20.dp))
                     SwatchRow(entry.swatches, entry.color, 40.dp) { hex ->
                         ChromaRepository.pick(hex, entry.swatches, nearestName(hex).key)
@@ -209,7 +213,8 @@ fun TodayScreen(
 @Composable
 private fun Empty(week: ColorName?, firstTime: Boolean, working: Boolean, onCamera: () -> Unit, onGallery: () -> Unit) {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Spacer(Modifier.height(64.dp))
+        // 56 plus the 8 every state starts with: 64 from the header, as pantallas.md 3 says.
+        Spacer(Modifier.height(56.dp))
         Text(S.todayPrompt, style = Styles.display, textAlign = TextAlign.Center)
         if (firstTime) {
             Spacer(Modifier.height(8.dp))
@@ -243,7 +248,7 @@ private fun Picking(pending: Pending, onPick: (String) -> Unit, onCancel: () -> 
     Spacer(Modifier.height(20.dp))
     Text(S.pickColor, style = Styles.label, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
     Spacer(Modifier.height(12.dp))
-    SwatchRow(pending.swatches, null, 48.dp, onPick)
+    SwatchRow(pending.swatches, null, 56.dp, HapticFeedbackType.Confirm, onPick)
     Spacer(Modifier.height(8.dp))
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { TextAction(S.cancel, onCancel) }
 }

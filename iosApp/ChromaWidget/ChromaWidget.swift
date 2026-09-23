@@ -41,7 +41,7 @@ private struct TodayView: View {
         if let hex = entry.state?.color, let name = entry.state?.name {
             VStack(alignment: .leading, spacing: 2) {
                 Spacer()
-                Text(L.today).font(.system(size: 12))
+                Text(L.today).font(.system(size: 13))
                 Text(name).font(.system(size: 17, weight: .medium)).lineLimit(2)
                 FriendsStrip(colors: entry.state?.friends ?? [])
             }
@@ -52,7 +52,7 @@ private struct TodayView: View {
                 Spacer()
                 Text(L.empty)
                     .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color("WidgetMuted"))
                     .multilineTextAlignment(.center)
                 Spacer()
                 FriendsStrip(colors: entry.state?.friends ?? [])
@@ -74,6 +74,8 @@ private struct FriendsStrip: View {
             .frame(height: 8)
             .clipShape(RoundedRectangle(cornerRadius: 4))
             .padding(.top, 8)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(L.friendsToday))
         }
     }
 }

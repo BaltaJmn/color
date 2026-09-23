@@ -28,6 +28,8 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
+import androidx.glance.semantics.contentDescription
+import androidx.glance.semantics.semantics
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
@@ -75,8 +77,8 @@ private fun Today(state: WidgetState?) {
 
     if (hex != null && name != null) {
         val ink = ColorProvider(inkColorFor(hex))
-        Column(frame.background(colorOf(hex)).padding(14.dp), verticalAlignment = Alignment.Bottom) {
-            Text(S.widgetTodayName, style = TextStyle(color = ink, fontSize = 12.sp))
+        Column(frame.background(colorOf(hex)).padding(12.dp), verticalAlignment = Alignment.Bottom) {
+            Text(S.widgetTodayName, style = TextStyle(color = ink, fontSize = 13.sp))
             Text(name, maxLines = 2, style = TextStyle(color = ink, fontSize = 17.sp, fontWeight = FontWeight.Medium))
             FriendsStrip(state.friends)
         }
@@ -86,7 +88,7 @@ private fun Today(state: WidgetState?) {
             Configuration.UI_MODE_NIGHT_YES
         val scheme = if (night) Dark else Light
         Column(
-            frame.background(scheme.surfaceVariant).padding(14.dp),
+            frame.background(scheme.surfaceVariant).padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -113,7 +115,10 @@ private fun Today(state: WidgetState?) {
 private fun FriendsStrip(colors: List<String>) {
     if (colors.isEmpty()) return
     Spacer(GlanceModifier.height(8.dp))
-    Row(GlanceModifier.fillMaxWidth().height(8.dp).cornerRadius(4.dp)) {
+    Row(
+        GlanceModifier.fillMaxWidth().height(8.dp).cornerRadius(4.dp)
+            .semantics { contentDescription = S.a11yFriendsToday },
+    ) {
         colors.forEach { Box(GlanceModifier.defaultWeight().fillMaxHeight().background(colorOf(it))) {} }
     }
 }

@@ -14,6 +14,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.selected
@@ -29,7 +31,15 @@ import com.baltajmn.color.i18n.S
  * at once and can change all day (docs/pantallas.md 3).
  */
 @Composable
-fun SwatchRow(colors: List<String>, selected: String?, size: Dp, onPick: (String) -> Unit) {
+fun SwatchRow(
+    colors: List<String>,
+    selected: String?,
+    size: Dp,
+    // A tick for changing it during the day; the first pick of the day passes Confirm.
+    feedback: HapticFeedbackType = HapticFeedbackType.SegmentTick,
+    onPick: (String) -> Unit,
+) {
+    val haptic = LocalHapticFeedback.current
     Row(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp, androidx.compose.ui.Alignment.CenterHorizontally),
@@ -45,7 +55,10 @@ fun SwatchRow(colors: List<String>, selected: String?, size: Dp, onPick: (String
                         contentDescription = S.a11ySwatch(nearestName(hex).key, isSelected)
                         this.selected = isSelected
                     }
-                    .clickable(role = Role.RadioButton) { onPick(hex) }
+                    .clickable(role = Role.RadioButton) {
+                        haptic.performHapticFeedback(feedback)
+                        onPick(hex)
+                    }
                     .padding(7.dp),
             ) {
                 Box(
