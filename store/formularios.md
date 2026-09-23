@@ -17,8 +17,8 @@ Hechos de partida, todos de `docs/tecnico.md`:
   ubicación. De la foto solo se lee la fecha, para rechazar una de otro día.
 - Lo único que sale del teléfono es lo de **RevenueCat**: un identificador anónimo de instalación
   (se configura sin `appUserID`), el historial de compras y datos técnicos del dispositivo.
-- Los widgets leen `widget.json`: el color de hoy, su nombre y, con Pro, los colores del año. Nunca
-  fotos ni palabras (`tecnico.md` 4.2).
+- Los widgets leen `widget.json`: el color de hoy, su nombre, con Pro los colores del año y, con
+  Amigos (v1.2), los colores de hoy de los amigos. Nunca fotos, palabras ni nombres (`tecnico.md` 4.2).
 - La notificación tiene siempre el mismo texto (`reminderTitle`, `reminderText`): no lleva nada del
   usuario.
 - Android no tiene el permiso `CAMERA`: la foto la hace la cámara del sistema con `TakePicture`, y la

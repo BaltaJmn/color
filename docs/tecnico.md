@@ -161,7 +161,11 @@ data class ChromaEntry(
 ```
 
 - `name` ya traducido: el widget no lleva la tabla.
-- `days` solo para el widget del año, y solo con Pro. `friends`, desde v1.2 (#42).
+- `days` solo para el widget del año, y solo con Pro. `friends`, desde v1.2 (#42) y gratis: los
+  colores de hoy de los amigos, en orden de hora, los mismos de la paleta del círculo. Salen de
+  `JournalFile.friendsToday` (fecha y colores), que se reescribe al cargar el feed y se borra al cerrar
+  sesión. Vive en `entries.json` para que cualquier otra escritura del widget lo conserve, pero no va
+  en la copia: `ExportFile` solo lleva los días.
 - Nunca fotos, nombres de amigos ni palabras.
 
 ### 4.3 La copia: `chroma-AAAA-MM-DD.zip`

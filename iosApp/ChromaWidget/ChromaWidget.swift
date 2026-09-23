@@ -43,14 +43,37 @@ private struct TodayView: View {
                 Spacer()
                 Text(L.today).font(.system(size: 12))
                 Text(name).font(.system(size: 17, weight: .medium)).lineLimit(2)
+                FriendsStrip(colors: entry.state?.friends ?? [])
             }
             .foregroundStyle(ChromaStore.ink(hex))
             .frame(maxWidth: .infinity, alignment: .leading)
         } else {
-            Text(L.empty)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+            VStack(spacing: 0) {
+                Spacer()
+                Text(L.empty)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                Spacer()
+                FriendsStrip(colors: entry.state?.friends ?? [])
+            }
+        }
+    }
+}
+
+/// #42: a thin strip with the circle's colors today, in order of the hour. Colors only, so the home
+/// screen says how your people's day went without naming anyone. Nothing at all without friends.
+private struct FriendsStrip: View {
+    let colors: [String]
+
+    var body: some View {
+        if !colors.isEmpty {
+            HStack(spacing: 0) {
+                ForEach(Array(colors.enumerated()), id: \.offset) { _, hex in ChromaStore.color(hex) }
+            }
+            .frame(height: 8)
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .padding(.top, 8)
         }
     }
 }

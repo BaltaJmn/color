@@ -19,8 +19,14 @@ import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
 import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
 import androidx.glance.layout.Column
+import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
+import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
@@ -72,6 +78,7 @@ private fun Today(state: WidgetState?) {
         Column(frame.background(colorOf(hex)).padding(14.dp), verticalAlignment = Alignment.Bottom) {
             Text(S.widgetTodayName, style = TextStyle(color = ink, fontSize = 12.sp))
             Text(name, maxLines = 2, style = TextStyle(color = ink, fontSize = 17.sp, fontWeight = FontWeight.Medium))
+            FriendsStrip(state.friends)
         }
     } else {
         // Glance 1.1.1 has no day/night ColorProvider, so the scheme is read from the host.
@@ -93,6 +100,20 @@ private fun Today(state: WidgetState?) {
                     textAlign = TextAlign.Center,
                 ),
             )
+            state?.let { FriendsStrip(it.friends) }
         }
+    }
+}
+
+/**
+ * #42: a thin strip with the circle's colors today, in order of the hour. Colors only, so the home
+ * screen says how your people's day went without naming anyone. Nothing at all without friends.
+ */
+@Composable
+private fun FriendsStrip(colors: List<String>) {
+    if (colors.isEmpty()) return
+    Spacer(GlanceModifier.height(8.dp))
+    Row(GlanceModifier.fillMaxWidth().height(8.dp).cornerRadius(4.dp)) {
+        colors.forEach { Box(GlanceModifier.defaultWeight().fillMaxHeight().background(colorOf(it))) {} }
     }
 }

@@ -36,4 +36,12 @@ class WidgetTest {
         assertEquals(2028, newYear.year)
         assertTrue(newYear.days.isEmpty())
     }
+
+    @Test
+    fun friendsColorsLastOnlyTheirDay() {
+        // #42: free, with or without Pro, and gone once the day is over.
+        val st = widgetState(j, Settings(), LocalDate.parse("2027-12-31"), nameOf = { it }, friends = listOf("#E07A5F", "#81B29A"))
+        assertEquals(listOf("#E07A5F", "#81B29A"), widgetView(st, LocalDate.parse("2027-12-31")).friends)
+        assertTrue(widgetView(st, LocalDate.parse("2028-01-01")).friends.isEmpty())
+    }
 }

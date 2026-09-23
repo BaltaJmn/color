@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.model.ChromaEntry
+import com.baltajmn.color.model.FriendsToday
 import com.baltajmn.color.model.Journal
 import com.baltajmn.color.model.JournalFile
 import com.baltajmn.color.model.JournalJson
@@ -132,6 +133,11 @@ object ChromaRepository {
 
     fun updateSettings(change: (Settings) -> Settings) = edit { it.copy(settings = change(it.settings)) }
 
+    /** The friends strip of the today widget; null forgets it. Written only when it changed. */
+    fun updateFriendsToday(today: FriendsToday?) {
+        if (today != file.friendsToday) edit { it.copy(friendsToday = today) }
+    }
+
     /** What the store says, kept on disk so the app knows it offline and the widgets can read it. */
     fun updatePro(active: Boolean) {
         if (active != settings.pro) updateSettings { it.copy(pro = active) }
@@ -239,7 +245,9 @@ object ChromaRepository {
     }
 
     fun syncWidgets(f: JournalFile = file) {
-        syncWidgets(widgetState(f.entries, f.settings, today(), nameOf = S::colorName))
+        val day = today()
+        val friends = f.friendsToday?.takeIf { it.date == day.toString() }?.colors.orEmpty()
+        syncWidgets(widgetState(f.entries, f.settings, day, nameOf = S::colorName, friends = friends))
     }
 
     // --- internals ----------------------------------------------------------------------------

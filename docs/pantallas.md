@@ -246,7 +246,7 @@ El `ProDialog` de Purl: título `proTitle`, lo que incluye (`proPoster`, `proYea
 
 | Widget | Tamaño | Contenido |
 |---|---|---|
-| Hoy | Pequeño (2x2) | Con entrada: el color a sangre y su nombre en tinta. Sin entrada: `surfaceVariant`, `widgetEmpty`. v1.2: tira de amigos de 8 de alto abajo |
+| Hoy | Pequeño (2x2) | Con entrada: el color a sangre y su nombre en tinta. Sin entrada: `surfaceVariant`, `widgetEmpty`. v1.2: tira de amigos de 8 de alto y radio 4 abajo, con o sin entrada, en orden de hora y sin nombres; sin amigos, no hay tira |
 | Año | Mediano (4x2) | El año arriba y la rejilla tumbada: 12 filas de meses por 31 columnas, porque el widget es más ancho que alto. Días futuros más tenues. Sin Pro: la rejilla vacía con `proTitle` y `widgetUnlock` encima |
 
 Tocar abre Hoy o Mi año; el del año sin Pro abre el paywall, que explica más que una rejilla vacía.

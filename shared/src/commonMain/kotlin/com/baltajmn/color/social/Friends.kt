@@ -6,10 +6,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import com.baltajmn.color.color.deltaE
 import com.baltajmn.color.color.labOf
+import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Route
 import com.baltajmn.color.data.Storage
 import com.baltajmn.color.data.decodeImage
 import com.baltajmn.color.model.ChromaEntry
+import com.baltajmn.color.model.FriendsToday
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
@@ -146,6 +148,11 @@ object Friends {
             order("updated_at", Order.DESCENDING)
         }.decodeList<FeedRow>()
         withContext(Dispatchers.IO) { Storage.keepCached(feed.map { it.cacheName }.toSet()) }
+        // The widget's strip: the same colors as the circle's palette, earliest first, and no names.
+        val shown = friends.map { it.id }.toSet()
+        val hidden = ChromaRepository.settings.hiddenCards
+        val colors = feed.filter { it.date == today && it.author in shown && it.key !in hidden }.asReversed().map { it.color }
+        ChromaRepository.updateFriendsToday(FriendsToday(today.toString(), colors))
     }
 
     /** Downloaded once and kept in the cache; null without a photo or when it cannot be fetched. */
@@ -235,5 +242,6 @@ object Friends {
         viewingDay = null
         acting = null
         Storage.keepCached(emptySet())
+        ChromaRepository.updateFriendsToday(null)
     }
 }

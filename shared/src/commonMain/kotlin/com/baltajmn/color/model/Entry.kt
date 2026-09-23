@@ -69,7 +69,15 @@ data class JournalFile(
      * file as the days so a change and its place in the queue are written together or not at all.
      */
     val outbox: List<String> = emptyList(),
+    /**
+     * Friends' colors on the day of the last feed load, for the today widget (#42). Colors only, in
+     * order of the hour; never exported, and forgotten on signing out.
+     */
+    val friendsToday: FriendsToday? = null,
 )
+
+@Serializable
+data class FriendsToday(val date: String, val colors: List<String>)
 
 /** Days whose change the server has to hear about: anything that is or was shared. */
 fun sharedChanges(before: Journal, after: Journal): List<String> =
