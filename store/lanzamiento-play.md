@@ -123,6 +123,11 @@ países que el español. "Gratuita" no se puede cambiar luego a "de pago", y es 
 
 ### Subir el AAB a prueba interna
 
+**Hecho el 24-09-2026 por el CI** (`gh workflow run release.yml -f track=internal -f status=draft`,
+`store/ci.md`): el `versionCode` 2 está en prueba interna como borrador. Falta publicarlo desde la
+consola (*Prueba interna > Versiones > Revisar versión > Iniciar lanzamiento*). Los pasos de abajo
+son la vía manual.
+
 La prueba interna es la vía rápida (sin revisión larga) y además es requisito para crear el producto
 de Pro: Play no deja crear productos hasta que hay un AAB subido con el permiso de facturación, y el
 de Chroma ya lo lleva.

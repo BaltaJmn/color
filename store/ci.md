@@ -31,8 +31,9 @@ gh workflow run release.yml --ref main -f track=internal
 ```
 
 **Mientras la app no tenga ninguna versión publicada** en ningún canal, Play solo acepta versiones en
-borrador: `-f status=draft`, y la versión se lanza después desde la consola. La primera subida de
-Chroma se hace a mano en la consola de todas formas, porque ahí se acepta la firma de apps de Play.
+borrador: `-f status=draft`, y la versión se lanza después desde la consola. Así se hizo la primera
+de Chroma (24-09-2026, `-f track=internal -f status=draft`, `versionCode` 2): Play acepta la primera
+subida por API y aplica solo su firma de apps.
 
 **`internal` y `alpha` no son el mismo sitio.** La prueba interna se activa en minutos; los 14 días
 con 12 testers solo corren en la **cerrada** (`alpha`). Un `versionCode` gastado en un canal no vale
@@ -55,7 +56,7 @@ detecta antes de subir: es esa comprobación del CN.
 | `KEYSTORE_PASSWORD` | La del almacén | `keystore.properties` |
 | `KEY_ALIAS` | `upload` | |
 | `KEY_PASSWORD` | La de la clave (la misma) | `keystore.properties` |
-| `PLAY_SERVICE_ACCOUNT_JSON` | La cuenta de servicio **de publicar** | `~/keys/play-service-account.json` |
+| `PLAY_SERVICE_ACCOUNT_JSON` | La cuenta de servicio **de publicar** | `~/keys/play-service-account.json`; al rotarla con `credenciales.sh play` se actualiza sola |
 
 Se ponen sin que el valor pase por la pantalla:
 
