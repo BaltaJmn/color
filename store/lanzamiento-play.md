@@ -299,7 +299,8 @@ disponible. No se rompe nada.
 **Hecho el 24-09-2026 por la API de RevenueCat:** proyecto Chroma con la app de Play
 (`com.baltajmn.color`) y el JSON de la cuenta de servicio, producto `pro_lifetime`, derecho `pro`,
 oferta `default` actual con el paquete `$rc_lifetime`, y la clave `goog_` en `Billing.android.kt`
-desde el `versionCode` 2. Queda el producto en Play Console (6.1). Los pasos de abajo sirven para
+desde el `versionCode` 2. El producto de Play Console (6.1) se creó y activó el mismo día: `pro_lifetime`, opción `buy`
+retrocompatible, 173 países. Los pasos de abajo sirven para
 comprobar o rehacer.
 
 ### 6.1 El producto en Play Console
@@ -316,8 +317,10 @@ cobras con Quilt, está).
 4. Categoría fiscal: la que proponga para apps (servicios digitales).
 5. **Opción de compra**: tipo *Comprar*, ID `buy`, y márcala **compatible con versiones anteriores**
    (backwards compatible). Es la que ven las versiones de la librería de facturación como la de Chroma.
-6. **Precio**: *Establecer precio* > `4,99 EUR`. Deja que Play calcule el resto de países (precios
-   regionales, es la decisión del issue 3).
+6. **Precio**: *Set prices* > *Editar precios en bloque*, todos los países, **`4,12 EUR`**. El precio
+   en bloque es **sin IVA**: con `4,99` España sale a 5,99. Con 4,12 España, Italia, Portugal y
+   Países Bajos quedan en 4,99, Alemania y Francia en 4,89, EE. UU. en 4,69 USD (redondeos de Play).
+   Cada país se puede retocar a mano después.
 7. *Guardar* y **Activar**. Un producto inactivo no aparece en RevenueCat ni en la app.
 
 Si tu consola aún muestra el modelo antiguo (*Productos de compra en aplicaciones*), es lo mismo sin el
