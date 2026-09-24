@@ -290,7 +290,7 @@ Qué espera el código, que no hay que tocar:
 | Derecho (entitlement) | `pro`, exacto | `Billing.kt`: Pro está activo si este derecho está activo |
 | Oferta (offering) | La marcada como **actual** (current); se llamará `default` | `Billing.kt`: pide la actual, no un nombre |
 | Paquete | El primero de la oferta actual. Tiene que haber **uno solo** | `Billing.kt` |
-| Producto | `pro_lifetime`, compra única, 4,99 EUR | Solo en Play y RevenueCat; el precio que ve el usuario lo da la tienda |
+| Producto | `pro_lifetime`, compra única, 2,99 EUR | Solo en Play y RevenueCat; el precio que ve el usuario lo da la tienda |
 | Clave pública Android | `goog_...` | `shared/src/androidMain/kotlin/com/baltajmn/color/billing/Billing.android.kt`, línea 4 |
 
 Mientras la clave sea `null`, la app funciona gratis y el panel de Pro dice que la tienda no está
@@ -317,9 +317,10 @@ cobras con Quilt, está).
 4. Categoría fiscal: la que proponga para apps (servicios digitales).
 5. **Opción de compra**: tipo *Comprar*, ID `buy`, y márcala **compatible con versiones anteriores**
    (backwards compatible). Es la que ven las versiones de la librería de facturación como la de Chroma.
-6. **Precio**: *Set prices* > *Editar precios en bloque*, todos los países, **`4,12 EUR`**. El precio
-   en bloque es **sin IVA**: con `4,99` España sale a 5,99. Con 4,12 España, Italia, Portugal y
-   Países Bajos quedan en 4,99, Alemania y Francia en 4,89, EE. UU. en 4,69 USD (redondeos de Play).
+6. **Precio**: *Set prices* > *Editar precios en bloque*, todos los países, **`2,47 EUR`**. El precio
+   en bloque es **sin IVA** (2,99 / 1,21 del IVA español): con `2,99` España saldría a 3,59. Con
+   2,47 casi toda la zona euro queda en 2,99, Alemania en 2,89, EE. UU. en 2,79 USD y Reino Unido
+   en 2,49 GBP (redondeos de Play, se dejan así).
    Cada país se puede retocar a mano después.
 7. *Guardar* y **Activar**. Un producto inactivo no aparece en RevenueCat ni en la app.
 

@@ -284,17 +284,18 @@ tienes y más miras. Es el incentivo que queremos evitar.
 
 ### Precio
 
-**4,99 EUR**, como Quilt, sin descuento de lanzamiento, con precios regionales en las dos tiendas. El
-paquete de v1.0 es fino (póster y widget), así que no puede costar como Purl. Se revisa al llegar
-las estadísticas; quien compró conserva Pro.
+**2,99 EUR**, sin descuento de lanzamiento, con precios regionales en las dos tiendas. El paquete de
+v1.0 es fino (póster y widget) y las apps parecidas son gratis, así que va por debajo de Quilt: mejor
+muchas ventas pequeñas que pocas. Los redondeos de cada país los deja la tienda (Alemania 2,89,
+EE. UU. 2,79 USD). Se revisa al llegar las estadísticas; quien compró conserva Pro.
 
 ```
-4,99 EUR escaparate
-/ 1,21 (IVA 21%)  = 4,12 EUR
-- 15 % comisión   = 3,50 EUR netos
+2,99 EUR escaparate
+/ 1,21 (IVA 21%)  = 2,47 EUR
+- 15 % comisión   = 2,10 EUR netos
 ```
 
-El plan Pro de Supabase se paga con unas 7 ventas al mes.
+El plan Pro de Supabase se paga con unas 12 ventas al mes.
 
 ### Reglas
 
