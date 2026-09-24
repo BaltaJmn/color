@@ -34,7 +34,8 @@ Hechos de partida, todos de `docs/tecnico.md`:
 |---|---|
 | ¿Tu app recoge o comparte alguno de los tipos de datos obligatorios? | Sí |
 | ¿Se cifran en tránsito todos los datos recogidos? | Sí (HTTPS del SDK de RevenueCat) |
-| ¿Ofreces una forma de pedir que se borren los datos? | Sí: por correo, lo explica la política |
+| ¿Ofreces una forma de pedir que se borren los datos? | Sí. URL `https://color.baltajmn.dev/delete`: su sección de compras explica cómo borrar lo de RevenueCat por correo con el número de pedido |
+| ¿Pueden iniciar sesión con cuentas creadas fuera? | No |
 | ¿Permite la app crear una cuenta? | No (v1.0). Por eso no hace falta URL de borrado de cuenta |
 
 Tipos de datos, los únicos dos que se marcan:
@@ -82,7 +83,7 @@ Resultado esperado: PEGI 3, ESRB Everyone, USK 0.
 | Grupos de edad | 13-15, 16-17, 18 y más |
 | ¿Atrae a menores de 13? | No |
 | Anuncios | No contiene anuncios |
-| Acceso a la app | Toda la funcionalidad disponible sin restricciones ni inicio de sesión |
+| Datos de inicio de sesión (antes "Acceso a la app") | **Sí**: la redacción de 2026 cuenta como restringido cualquier pago ("productos únicos") y la autenticación biométrica, y Google no compra con cuentas personales. Pro necesita un código promocional de `pro_lifetime` para el revisor; el bloqueo viene apagado. Play no deja empezar Público objetivo sin esta sección |
 | App de noticias, salud, finanzas, gobierno | No |
 
 Con Amigos (v1.1), al publicar la primera versión con servidor:
@@ -116,6 +117,7 @@ la aplicación?" es **sí** aunque las claves de RevenueCat sean `null`.
 | Correo de contacto | `baltajmn@gmail.com`, el mismo de la política |
 | Sitio web | `https://color.baltajmn.dev/` |
 | Teléfono | Vacío |
+| Etiquetas | Fotografía, Estilo de vida, Arte y diseño, Personalización (no existen Diario ni Minimalista) |
 | Política de privacidad | `https://color.baltajmn.dev/` |
 
 Fotografía y no Estilo de vida como Purl: lo que se hace cada día es una foto, y es donde se busca.
