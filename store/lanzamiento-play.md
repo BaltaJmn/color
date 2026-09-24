@@ -48,7 +48,8 @@ Firma de apps > Solicitar restablecimiento de la clave de subida*. Tarda unos d�
 ./gradlew :androidApp:bundleRelease
 ```
 
-Sale en `androidApp/build/outputs/bundle/release/androidApp-release.aab`. Antes de subirlo, comprueba
+Sale en `androidApp/build/outputs/bundle/release/androidApp-release.aab`. Desde la segunda versión
+lo hace GitHub Actions al poner una etiqueta: `store/ci.md`. Antes de subirlo, comprueba
 que va firmado con la clave de subida y no con la de depuración (si falta `keystore.properties`, el
 build firma en silencio con la de depuración y Play lo rechaza):
 
@@ -226,8 +227,7 @@ python3 tools/store/fichas.py
 
 **Atajo: subir los cinco idiomas de golpe.** En vez de pegar quince campos a mano, el mismo script los
 sube por la API en una sola edición (entran todos o ninguno). Necesita que la app exista y tenga un AAB
-subido, y una cuenta de servicio con permiso de ficha (la del paso 6 sirve si le das además "Gestionar
-presencia en Play Store"):
+subido, y la cuenta de servicio **de publicar** (`store/ci.md`), nunca la de RevenueCat:
 
 ```bash
 pip3 install google-api-python-client google-auth
@@ -340,11 +340,12 @@ Google Cloud.
    - Ver datos financieros, pedidos y respuestas a la encuesta de cancelación
    - Gestionar pedidos y suscripciones
 
-   *Invitar usuario*. (Para el atajo de `fichas.py --subir`, añade también "Gestionar presencia en
-   Play Store".)
+   *Invitar usuario*. Nada más: esta cuenta es de solo lectura a propósito. La que publica es otra
+   (`store/ci.md`), y no se juntan nunca.
 
-Si ya tienes una cuenta de servicio así para Quilt o MoodTraker en RevenueCat, reutiliza el mismo
-JSON: los permisos de cuenta cubren todas tus apps.
+Si ya tienes la de RevenueCat de Quilt o MoodTraker, reutilízala con una clave JSON nueva: los
+permisos de cuenta cubren todas tus apps. Se guarda con `~/keys/credenciales.sh revenuecat-play
+<json>`.
 
 ### 6.3 El proyecto en RevenueCat
 

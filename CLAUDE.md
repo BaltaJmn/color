@@ -59,6 +59,8 @@ El repositorio es público: todo lo que entra en su historia se queda.
 - En el binario solo van claves públicas: las de RevenueCat (`goog_`, `appl_`) y la `anon` de
   Supabase. La `sk_` de RevenueCat, la `service_role` de Supabase y la de Resend nunca entran en el
   repositorio.
+- La cuenta de servicio que publica en Play es distinta de la de RevenueCat, que es de solo lectura a
+  propósito. No se juntan ni se usan una para el trabajo de la otra (`store/ci.md`).
 
 ## Commits
 
@@ -86,3 +88,6 @@ xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp \
 ```
 
 Iterar con el objetivo mínimo del módulo tocado; el build de todo, una vez al final.
+
+Publicar: subir el `versionCode`, y `git tag vX.Y && git push origin vX.Y` dispara Play (`alpha`) y
+TestFlight, este último solo cuando existan los secretos de Apple (`store/ci.md`).

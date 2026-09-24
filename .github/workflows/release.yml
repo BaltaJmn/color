@@ -1,0 +1,44 @@
+name: Release to Play
+
+# Tag driven on purpose: every push to main would burn a versionCode and spam the
+# testers with a build nobody asked for. You tag when you mean to ship.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      track:
+        description: Play track to publish to
+        type: choice
+        options: [alpha, internal, beta, production]
+        default: alpha
+      status:
+        description: draft only while the app has never published a release on any track
+        type: choice
+        options: [completed, draft]
+        default: completed
+
+# Reading the code is all these jobs need from GitHub; the Play credentials travel as secrets.
+permissions:
+  contents: read
+
+jobs:
+  release:
+    # The whole sequence lives in BaltaJmn/ci, shared with the sister apps (store/ci.md).
+    # Secrets go one by one and not with `secrets: inherit`: only these five belong to a Play
+    # release.
+    uses: BaltaJmn/ci/.github/workflows/android-play-release.yml@main
+    with:
+      package-name: com.baltajmn.color
+      # The upload key was generated with this CN, not the shared default CN=Baltasar.
+      signer-cn: CN=BaltaJmn
+      gradle-tasks: ':shared:testAndroidHostTest :androidApp:bundleRelease'
+      track: ${{ inputs.track || 'alpha' }}
+      status: ${{ inputs.status || 'completed' }}
+      whatsnew-dir: store/whatsnew
+    secrets:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
