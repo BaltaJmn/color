@@ -1,6 +1,8 @@
-Haz una foto al día y elige el color que te da. En diciembre, tu año es una rejilla de colores que se lee de un vistazo.
+Chroma es tu diario de color: haz una foto al día y elige el color que te da. En diciembre tu año es una rejilla de colores que se lee de un vistazo.
 
 Chroma es un diario sin palabras. No escribes, miras: el cielo de camino al trabajo, el abrigo de quien va delante en la cola, la luz de la cocina. La app encuentra los colores de tu foto y tú eliges el que fue tu día.
+
+A diferencia de un year in pixels o un mood tracker de estados de ánimo elegidos de una lista, en Chroma el color sale de una foto real, no de cómo te sientes.
 
 ELIGE EL COLOR, NO UN FILTRO
 
@@ -28,7 +30,7 @@ Sin cuenta, sin registro, sin nube nuestra. Las fotos se guardan sin su ubicaci�
 
 GRATIS, SIN CUENTA ATRÁS
 
-Las fotos y los colores, Mi año, las tarjetas, el recordatorio, el widget de hoy, el color de la semana, el bloqueo con tu cara o tu huella y exportar e importar tus datos: todo gratis, para siempre.
+Las fotos y los colores, Mi año, las tarjetas, el recordatorio, el widget de hoy, el color de la semana, el bloqueo con tu cara o tu huella y exportar e importar tus datos: tu diario de color, gratis para siempre.
 
 PRO, UN SOLO PAGO
 

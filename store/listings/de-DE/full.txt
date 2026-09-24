@@ -1,6 +1,8 @@
-Mach jeden Tag ein Foto und wähle die Farbe, die es dir gibt. Im Dezember ist dein Jahr ein Raster aus Farben, das sich auf einen Blick lesen lässt.
+Chroma ist dein Farbtagebuch: Mach jeden Tag ein Foto und wähle die Farbe, die es dir gibt. Im Dezember ist dein Jahr ein Raster aus Farben, das sich auf einen Blick lesen lässt, wie ein Year in Pixels aus echten Fotos.
 
 Chroma ist ein Tagebuch ohne Worte. Du schreibst nicht, du schaust: den Himmel auf dem Weg zur Arbeit, den Mantel der Person vor dir in der Schlange, das Licht in der Küche. Die App findet die Farben in deinem Foto, und du wählst die, die dein Tag war.
+
+Anders als ein Stimmungstracker oder ein Year in Pixels mit Farben aus einer Stimmungsliste: In Chroma kommt die Farbe aus einem echten Foto, nicht aus einer Bewertung deiner Laune.
 
 WÄHLE DIE FARBE, KEINEN FILTER
 
@@ -8,7 +10,7 @@ Chroma bietet dir bis zu fünf Farben aus jedem Foto an, die kräftigste immer d
 
 EIN JAHR AUF EINEN BLICK
 
-Mein Jahr zeigt jeden Tag als Quadrat, die zwölf Monate nebeneinander. Wechsle zum Streifen, und das Jahr wird zu einem langen Verlauf, vom Grau des Winters bis zum Ocker des Sommers. Tippe auf einen Tag, um seine Karte und sein Foto zu sehen.
+Mein Jahr zeigt jeden Tag als Quadrat, die zwölf Monate nebeneinander: dein eigenes Year in Pixels. Wechsle zum Streifen, und das Jahr wird zu einem langen Verlauf, vom Grau des Winters bis zum Ocker des Sommers. Tippe auf einen Tag, um seine Karte und sein Foto zu sehen.
 
 EINE KARTE ZUM TEILEN
 
@@ -28,7 +30,7 @@ Kein Konto, keine Anmeldung, keine Cloud von uns. Fotos werden ohne ihren Stando
 
 KOSTENLOS, OHNE ABLAUFDATUM
 
-Fotos und Farben, Mein Jahr, die Karten, die Erinnerung, das Heute-Widget, die Farbe der Woche, die Sperre mit Gesicht oder Fingerabdruck sowie Export und Import deiner Daten: alles kostenlos, dauerhaft.
+Fotos und Farben, Mein Jahr, die Karten, die Erinnerung, das Heute-Widget, die Farbe der Woche, die Sperre mit Gesicht oder Fingerabdruck sowie Export und Import deiner Daten: dein Farbtagebuch, kostenlos, dauerhaft.
 
 PRO, EINE ZAHLUNG
 

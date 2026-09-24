@@ -1,6 +1,8 @@
-Prends une photo par jour et choisis la couleur qu'elle te donne. En décembre, ton année est une grille de couleurs qui se lit d'un coup d'œil.
+Chroma est ton journal de couleurs : prends une photo par jour et choisis la couleur qu'elle te donne. En décembre, ton année est une grille de couleurs qui se lit d'un coup d'œil, comme une year in pixels faite de vraies photos.
 
 Chroma est un journal sans mots. Tu n'écris pas, tu regardes : le ciel sur le chemin du travail, le manteau de la personne devant toi dans la file, la lumière de la cuisine. L'app trouve les couleurs de ta photo, et tu choisis celle qui a été ta journée.
+
+À la différence d'un suivi d'humeur ou d'une year in pixels où l'on choisit une couleur dans une liste d'humeurs, dans Chroma la couleur vient d'une vraie photo, pas de ton humeur du jour.
 
 CHOISIS LA COULEUR, PAS UN FILTRE
 
@@ -8,7 +10,7 @@ Chroma te propose jusqu'à cinq couleurs par photo, toujours avec la plus vive, 
 
 UNE ANNÉE D'UN COUP D'ŒIL
 
-Mon année montre chaque jour comme un carré, les douze mois côte à côte. Passe à la bande et l'année devient un long dégradé, des gris de l'hiver aux ocres de l'été. Touche un jour pour voir sa carte et sa photo.
+Mon année montre chaque jour comme un carré, les douze mois côte à côte : ta propre year in pixels. Passe à la bande et l'année devient un long dégradé, des gris de l'hiver aux ocres de l'été. Touche un jour pour voir sa carte et sa photo.
 
 UNE CARTE À PARTAGER
 
@@ -28,7 +30,7 @@ Pas de compte, pas d'inscription, pas de cloud à nous. Les photos sont gardées
 
 GRATUIT, SANS COMPTE À REBOURS
 
-Les photos et les couleurs, Mon année, les cartes, le rappel, le widget du jour, la couleur de la semaine, le verrouillage par visage ou empreinte, et l'export et l'import de tes données : tout est gratuit, pour toujours.
+Les photos et les couleurs, Mon année, les cartes, le rappel, le widget du jour, la couleur de la semaine, le verrouillage par visage ou empreinte, et l'export et l'import de tes données : ton journal de couleurs, gratuit, pour toujours.
 
 PRO, UN SEUL PAIEMENT
 

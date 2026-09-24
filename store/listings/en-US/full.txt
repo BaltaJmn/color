@@ -1,6 +1,8 @@
-Take one photo a day and pick the color it gives you. By December your year is a grid of colors you can read at a glance.
+Chroma is a color diary and a year in pixels, made from real photos: take one photo a day and pick the color it gives you. By December your year is a grid of colors you can read at a glance.
 
 Chroma is a diary without words. You do not write, you look: at the sky on the way to work, the coat of the person ahead of you in the queue, the light in the kitchen. The app finds the colors in your photo, and you choose the one that was your day.
+
+Unlike a mood tracker or a year in pixels where you pick a mood from a list, in Chroma the color comes from a real photo, not from how you say you feel.
 
 PICK THE COLOR, NOT A FILTER
 
@@ -8,7 +10,7 @@ Chroma offers up to five colors from each photo, the most vivid always among the
 
 A YEAR IN ONE LOOK
 
-My year shows every day as a square, twelve months side by side. Switch to the strip and the year becomes one long gradient, from winter greys to summer ochres. Tap any day to see its card and its photo.
+My year shows every day as a square, twelve months side by side: your own year in pixels. Switch to the strip and the year becomes one long gradient, from winter greys to summer ochres. Tap any day to see its card and its photo.
 
 A CARD WORTH SHARING
 
@@ -28,7 +30,7 @@ No account, no sign-up, no cloud of ours. Photos are stored without their locati
 
 FREE, WITHOUT A TIMER RUNNING
 
-Photos and colors, My year, sharing cards, the reminder, the today widget, the color of the week, the lock with your face or fingerprint, and exporting and importing your data: all free, permanently.
+Photos and colors, My year, sharing cards, the reminder, the today widget, the color of the week, the lock with your face or fingerprint, and exporting and importing your data: your color diary, free, permanently.
 
 PRO, ONE PAYMENT
 

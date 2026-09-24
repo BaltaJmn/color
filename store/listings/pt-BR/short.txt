@@ -1,1 +1,1 @@
-Uma foto por dia vira uma cor. Seu ano, pintado numa grade.
+Diário de cores: uma foto por dia vira uma cor. Seu ano em pixels, numa grade.

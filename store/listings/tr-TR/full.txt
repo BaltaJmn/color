@@ -1,0 +1,32 @@
+Chroma gerçek fotoğraflardan oluşan bir renk günlüğü ve bir year in pixels'tir: günde bir fotoğraf çek, sana verdiği rengi seç. Aralık ayına geldiğinde yılın, tek bakışta okuyabileceğin renklerden oluşan bir ızgaraya dönüşür.
+
+Chroma kelimesiz, sözsüz bir günlüktür: bir fotoğraf günlüğü. Yazmazsın, bakarsın: işe giderken gökyüzüne, sırada önündeki kişinin paltosuna, mutfaktaki ışığa. Uygulama fotoğrafındaki renkleri bulur, sen de günün hangi renk olduğunu seçersin.
+
+Ruh hali günlüğü tutup listeden bir duygu seçtiğin uygulamalardan farklı olarak, Chroma'da renk gerçek bir fotoğraftan gelir; kendini nasıl hissettiğini yazmandan değil.
+
+RENK SEÇ, FİLTRE DEĞİL
+Chroma her fotoğraftan beşe kadar renk sunar, en canlısı her zaman aralarındadır, ve her rengin bir adı vardır: fırtına mavisi, adaçay yeşili, terakota. Seçimini gün boyunca istediğin kadar değiştirebilir, gün gerektiriyorsa tek bir kelime ekleyebilirsin.
+
+TEK BAKIŞTA BİR YIL
+Benim Yılım, on iki ayı yan yana dizip her günü bir kare olarak gösterir: piksellerle kendi yılın. Şeride geçtiğinde yıl, kış grilerinden yaz kehribanlarına uzanan tek bir uzun degradeye dönüşür. Herhangi bir güne dokun, kartını ve fotoğrafını gör.
+
+PAYLAŞMAYA DEĞER BİR KART
+Her gün bir kart oluşturur: kenardan kenara renk, adı, tarih ve köşede fotoğrafın. Fotoğrafla birlikte paylaşabilir, ya da fotoğraf sadece sana aitse yalnızca rengi paylaşabilirsin.
+
+ANA EKRANINDA
+Bugünün widget'ı rengini, adıyla birlikte kenardan kenara gösterir. Fotoğrafını asla göstermez: ana ekranı yanındaki herkes görür.
+
+TEK BİR HATIRLATICI, NE ZAMAN DURACAĞINI BİLİR
+Seçtiğin saatte günde bir kez, günün rengi ne olduğunu soran nazik bir hatırlatma. Bugüne rengi verildiğinde sessizleşir.
+
+HER ŞEY TELEFONUNDA KALIR
+Hesap yok, kayıt yok, bize ait bir bulut yok. Fotoğraflar konum bilgisi olmadan saklanır. İstediğin an tüm günlerini, fotoğraflar dahil, tek bir dosya olarak dışa aktar ve başka bir telefona aktar: içe aktarma sadece ekler, asla silmez.
+
+SÜRESİ İŞLEMEYEN ÜCRETSİZ SÜRÜM
+Fotoğraflar ve renkler, Benim Yılım, paylaşım kartları, hatırlatıcı, bugünün widget'ı, haftanın rengi, yüzünle veya parmak izinle kilit, verilerini dışa ve içe aktarma: renk günlüğün, kalıcı olarak ücretsiz.
+
+PRO, TEK ÖDEME
+Renk günlüğünün yıl sonu hali: yazdırmak ya da duvar kağıdı olarak kullanmak için üç farklı stilde yıl posteri, yıl widget'ı ve yılının kısa cümlelerle anlatımı. Tek seferlik bir ödeme, asla abonelik değil.
+
+BURADA BULAMAYACAKLARIN
+Seri yok, filtre yok, beğeni yok, reklam yok, analitik yok.
