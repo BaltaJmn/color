@@ -74,7 +74,9 @@ en Purl.
 | ¿Contiene anuncios? | No |
 | ¿Acceso sin restricciones a internet? | No |
 
-Resultado esperado: PEGI 3, ESRB Everyone, USK 0.
+Resultado (enviado el 24-09-2026): PEGI 3, ESRB Everyone, USK 0, IARC 3+; Brasil (ClassInd) 14+ por
+las compras. El cuestionario de 2026 pregunta además por cajas de botín, recompensas en metálico o
+NFT, navegador y app informativa: no a todo. Correo de IARC: `baltajmn@gmail.com`.
 
 ## 3. Play: público objetivo y declaraciones
 
@@ -107,6 +109,16 @@ grep -oE '<uses-permission[^>]*android:name="[^"]*"' \
 
 `com.android.vending.BILLING` está en el binario desde la primera subida, así que "¿Tiene compras en
 la aplicación?" es **sí** aunque las claves de RevenueCat sean `null`.
+
+## 3b. Play: prueba cerrada y revisor
+
+| Campo | Valor |
+|---|---|
+| Canal | Prueba cerrada - Alpha, todos los países (177) |
+| Testers | Grupo de Google `chroma-testers@googlegroups.com` (excluye las listas de correo) |
+| Comentarios | `baltajmn@gmail.com` |
+| Enlace de opt-in | `https://play.google.com/apps/testing/com.baltajmn.color`, activo cuando se publique la versión |
+| Pro para el revisor | Promoción "Revision de Google Play" (id 131156526): 5 códigos de `pro_lifetime`, del 24-09-2026 al 24-03-2027. Un código va en *Datos de inicio de sesión* |
 
 ## 4. Play: ficha, categoría y contacto
 
