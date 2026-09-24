@@ -72,7 +72,9 @@ huecos de `web/`, que están con marcadores hasta que existan las cuentas:
   de apps de Play (*Play Console > Prueba y publicación > Integridad de la app*). Si se quiere probar
   una build firmada con la clave de subida, se añade también la suya a la lista.
 - `web/.well-known/apple-app-site-association`: `TEAM_ID` por el Team ID de `Config.xcconfig`. El
-  App ID necesita la capacidad *Associated Domains* (el entitlement ya está en `iosApp.entitlements`).
+  App ID necesita la capacidad *Associated Domains*. En v1.0 se quitaron de `iosApp.entitlements`
+  `associated-domains` (`applinks:color.baltajmn.dev`) y `applesignin` (`Default`): un equipo
+  personal de Xcode no firma con ellas. Volver a ponerlas al activar Amigos.
 - `web/404.html`: `APP_STORE_ID` por el identificador numérico de la app en App Store Connect. Vacío,
   la página solo enseña Google Play.
 
