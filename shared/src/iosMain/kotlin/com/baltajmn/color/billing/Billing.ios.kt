@@ -1,4 +1,4 @@
 package com.baltajmn.color.billing
 
-/** App Store key from the RevenueCat dashboard ("appl_..."). Public, but the project does not exist yet. */
+/** App Store key ("appl_...") of the RevenueCat project Chroma, once it has its App Store app. Public. */
 actual val revenueCatApiKey: String? = null

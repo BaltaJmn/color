@@ -291,6 +291,12 @@ Qué espera el código, que no hay que tocar:
 Mientras la clave sea `null`, la app funciona gratis y el panel de Pro dice que la tienda no está
 disponible. No se rompe nada.
 
+**Hecho el 24-09-2026 por la API de RevenueCat:** proyecto Chroma con la app de Play
+(`com.baltajmn.color`) y el JSON de la cuenta de servicio, producto `pro_lifetime`, derecho `pro`,
+oferta `default` actual con el paquete `$rc_lifetime`, y la clave `goog_` en `Billing.android.kt`
+desde el `versionCode` 2. Queda el producto en Play Console (6.1). Los pasos de abajo sirven para
+comprobar o rehacer.
+
 ### 6.1 El producto en Play Console
 
 Requisitos: el AAB del paso 3 ya subido y un perfil de pagos (*Configuración > Perfil de pagos*; si ya

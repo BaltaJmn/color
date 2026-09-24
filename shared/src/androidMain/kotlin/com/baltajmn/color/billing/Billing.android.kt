@@ -1,4 +1,4 @@
 package com.baltajmn.color.billing
 
-/** Google Play key from the RevenueCat dashboard ("goog_..."). Public, but the project does not exist yet. */
-actual val revenueCatApiKey: String? = null
+/** Google Play public SDK key of the RevenueCat project Chroma. Public by design: it only identifies the app. */
+actual val revenueCatApiKey: String? = "goog_LDoyyatbqWMgFYYlFEmJKsNOTVC"
