@@ -11,6 +11,7 @@ import com.baltajmn.color.model.JournalFile
 import com.baltajmn.color.model.JournalJson
 import com.baltajmn.color.model.Settings
 import com.baltajmn.color.model.Share
+import com.baltajmn.color.review.Review
 import com.baltajmn.color.model.isoKey
 import com.baltajmn.color.model.logicalDate
 import com.baltajmn.color.model.sharedChanges
@@ -266,11 +267,23 @@ object ChromaRepository {
             // A new color today moves the next nudge to tomorrow; iOS has to be told.
             Reminder.sync(askPermission = false)
             afterSave.forEach { runCatching { it(snapshot) } }
+            maybeRequestReview(snapshot)
             val gone = photosOf(previous) - photosOf(snapshot)
             if (gone.isNotEmpty()) withContext(Dispatchers.IO) { gone.forEach(Storage::deletePhoto) }
         } else {
             saveFailed = true
         }
+    }
+
+    /**
+     * Once ever, the moment the journal reaches a week of entries. Only runs from a real save, so it
+     * never fires on first launch (nothing saved yet) and never mid purchase (that flow does not
+     * touch the journal).
+     */
+    private fun maybeRequestReview(f: JournalFile) {
+        if (!reachedReviewDayCount(f.entries.size, f.settings.reviewRequested)) return
+        updateSettings { it.copy(reviewRequested = true) }
+        Review.request()
     }
 
     /** Photos nobody references any more, and whatever an import left half done. */
@@ -292,3 +305,7 @@ object ChromaRepository {
 
     private fun Map<String, ChromaEntry>.toSortedMap() = entries.sortedBy { it.key }.associate { it.toPair() }
 }
+
+/** Whether a just-persisted journal should trigger the once-ever review prompt. */
+internal fun reachedReviewDayCount(totalDays: Int, alreadyRequested: Boolean): Boolean =
+    !alreadyRequested && totalDays >= 7

@@ -15,6 +15,7 @@ import com.baltajmn.color.data.FilePicker
 import com.baltajmn.color.data.Lock
 import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.Route
+import com.baltajmn.color.review.Review
 import com.baltajmn.color.social.handleLinkIntent
 import java.lang.ref.WeakReference
 
@@ -43,6 +44,7 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         AndroidContext.init(this)
         Lock.host = WeakReference(this)
+        Review.host = WeakReference(this)
         // The permission is asked the moment the reminder is switched on and never before.
         Reminder.onNeedsPermission = {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -78,6 +80,7 @@ class MainActivity : FragmentActivity() {
         FilePicker.createDocument = null
         FilePicker.openDocument = null
         Lock.host = null
+        Review.host = null
         super.onDestroy()
     }
 }

@@ -53,6 +53,8 @@ data class Settings(
     val watermark: Boolean = true,
     /** Friends' days this person reported, "<author>/<day>": hidden from them for good. */
     val hiddenCards: List<String> = emptyList(),
+    /** The once-ever in-app rating prompt already fired. Never reset, even if it failed to show. */
+    val reviewRequested: Boolean = false,
 )
 
 /** Local ISO date ("2026-09-22") of the logical day to its entry. */

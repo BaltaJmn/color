@@ -77,6 +77,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.uiTooling)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.play.review.ktx)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
