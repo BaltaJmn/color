@@ -228,18 +228,8 @@ actuar en 24 horas. Los reportes llegan por correo (`report-notify`, `store/serv
 repositorio (`.github/workflows/pages.yml` sube la carpeta `web/`). La misma URL va en la Play Console,
 en App Store Connect (política y soporte), en la ficha de Play (sitio web) y en la app (`PRIVACY_URL`).
 
-Pasos a mano, una vez:
-
-1. *Settings > Pages > Build and deployment > Source*: **GitHub Actions**. Lanzar el flujo
-   (`gh workflow run pages.yml`) y comprobar que queda en `https://baltajmn.github.io/color/`.
-2. En **Cloudflare**, zona `baltajmn.dev`: registro `CNAME`, nombre `color`, destino
-   `baltajmn.github.io`, **sin proxy**, para que GitHub pueda emitir el certificado.
-3. Con `dig +short color.baltajmn.dev` resolviendo, dominio propio y HTTPS:
-
-   ```bash
-   gh api -X PUT repos/BaltaJmn/color/pages -f cname=color.baltajmn.dev
-   gh api -X PUT repos/BaltaJmn/color/pages -F https_enforced=true
-   ```
-
-El orden importa: con el dominio puesto antes de que el DNS resuelva, Pages redirige a un dominio que
-todavía no existe. Comprobación final: `curl -sI https://color.baltajmn.dev/` devuelve 200.
+Montado el 24-09-2026, como Quilt: Pages con fuente *GitHub Actions* y dominio propio, y en
+Cloudflare (que es quien sirve el DNS de `baltajmn.dev`; Porkbun solo es el registrador) un `CNAME
+color` a `baltajmn.github.io` **con proxy**. El HTTPS lo pone Cloudflare; *Enforce HTTPS* de GitHub
+se queda sin marcar porque detrás del proxy GitHub no puede emitir certificado. Los pasos para otra
+web, en `store/lanzamiento-play.md` sección 2.

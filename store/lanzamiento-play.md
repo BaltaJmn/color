@@ -7,7 +7,7 @@ pinchan. Los textos de la ficha viven en `store/listings/`.
 Orden, de un vistazo:
 
 1. Guardar la clave de subida (5 minutos).
-2. Poner la web de privacidad en `color.baltajmn.dev` (15 minutos, más la espera del certificado).
+2. ~~Poner la web de privacidad en `color.baltajmn.dev`~~ (hecho).
 3. Crear la app en Play Console y subir el AAB a prueba interna.
 4. Rellenar el contenido de la app (formularios).
 5. Montar la ficha: textos, gráficos y capturas.
@@ -64,112 +64,42 @@ ni siquiera si la versión anterior no llegó a publicarse.
 
 ## 2. La web de privacidad en color.baltajmn.dev
 
-Play exige una URL de política de privacidad. La política ya está escrita (`web/index.html`, más
-`terms.html` y `delete.html`) y la app ya apunta a `https://color.baltajmn.dev/` (`AppInfo.kt`).
-Falta publicarla.
+**Hecho el 24-09-2026.** La política (`web/index.html`, más `terms.html` y `delete.html`) se publica en
+`https://color.baltajmn.dev/`, que es la URL a la que ya apunta la app (`AppInfo.kt`).
 
-### Dónde se toca el DNS: en Cloudflare, no en Porkbun
+Cómo está montado, igual que Quilt:
 
-`baltajmn.dev` está comprado en Porkbun, pero sus servidores de nombres son los de Cloudflare
-(`rory.ns.cloudflare.com` y `virginia.ns.cloudflare.com`). Eso significa que **los registros que
-pongas en Porkbun no sirven para nada**: el mundo pregunta a Cloudflare. En Porkbun no hay que tocar
-nada. Todo lo de abajo se hace en el panel de Cloudflare.
-
-(Se podría devolver el DNS a Porkbun cambiando allí los servidores de nombres, pero se perderían los
-registros que ya tengas en Cloudflare. No merece la pena.)
-
-### Paso A. Activar GitHub Pages en el repositorio
-
-1. Abre `https://github.com/BaltaJmn/color/settings/pages`.
-2. En *Build and deployment > Source*, elige **GitHub Actions**. No hay que elegir rama ni carpeta: el
-   flujo `.github/workflows/pages.yml` ya sube la carpeta `web/`.
-
-### Paso B. Publicar por primera vez
-
-1. Pestaña *Actions* del repositorio, flujo **pages**, botón *Run workflow* sobre `main`. O desde la
-   terminal:
-
-   ```bash
-   gh workflow run pages.yml
-   ```
-
-2. Cuando termine en verde, abre `https://baltajmn.github.io/color/`. Tiene que verse la política.
-   A partir de ahora se vuelve a publicar solo cada vez que cambie algo en `web/`.
-
-### Paso C. El registro en Cloudflare
-
-1. `https://dash.cloudflare.com`, entra en la zona **baltajmn.dev**, menú *DNS > Records*.
-2. *Add record*:
-
-   | Campo | Valor |
-   |---|---|
-   | Type | `CNAME` |
-   | Name | `color` |
-   | Target | `baltajmn.github.io` |
-   | Proxy status | **DNS only** (la nube gris, no la naranja) |
-   | TTL | Auto |
-
-3. *Save*.
-
-La nube tiene que ser gris. Con el proxy de Cloudflare encendido, GitHub no ve sus propias IP detrás
-del nombre y no puede emitir el certificado; la web se queda sin HTTPS, y un `.dev` sin HTTPS no abre
-en ningún navegador (el dominio entero está en la lista HSTS precargada).
-
-Si la zona tiene registros `CAA` (en la misma lista, tipo CAA), añade uno más: nombre `@`, etiqueta
-`issue`, valor `letsencrypt.org`. Si no hay ninguno, no hace falta nada.
-
-Comprobación, a los pocos minutos:
-
-```bash
-dig +short color.baltajmn.dev
-```
-
-Tiene que responder `baltajmn.github.io.` y después cuatro IP que empiezan por `185.199.`.
-
-### Paso D. Dominio propio en GitHub Pages
-
-Solo cuando el `dig` de arriba ya responde (con el dominio puesto antes, Pages redirige a una
-dirección que todavía no existe):
-
-1. Vuelve a `https://github.com/BaltaJmn/color/settings/pages`.
-2. *Custom domain*: `color.baltajmn.dev`, *Save*.
-3. GitHub comprueba el DNS; espera a que salga la marca verde "DNS check successful".
-4. El certificado tarda de unos minutos a una hora. Cuando la casilla *Enforce HTTPS* deje de estar
-   gris, márcala.
-
-Con despliegue por Actions no hace falta fichero `CNAME` en `web/`: el dominio se guarda en los
-ajustes.
-
-### Paso E (recomendado). Verificar el dominio en tu cuenta de GitHub
-
-Evita que otra cuenta de GitHub pueda reclamar un subdominio tuyo si algún día quitas el sitio y el
-registro se queda puesto.
-
-1. GitHub, tu foto > *Settings > Pages* (los de la cuenta, no los del repositorio) > *Add a domain*.
-2. Escribe `baltajmn.dev`. GitHub te da un registro TXT: un nombre del estilo
-   `_github-pages-challenge-BaltaJmn` y un valor.
-3. En Cloudflare, *Add record*: Type `TXT`, Name el que te dio, Content el valor. *Save*.
-4. Vuelve a GitHub y pulsa *Verify*.
-
-### Paso F. Comprobar
-
-```bash
-for p in "" terms.html delete.html; do curl -s -o /dev/null -w "%{http_code} /$p\n" https://color.baltajmn.dev/$p; done
-```
-
-Las tres tienen que dar `200`. `/.well-known/assetlinks.json` también se publica, pero con un marcador:
-solo lo usarán los enlaces de invitación de Amigos (v1.1), y se rellena entonces (sección 9).
-
-Si algo falla:
-
-| Síntoma | Causa y arreglo |
+| Pieza | Estado |
 |---|---|
-| GitHub dice "DNS check unsuccessful" | El registro aún no se ha propagado, o la nube está naranja. Espera 10 minutos y pulsa *Check again* |
-| *Enforce HTTPS* sigue gris tras una hora | Quita el dominio en *Custom domain*, guarda, vuelve a ponerlo. Mira que no haya un `CAA` que excluya a Let's Encrypt |
-| El navegador da error de certificado | Normal hasta que GitHub emite el suyo: los `.dev` solo abren por HTTPS |
-| 404 de GitHub | El flujo `pages` no ha corrido desde que se activó Pages. Paso B |
+| Registrador | Porkbun. No se toca: los servidores de nombres de `baltajmn.dev` son los de Cloudflare |
+| DNS | Cloudflare, zona `baltajmn.dev`: `CNAME color` a `baltajmn.github.io`, **con proxy** (nube naranja) |
+| HTTPS | Lo pone Cloudflare en su borde y redirige `http` a `https`. GitHub no puede emitir certificado detrás del proxy, así que su casilla *Enforce HTTPS* se queda sin marcar, y está bien |
+| GitHub Pages | Fuente *GitHub Actions*; dominio propio `color.baltajmn.dev`. `.github/workflows/pages.yml` publica `web/` en cada cambio |
 
-Purl (`line.baltajmn.dev`) se publica igual, con su repositorio y `line` en el paso C.
+Si Cloudflare pasara algún día a SSL "Full (strict)", estas webs darían error 526: el certificado de
+GitHub no cubre el subdominio. Con el modo actual funcionan.
+
+Para la web de otra app, lo mismo cambiando el nombre:
+
+```bash
+gh api -X POST repos/BaltaJmn/<repo>/pages -f build_type=workflow
+gh workflow run pages.yml --repo BaltaJmn/<repo>
+# CNAME <app> a baltajmn.github.io, con proxy, en Cloudflare
+gh api -X PUT repos/BaltaJmn/<repo>/pages -f cname=<app>.baltajmn.dev
+```
+
+Si antes de poner el dominio alguien pidió la URL, algunos nodos del CDN de GitHub se quedan con su
+404 ("Site not found") y `/` alterna 404 y 200 durante mucho más de los 10 minutos de caché. Un
+despliegue nuevo lo purga: `gh workflow run pages.yml --repo BaltaJmn/<repo>`.
+
+Comprobación:
+
+```bash
+for p in "" terms.html delete.html .well-known/assetlinks.json; do curl -s -o /dev/null -w "%{http_code} /$p\n" https://color.baltajmn.dev/$p; done
+```
+
+`/.well-known/assetlinks.json` lleva todavía un marcador: solo lo usarán los enlaces de invitación de
+Amigos (v1.1), y se rellena entonces (sección 9).
 
 ---
 
