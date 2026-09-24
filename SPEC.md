@@ -65,20 +65,20 @@ métricas.
 
 ### v1.0: Chroma en solitario
 
-- [ ] Hacer la foto del día con la cámara del sistema, o elegir de la galería una foto **de hoy**.
-- [ ] La app extrae hasta 5 colores de la foto y **el usuario elige uno**. No hay cuentagotas libre:
+- [x] Hacer la foto del día con la cámara del sistema, o elegir de la galería una foto **de hoy**.
+- [x] La app extrae hasta 5 colores de la foto y **el usuario elige uno**. No hay cuentagotas libre:
       elegir entre pocos es rápido y siempre sale un color que representa la foto.
-- [ ] Nombre del color en el idioma del usuario ("azul tormenta") y, opcionalmente, una palabra.
-- [ ] La tarjeta: el color a sangre y la foto pequeña abajo a la derecha.
-- [ ] Una entrada por día, editable (otro color, otra foto) hasta que acaba el día lógico. No se
+- [x] Nombre del color en el idioma del usuario ("azul tormenta") y, opcionalmente, una palabra.
+- [x] La tarjeta: el color a sangre y la foto pequeña abajo a la derecha.
+- [x] Una entrada por día, editable (otro color, otra foto) hasta que acaba el día lógico. No se
       pueden rellenar días pasados: el color tiene que ser de un día que has vivido mirando.
-- [ ] Mi año: rejilla con un cuadro por día y la tira degradada. Tocar un día abre su tarjeta.
-- [ ] Compartir la tarjeta como imagen.
-- [ ] Póster del año (Pro).
-- [ ] Widget de hoy (gratis) y widget del año (Pro).
-- [ ] Recordatorio a la hora que elijas, que se calla si ya tienes color.
-- [ ] Exportar e importar en zip.
-- [ ] Cinco idiomas: en, es, pt, de, fr.
+- [x] Mi año: rejilla con un cuadro por día y la tira degradada. Tocar un día abre su tarjeta.
+- [x] Compartir la tarjeta como imagen.
+- [x] Póster del año (Pro).
+- [x] Widget de hoy (gratis) y widget del año (Pro).
+- [x] Recordatorio a la hora que elijas, que se calla si ya tienes color.
+- [x] Exportar e importar en zip.
+- [x] Cinco idiomas: en, es, pt, de, fr.
 
 ### v1.1: Amigos
 
