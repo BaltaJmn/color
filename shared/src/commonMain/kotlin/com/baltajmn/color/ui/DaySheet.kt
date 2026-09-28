@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.widthIn
@@ -53,18 +54,15 @@ fun DaySheet(
     ) {
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-                GlyphButton(Glyph.CLOSE, S.a11yClose, onClose)
-                Text(
-                    // The year only when it is not this one, as Today says it: two lines of date
-                    // over a card that already carries its date is too much header.
-                    if (date.year == today().year) S.longDate(date) else S.longDateWithYear(date),
-                    style = Styles.title, modifier = Modifier.weight(1f).padding(start = 4.dp))
+                GlyphButton(Glyph.CLOSE, S.a11yClose, onClose, Modifier.offset(x = (-12).dp), tint = MaterialTheme.colorScheme.onBackground)
+            }
+            // The same masthead as Today, so an old day reads as that day. The year only when it is not this one.
+            Masthead(date.day, S.weekday(date), S.monthOf(date, withYear = date.year != today().year)) {
                 if (entry != null) {
-                    GlyphButton(Glyph.SHARE, S.a11yShare, { onShare(date) })
-                    GlyphButton(Glyph.TRASH, S.deleteDay, { confirmDelete = true })
+                    GlyphButton(Glyph.SHARE, S.a11yShare, { onShare(date) }, tint = MaterialTheme.colorScheme.onBackground)
+                    GlyphButton(Glyph.TRASH, S.deleteDay, { confirmDelete = true }, tint = MaterialTheme.colorScheme.onBackground)
                 }
             }
-            Spacer(Modifier.height(8.dp))
             entry?.let { ChromaCard(it, date, onPhoto = onPhoto) { WeekMark(it.color, date) } }
             Spacer(Modifier.height(32.dp))
         }

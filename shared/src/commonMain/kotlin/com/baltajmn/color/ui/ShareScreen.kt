@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.widthIn
@@ -19,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +29,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFontFamilyResolver
@@ -42,6 +48,7 @@ import com.baltajmn.color.share.encodeToPng
 import com.baltajmn.color.share.renderDayCard
 import com.baltajmn.color.ui.theme.GUTTER
 import com.baltajmn.color.ui.theme.MAX_CONTENT_WIDTH
+import com.baltajmn.color.ui.theme.Styles
 import kotlinx.datetime.LocalDate
 
 /** Density 1, not the screen's: pictures are laid out in pixels, and the screen's density would triple every text. */
@@ -67,9 +74,11 @@ fun ShareScreen(date: LocalDate, onClose: () -> Unit) {
     }
 
     val description = S.colorName(entry.name) + ", " + entry.color + ", " + S.shortDate(date)
-    PictureScreen(card, description, onClose) {
+    PictureScreen(S.share, card, description, onClose) {
         if (photo != null) {
-            ToggleRow(S.includePhoto, checked = withPhoto) { withPhoto = it }
+            Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(MaterialTheme.colorScheme.surface)) {
+                ToggleRow(S.includePhoto, checked = withPhoto, glyph = Glyph.PHOTO) { withPhoto = it }
+            }
             Spacer(Modifier.height(16.dp))
         }
     }
@@ -82,6 +91,7 @@ fun ShareScreen(date: LocalDate, onClose: () -> Unit) {
  */
 @Composable
 fun PictureScreen(
+    title: String,
     picture: ImageBitmap,
     description: String,
     onClose: () -> Unit,
@@ -97,33 +107,44 @@ fun PictureScreen(
     ) {
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-                GlyphButton(Glyph.CLOSE, S.a11yClose, onClose)
+                GlyphButton(Glyph.CLOSE, S.a11yClose, onClose, Modifier.offset(x = (-12).dp), tint = MaterialTheme.colorScheme.onBackground)
+                Text(title, style = Styles.title, modifier = Modifier.semantics { heading() })
             }
-            Box(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 16.dp), contentAlignment = Alignment.Center) {
-                val shape = RoundedCornerShape(14.dp)
+            // The picture on a stage of its own, the way a print is looked at before it leaves the shop.
+            Box(
+                Modifier.fillMaxWidth()
+                    .padding(top = 8.dp, bottom = 16.dp)
+                    .clip(RoundedCornerShape(28.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                val shape = RoundedCornerShape(12.dp)
                 Image(
                     bitmap = picture,
                     contentDescription = description,
                     contentScale = ContentScale.Fit,
-                    modifier = Modifier.widthIn(max = 320.dp).heightIn(max = 520.dp).clip(shape).border(1.dp, MaterialTheme.colorScheme.outline, shape),
+                    modifier = Modifier.widthIn(max = 320.dp).heightIn(max = 480.dp)
+                        .shadow(16.dp, shape, ambientColor = Color.Black.copy(alpha = 0.12f), spotColor = Color.Black.copy(alpha = 0.12f))
+                        .clip(shape),
                 )
             }
             options()
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)) {
-                OutlinedAction(S.share, onClick = { if (locked) onLocked() else Sharing.sharePng(picture.encodeToPng()) }, pro = locked)
-                if (Sharing.canSaveToPhotos) {
-                    OutlinedAction(
-                        S.saveToPhotos,
-                        onClick = {
-                            if (locked) {
-                                onLocked()
-                            } else {
-                                Sharing.savePngToPhotos(picture.encodeToPng()) { ok -> saved = if (ok) S.saved else S.saveFailed }
-                            }
-                        },
-                        pro = locked,
-                    )
+            val share = { if (locked) onLocked() else Sharing.sharePng(picture.encodeToPng()) }
+            val save = {
+                if (locked) {
+                    onLocked()
+                } else {
+                    Sharing.savePngToPhotos(picture.encodeToPng()) { ok -> saved = if (ok) S.saved else S.saveFailed }
                 }
+            }
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                if (locked) {
+                    OutlinedAction(S.share, share, Modifier.weight(1f), pro = true, glyph = Glyph.SHARE)
+                } else {
+                    PrimaryAction(S.share, share, Modifier.weight(1f), glyph = Glyph.SHARE)
+                }
+                if (Sharing.canSaveToPhotos) OutlinedAction(S.saveToPhotos, save, Modifier.weight(1f), pro = locked)
             }
             Spacer(Modifier.height(32.dp))
         }

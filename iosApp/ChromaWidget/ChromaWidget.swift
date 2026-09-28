@@ -37,26 +37,30 @@ private struct TodayView: View {
         if let hex = entry.state?.color { ChromaStore.color(hex) } else { Color("WidgetEmpty") }
     }
 
+    // The same reading as the app: the day as a big light numeral on top, the color's name and its
+    // code at the foot, like the card and the blank chip before it has a color.
+    private var dayNumber: String { String(Calendar.current.component(.day, from: ChromaStore.logicalDay(entry.date))) }
+
     @ViewBuilder private var content: some View {
         if let hex = entry.state?.color, let name = entry.state?.name {
             VStack(alignment: .leading, spacing: 2) {
+                Text(dayNumber).font(.system(size: 30, weight: .light))
                 Spacer()
-                Text(L.today).font(.system(size: 13))
-                Text(name).font(.system(size: 17, weight: .medium)).lineLimit(2)
+                Text(name).font(.system(size: 17, weight: .bold)).lineLimit(2)
+                Text(hex).font(.system(size: 12, weight: .medium)).monospacedDigit()
                 FriendsStrip(colors: entry.state?.friends ?? [])
             }
             .foregroundStyle(ChromaStore.ink(hex))
             .frame(maxWidth: .infinity, alignment: .leading)
         } else {
-            VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(dayNumber).font(.system(size: 30, weight: .light))
                 Spacer()
-                Text(L.empty)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(Color("WidgetMuted"))
-                    .multilineTextAlignment(.center)
-                Spacer()
+                Text(L.empty).font(.system(size: 14, weight: .medium)).lineLimit(2)
+                Text("#------").font(.system(size: 12)).foregroundStyle(Color("WidgetMuted"))
                 FriendsStrip(colors: entry.state?.friends ?? [])
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }

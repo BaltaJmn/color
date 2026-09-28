@@ -29,7 +29,10 @@ import androidx.compose.ui.unit.dp
  * angle quote as colour emoji and Android as plain text, so typed glyphs ship two icon sets.
  * Coordinates are fractions of the side (docs/pantallas.md 2).
  */
-enum class Glyph { BACK, FORWARD, SHARE, SETTINGS, YEAR, CLOSE, PHOTO, CAMERA, TODAY, FRIENDS, MORE, TRASH, CHECK }
+enum class Glyph {
+    BACK, FORWARD, SHARE, SETTINGS, YEAR, CLOSE, PHOTO, CAMERA, TODAY, FRIENDS, MORE, TRASH, CHECK,
+    BELL, LOCK, DOC, DIAMOND, STAMP, EXPORT, IMPORT, SPARK, RESTORE, WORDS, WIDGET, POSTER, APPS,
+}
 
 /** A 48dp tap target with no background: the glyph is the whole control. */
 @Composable
@@ -52,8 +55,8 @@ fun GlyphButton(
 }
 
 @Composable
-fun GlyphIcon(glyph: Glyph, size: Dp = 20.dp, tint: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
-    Canvas(Modifier.size(size)) {
+fun GlyphIcon(glyph: Glyph, size: Dp = 20.dp, tint: Color = MaterialTheme.colorScheme.onSurfaceVariant, modifier: Modifier = Modifier) {
+    Canvas(modifier.size(size)) {
         val side = this.size.width
         val stroke = Stroke(width = side * 0.09f, cap = StrokeCap.Round, join = StrokeJoin.Round)
         fun at(x: Float, y: Float) = Offset(x * side, y * side)
@@ -122,6 +125,65 @@ fun GlyphIcon(glyph: Glyph, size: Dp = 20.dp, tint: Color = MaterialTheme.colorS
             }
             Glyph.MORE -> listOf(0.22f, 0.50f, 0.78f).forEach { x -> dot(x, 0.50f, 0.075f) }
             Glyph.CHECK -> line(0.22f to 0.52f, 0.42f to 0.72f, 0.78f to 0.30f)
+            Glyph.BELL -> {
+                line(0.24f to 0.70f, 0.30f to 0.62f, 0.30f to 0.44f)
+                drawArc(tint, 180f, 180f, false, at(0.30f, 0.24f), Size(0.40f * side, 0.40f * side), style = stroke)
+                line(0.70f to 0.44f, 0.70f to 0.62f, 0.76f to 0.70f, 0.24f to 0.70f)
+                line(0.44f to 0.82f, 0.56f to 0.82f)
+            }
+            Glyph.LOCK -> {
+                drawRoundRect(tint, topLeft = at(0.22f, 0.44f), size = Size(0.56f * side, 0.40f * side), cornerRadius = CornerRadius(0.08f * side), style = stroke)
+                line(0.34f to 0.44f, 0.34f to 0.32f)
+                drawArc(tint, 180f, 180f, false, at(0.34f, 0.16f), Size(0.32f * side, 0.32f * side), style = stroke)
+                line(0.66f to 0.32f, 0.66f to 0.44f)
+            }
+            Glyph.DOC -> {
+                line(0.62f to 0.14f, 0.26f to 0.14f, 0.26f to 0.86f, 0.74f to 0.86f, 0.74f to 0.26f, 0.62f to 0.14f)
+                line(0.38f to 0.50f, 0.62f to 0.50f)
+                line(0.38f to 0.66f, 0.62f to 0.66f)
+            }
+            // The mark a day gets when it met the color of the week.
+            Glyph.DIAMOND -> line(0.50f to 0.16f, 0.82f to 0.50f, 0.50f to 0.84f, 0.18f to 0.50f, 0.50f to 0.16f)
+            // The name printed under a shared card.
+            Glyph.STAMP -> {
+                drawRoundRect(tint, topLeft = at(0.18f, 0.16f), size = Size(0.64f * side, 0.68f * side), cornerRadius = CornerRadius(0.10f * side), style = stroke)
+                line(0.32f to 0.68f, 0.54f to 0.68f)
+            }
+            Glyph.EXPORT -> {
+                line(0.50f to 0.60f, 0.50f to 0.14f)
+                line(0.32f to 0.32f, 0.50f to 0.14f, 0.68f to 0.32f)
+                line(0.20f to 0.56f, 0.20f to 0.84f, 0.80f to 0.84f, 0.80f to 0.56f)
+            }
+            Glyph.IMPORT -> {
+                line(0.50f to 0.14f, 0.50f to 0.60f)
+                line(0.32f to 0.42f, 0.50f to 0.60f, 0.68f to 0.42f)
+                line(0.20f to 0.56f, 0.20f to 0.84f, 0.80f to 0.84f, 0.80f to 0.56f)
+            }
+            // Four points: the one thing that sets Pro apart, not a crown or a star rating.
+            Glyph.SPARK -> line(
+                0.50f to 0.12f, 0.58f to 0.42f, 0.88f to 0.50f, 0.58f to 0.58f,
+                0.50f to 0.88f, 0.42f to 0.58f, 0.12f to 0.50f, 0.42f to 0.42f, 0.50f to 0.12f,
+            )
+            Glyph.RESTORE -> {
+                drawArc(tint, 200f, 290f, false, at(0.20f, 0.20f), Size(0.60f * side, 0.60f * side), style = stroke)
+                line(0.16f to 0.28f, 0.22f to 0.42f, 0.36f to 0.36f)
+            }
+            Glyph.WORDS -> listOf(0.30f to 0.80f, 0.50f to 0.80f, 0.70f to 0.56f).forEach { (y, end) -> line(0.18f to y, end to y) }
+            Glyph.WIDGET -> {
+                drawRoundRect(tint, topLeft = at(0.16f, 0.16f), size = Size(0.30f * side, 0.30f * side), cornerRadius = CornerRadius(0.07f * side), style = stroke)
+                drawRoundRect(tint, topLeft = at(0.54f, 0.16f), size = Size(0.30f * side, 0.30f * side), cornerRadius = CornerRadius(0.07f * side), style = stroke)
+                drawRoundRect(tint, topLeft = at(0.16f, 0.54f), size = Size(0.68f * side, 0.30f * side), cornerRadius = CornerRadius(0.07f * side), style = stroke)
+            }
+            // A frame with the year's cells inside.
+            Glyph.POSTER -> {
+                drawRoundRect(tint, topLeft = at(0.18f, 0.12f), size = Size(0.64f * side, 0.76f * side), cornerRadius = CornerRadius(0.08f * side), style = stroke)
+                listOf(0.34f, 0.50f, 0.66f).forEach { y -> listOf(0.36f, 0.50f, 0.64f).forEach { x -> dot(x, y, 0.045f) } }
+            }
+            Glyph.APPS -> listOf(0.32f, 0.68f).forEach { y ->
+                listOf(0.32f, 0.68f).forEach { x ->
+                    drawRoundRect(tint, topLeft = at(x - 0.13f, y - 0.13f), size = Size(0.26f * side, 0.26f * side), cornerRadius = CornerRadius(0.07f * side), style = stroke)
+                }
+            }
         }
     }
 }

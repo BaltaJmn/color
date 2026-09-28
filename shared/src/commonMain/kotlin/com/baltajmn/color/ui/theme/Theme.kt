@@ -33,33 +33,33 @@ val CARD_RADIUS = 28.dp
  */
 internal val Light = lightColorScheme(
     primary = Color(0xFF111111),
-    onPrimary = Color(0xFFF3F3F3),
-    secondary = Color(0xFF595959),
-    background = Color(0xFFF3F3F3),
+    onPrimary = Color(0xFFF1F1F1),
+    secondary = Color(0xFF5E5E5E),
+    background = Color(0xFFF1F1F1),
     onBackground = Color(0xFF111111),
     surface = Color(0xFFFFFFFF),
     onSurface = Color(0xFF111111),
-    surfaceVariant = Color(0xFFE5E5E5),
-    onSurfaceVariant = Color(0xFF595959),
+    surfaceVariant = Color(0xFFE6E6E6),
+    onSurfaceVariant = Color(0xFF5E5E5E),
     surfaceContainerHigh = Color(0xFFFFFFFF),
-    outline = Color(0xFFD0D0D0),
-    outlineVariant = Color(0xFFE5E5E5),
+    outline = Color(0xFFD6D6D6),
+    outlineVariant = Color(0xFFEAEAEA),
     error = Color(0xFFB3261E),
 )
 
 internal val Dark = darkColorScheme(
     primary = Color(0xFFF2F2F2),
-    onPrimary = Color(0xFF121212),
-    secondary = Color(0xFFA8A8A8),
-    background = Color(0xFF121212),
+    onPrimary = Color(0xFF0E0E0E),
+    secondary = Color(0xFFA3A3A3),
+    background = Color(0xFF0E0E0E),
     onBackground = Color(0xFFF2F2F2),
-    surface = Color(0xFF1C1C1C),
+    surface = Color(0xFF1A1A1A),
     onSurface = Color(0xFFF2F2F2),
-    surfaceVariant = Color(0xFF262626),
-    onSurfaceVariant = Color(0xFFA8A8A8),
-    surfaceContainerHigh = Color(0xFF1C1C1C),
-    outline = Color(0xFF333333),
-    outlineVariant = Color(0xFF262626),
+    surfaceVariant = Color(0xFF252525),
+    onSurfaceVariant = Color(0xFFA3A3A3),
+    surfaceContainerHigh = Color(0xFF1A1A1A),
+    outline = Color(0xFF303030),
+    outlineVariant = Color(0xFF222222),
     error = Color(0xFFF2B8B5),
 )
 
@@ -76,19 +76,28 @@ fun ChromaTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable
     MaterialTheme(colorScheme = if (darkTheme) Dark else Light, shapes = SoftShapes, content = content)
 }
 
-/** The styles of docs/pantallas.md 1, in the system font: the color is the protagonist. */
+/**
+ * The styles of docs/pantallas.md 1, in the system font: the color is the protagonist. The voice
+ * comes from weight and spacing instead: numerals huge and light like the readout of an instrument,
+ * small labels in tracked capitals, and codes in tabular figures like the one printed on a paint chip.
+ */
 object Styles {
-    val display: TextStyle @Composable get() = system(34.sp, 40.sp, FontWeight.Medium, colors.onBackground)
-    val title: TextStyle @Composable get() = system(22.sp, 28.sp, FontWeight.Medium, colors.onBackground)
+    val numeral: TextStyle @Composable get() = system(64.sp, 64.sp, FontWeight.ExtraLight, colors.onBackground, (-2.5).sp)
+    val display: TextStyle @Composable get() = system(34.sp, 40.sp, FontWeight.Medium, colors.onBackground, (-0.6).sp)
+    val title: TextStyle @Composable get() = system(22.sp, 28.sp, FontWeight.SemiBold, colors.onBackground, (-0.3).sp)
     val body: TextStyle @Composable get() = system(17.sp, 24.sp, FontWeight.Normal, colors.onBackground)
     val label: TextStyle @Composable get() = system(14.sp, 20.sp, FontWeight.Medium, colors.onSurfaceVariant)
     val caption: TextStyle @Composable get() = system(13.sp, 18.sp, FontWeight.Normal, colors.onSurfaceVariant)
     val muted: TextStyle @Composable get() = system(17.sp, 24.sp, FontWeight.Normal, colors.onSurfaceVariant)
+    /** Section names and the weekday: say what follows, never compete with it. Upper-case at the call site. */
+    val eyebrow: TextStyle @Composable get() = system(12.sp, 16.sp, FontWeight.SemiBold, colors.onSurfaceVariant, 1.4.sp)
+    val code: TextStyle @Composable get() = system(14.sp, 20.sp, FontWeight.Medium, colors.onSurfaceVariant, 1.sp)
+        .copy(fontFeatureSettings = "tnum")
 
     private val colors @Composable get() = MaterialTheme.colorScheme
 
-    private fun system(size: TextUnit, line: TextUnit, weight: FontWeight, color: Color) =
-        TextStyle(fontSize = size, lineHeight = line, fontWeight = weight, color = color)
+    private fun system(size: TextUnit, line: TextUnit, weight: FontWeight, color: Color, tracking: TextUnit = TextUnit.Unspecified) =
+        TextStyle(fontSize = size, lineHeight = line, fontWeight = weight, color = color, letterSpacing = tracking)
 }
 
 /**

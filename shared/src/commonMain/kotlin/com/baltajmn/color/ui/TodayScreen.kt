@@ -132,8 +132,7 @@ fun TodayScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
-            Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(S.longDate(today), style = Styles.title, modifier = Modifier.weight(1f))
+            Masthead(today.day, S.weekday(today), S.monthOf(today)) {
                 if (entry != null && pending == null) {
                     CardMenu(
                         onRetake = { if (Capture.cameraAvailable) camera() else gallery() },
@@ -141,7 +140,7 @@ fun TodayScreen(
                         onDelete = { confirmDelete = true },
                     )
                 }
-                GlyphButton(Glyph.SETTINGS, S.a11ySettings, onSettings)
+                GlyphButton(Glyph.SETTINGS, S.a11ySettings, onSettings, tint = MaterialTheme.colorScheme.onBackground)
             }
 
             val settings = ChromaRepository.settings
@@ -160,6 +159,7 @@ fun TodayScreen(
                         ChromaRepository.updateSettings { it.copy(reminderOffered = true, reminderOn = true) }
                         Reminder.sync(askPermission = true)
                     },
+                    glyph = Glyph.BELL,
                 )
                 ChromaRepository.needsBackupNotice(today) && FilePicker.available -> Notice(
                     S.noticeBackup,
@@ -167,6 +167,7 @@ fun TodayScreen(
                     S.makeBackup to {
                         startExport(today) { result -> if (result == PickResult.Failed) notice = S.exportFailed }
                     },
+                    glyph = Glyph.EXPORT,
                 )
             }
             below()
@@ -219,30 +220,50 @@ fun TodayScreen(
     }
 }
 
+/**
+ * The card before it has a color: a blank chip, the same size and shape the day will take, with the
+ * question where the name goes and an empty code where the hex will be.
+ */
 @Composable
 private fun Empty(week: ColorName?, firstTime: Boolean, working: Boolean, onCamera: () -> Unit, onGallery: () -> Unit) {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        // 56 plus the 8 every state starts with: 64 from the header, as pantallas.md 3 says.
-        Spacer(Modifier.height(56.dp))
-        Text(S.todayPrompt, style = Styles.display, textAlign = TextAlign.Center)
-        if (firstTime) {
-            Spacer(Modifier.height(8.dp))
-            Text(S.firstHelp, style = Styles.muted, textAlign = TextAlign.Center)
-        }
-        // A suggestion to look for, not a task: no count, no streak, and it can be switched off.
-        week?.let {
-            Spacer(Modifier.height(12.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.size(12.dp).clip(CircleShape).background(colorOf(it.hex)))
-                Spacer(Modifier.width(8.dp))
-                Text(S.weekHint(S.colorName(it.key)), style = Styles.caption)
+        Box(
+            Modifier.fillMaxWidth()
+                .aspectRatio(4f / 5f)
+                .clip(RoundedCornerShape(CARD_RADIUS))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .padding(24.dp),
+        ) {
+            // A suggestion to look for, not a task: no count, no streak, and it can be switched off.
+            week?.let {
+                Row(
+                    Modifier.align(Alignment.TopStart)
+                        .clip(RoundedCornerShape(50))
+                        .background(MaterialTheme.colorScheme.surface)
+                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Box(Modifier.size(12.dp).clip(CircleShape).background(colorOf(it.hex)))
+                    Spacer(Modifier.width(8.dp))
+                    Text(S.weekHint(S.colorName(it.key)), style = Styles.caption.copy(color = MaterialTheme.colorScheme.onBackground))
+                }
+            }
+            Column(Modifier.align(Alignment.BottomStart)) {
+                Text(S.todayPrompt, style = Styles.display)
+                Spacer(Modifier.height(4.dp))
+                Text("#------", style = Styles.code)
             }
         }
-        Spacer(Modifier.height(32.dp))
-        if (Capture.cameraAvailable) PrimaryAction(S.takePhoto, onCamera, Modifier.fillMaxWidth(), enabled = !working)
-        Spacer(Modifier.height(8.dp))
+        if (firstTime) {
+            Spacer(Modifier.height(16.dp))
+            Text(S.firstHelp, style = Styles.muted, textAlign = TextAlign.Center)
+        }
+        Spacer(Modifier.height(20.dp))
+        if (Capture.cameraAvailable) {
+            PrimaryAction(if (working) S.working else S.takePhoto, onCamera, Modifier.fillMaxWidth(), enabled = !working, glyph = Glyph.CAMERA)
+            Spacer(Modifier.height(4.dp))
+        }
         TextAction(S.fromGallery, onGallery, enabled = !working)
-        if (working) Text(S.working, style = Styles.caption)
     }
 }
 
@@ -254,12 +275,12 @@ private fun Picking(pending: Pending, onPick: (String) -> Unit, onCancel: () -> 
         contentScale = ContentScale.Crop,
         modifier = Modifier.fillMaxWidth().aspectRatio(4f / 5f).clip(RoundedCornerShape(CARD_RADIUS)),
     )
-    Spacer(Modifier.height(20.dp))
-    Text(S.pickColor, style = Styles.label, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+    Spacer(Modifier.height(24.dp))
+    Text(S.pickColor.uppercase(), style = Styles.eyebrow, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
     Spacer(Modifier.height(12.dp))
     SwatchRow(pending.swatches, null, 56.dp, HapticFeedbackType.Confirm, onPick)
     Spacer(Modifier.height(8.dp))
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { TextAction(S.cancel, onCancel) }
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { TextAction(S.cancel, onCancel, quiet = true) }
 }
 
 /** The optional word: closed until asked for, a single line, with the limit in sight. */
@@ -318,7 +339,7 @@ private fun CardMenu(onRetake: () -> Unit, onShare: () -> Unit, onDelete: () -> 
     var open by remember { mutableStateOf(false) }
     Box {
         GlyphButton(Glyph.MORE, S.a11yMore, { open = true })
-        DropdownMenu(open, onDismissRequest = { open = false }, containerColor = MaterialTheme.colorScheme.surface) {
+        DropdownMenu(open, onDismissRequest = { open = false }, containerColor = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(18.dp)) {
             DropdownMenuItem(text = { Text(S.retakePhoto, style = Styles.body) }, onClick = { open = false; onRetake() })
             DropdownMenuItem(text = { Text(S.share, style = Styles.body) }, onClick = { open = false; onShare() })
             DropdownMenuItem(

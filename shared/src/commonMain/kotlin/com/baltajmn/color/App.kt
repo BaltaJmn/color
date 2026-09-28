@@ -2,19 +2,32 @@ package com.baltajmn.color
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -211,23 +224,44 @@ fun App() {
     }
 }
 
+/**
+ * A capsule floating over the bottom edge rather than a bar across it: two or three places do not
+ * need a band of chrome. The chosen one is filled with ink, like the primary button.
+ */
 @Composable
 private fun BottomBar(current: Screen, todayColor: String?, modifier: Modifier = Modifier, onSelect: (Screen) -> Unit) {
     val colors = MaterialTheme.colorScheme
-    NavigationBar(modifier, containerColor = colors.background, tonalElevation = 0.dp) {
-        // Friends only exists once there is a server to be friends on.
-        val tabs = listOfNotNull(
-            Screen.Today to (Glyph.TODAY to S.navToday),
-            Screen.Year to (Glyph.YEAR to S.navYear),
-            (Screen.Friends to (Glyph.FRIENDS to S.navFriends)).takeIf { Social.available },
-        )
-        tabs.forEach { (s, look) ->
-            val (glyph, label) = look
-            val tint = if (s == current) colors.onBackground else colors.onSurfaceVariant
-            NavigationBarItem(
-                selected = s == current,
-                onClick = { onSelect(s) },
-                icon = {
+    // Friends only exists once there is a server to be friends on.
+    val tabs = listOfNotNull(
+        Screen.Today to (Glyph.TODAY to S.navToday),
+        Screen.Year to (Glyph.YEAR to S.navYear),
+        (Screen.Friends to (Glyph.FRIENDS to S.navFriends)).takeIf { Social.available },
+    )
+    Box(
+        modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.navigationBars).padding(top = 8.dp, bottom = 12.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Row(
+            Modifier.shadow(12.dp, RoundedCornerShape(32.dp), ambientColor = Color.Black.copy(alpha = 0.10f), spotColor = Color.Black.copy(alpha = 0.10f))
+                .clip(RoundedCornerShape(32.dp))
+                .background(colors.surface)
+                .border(1.dp, colors.outlineVariant, RoundedCornerShape(32.dp))
+                .selectableGroup()
+                .padding(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            tabs.forEach { (s, look) ->
+                val (glyph, label) = look
+                val on = s == current
+                val ink = if (on) colors.onPrimary else colors.onSurfaceVariant
+                Row(
+                    Modifier.heightIn(min = 48.dp)
+                        .clip(RoundedCornerShape(26.dp))
+                        .background(if (on) colors.primary else Color.Transparent)
+                        .selectable(selected = on, role = Role.Tab, onClick = { onSelect(s) })
+                        .padding(horizontal = 18.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     // The one place the chrome takes a color: once picked, Today's dot is the day's own.
                     if (s == Screen.Today && todayColor != null) {
                         Box(Modifier.size(20.dp), contentAlignment = Alignment.Center) {
@@ -235,16 +269,16 @@ private fun BottomBar(current: Screen, todayColor: String?, modifier: Modifier =
                                 Modifier.size(14.dp)
                                     .clip(CircleShape)
                                     .background(colorOf(todayColor))
-                                    .border(1.dp, colors.outline, CircleShape),
+                                    .border(1.dp, if (on) colors.onPrimary.copy(alpha = 0.6f) else colors.outline, CircleShape),
                             )
                         }
                     } else {
-                        GlyphIcon(glyph, tint = tint)
+                        GlyphIcon(glyph, tint = ink)
                     }
-                },
-                label = { Text(label, style = Styles.caption.copy(color = tint)) },
-                colors = NavigationBarItemDefaults.colors(indicatorColor = colors.surfaceVariant),
-            )
+                    Spacer(Modifier.width(8.dp))
+                    Text(label, style = Styles.label.copy(color = ink, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Medium))
+                }
+            }
         }
     }
 }

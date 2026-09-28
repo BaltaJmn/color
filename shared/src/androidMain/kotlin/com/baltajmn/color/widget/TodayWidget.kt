@@ -32,7 +32,6 @@ import androidx.glance.semantics.contentDescription
 import androidx.glance.semantics.semantics
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
-import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import com.baltajmn.color.color.colorOf
@@ -44,6 +43,7 @@ import com.baltajmn.color.data.widgetView
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.ui.theme.Dark
 import com.baltajmn.color.ui.theme.Light
+import kotlinx.datetime.LocalDate
 
 class TodayWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget = TodayWidget()
@@ -74,12 +74,17 @@ private fun Today(state: WidgetState?) {
         .clickable(actionStartActivity(open))
     val hex = state?.color
     val name = state?.name
+    val day = state?.date?.let(LocalDate::parse) ?: today()
 
+    // The same reading as the app: the day as a big light numeral on top, the color's name and its
+    // code at the foot, like the card and the blank chip before it has a color.
     if (hex != null && name != null) {
         val ink = ColorProvider(inkColorFor(hex))
-        Column(frame.background(colorOf(hex)).padding(12.dp), verticalAlignment = Alignment.Bottom) {
-            Text(S.widgetTodayName, style = TextStyle(color = ink, fontSize = 13.sp))
-            Text(name, maxLines = 2, style = TextStyle(color = ink, fontSize = 17.sp, fontWeight = FontWeight.Medium))
+        Column(frame.background(colorOf(hex)).padding(14.dp)) {
+            Text(day.day.toString(), style = TextStyle(color = ink, fontSize = 30.sp, fontWeight = FontWeight.Normal))
+            Spacer(GlanceModifier.defaultWeight())
+            Text(name, maxLines = 2, style = TextStyle(color = ink, fontSize = 17.sp, fontWeight = FontWeight.Bold))
+            Text(hex, style = TextStyle(color = ink, fontSize = 12.sp, fontWeight = FontWeight.Medium))
             FriendsStrip(state.friends)
         }
     } else {
@@ -87,21 +92,15 @@ private fun Today(state: WidgetState?) {
         val night = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
             Configuration.UI_MODE_NIGHT_YES
         val scheme = if (night) Dark else Light
-        Column(
-            frame.background(scheme.surfaceVariant).padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+        Column(frame.background(scheme.surfaceVariant).padding(14.dp)) {
+            Text(day.day.toString(), style = TextStyle(color = ColorProvider(scheme.onBackground), fontSize = 30.sp, fontWeight = FontWeight.Normal))
+            Spacer(GlanceModifier.defaultWeight())
             Text(
                 S.widgetEmpty,
                 maxLines = 2,
-                style = TextStyle(
-                    color = ColorProvider(scheme.onSurfaceVariant),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center,
-                ),
+                style = TextStyle(color = ColorProvider(scheme.onBackground), fontSize = 14.sp, fontWeight = FontWeight.Medium),
             )
+            Text("#------", style = TextStyle(color = ColorProvider(scheme.onSurfaceVariant), fontSize = 12.sp))
             state?.let { FriendsStrip(it.friends) }
         }
     }

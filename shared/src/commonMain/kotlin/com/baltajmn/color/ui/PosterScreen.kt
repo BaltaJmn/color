@@ -24,7 +24,7 @@ fun PosterScreen(year: Int, onClose: () -> Unit) {
     val picture = remember(style, year, days, settings.watermark) { renderPoster(style, year, days, settings.watermark, measurer) }
     val styleLabels = listOf(S.posterGrid, S.posterStrip, S.posterWallpaper)
 
-    PictureScreen(picture, "$year, ${styleLabels[style.ordinal]}", onClose, locked = !settings.pro, onLocked = { Paywall.open = true }) {
+    PictureScreen(S.poster, picture, "$year, ${styleLabels[style.ordinal]}", onClose, locked = !settings.pro, onLocked = { Paywall.open = true }) {
         Segmented(styleLabels, style.ordinal) { style = PosterStyle.entries[it] }
         Spacer(Modifier.height(16.dp))
     }

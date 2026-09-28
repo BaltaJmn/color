@@ -82,8 +82,8 @@ private fun Year(state: WidgetState?) {
     val density = context.resources.displayMetrics.density
     val size = LocalSize.current
     val grid = yearBitmap(
-        width = ((size.width.value - 24) * density).toInt(),
-        height = ((size.height.value - 24 - 22) * density).toInt(),
+        width = ((size.width.value - 28) * density).toInt(),
+        height = ((size.height.value - 28 - 34) * density).toInt(),
         days = if (pro) state?.days.orEmpty() else emptyMap(),
         today = day,
         empty = scheme.surfaceVariant.toArgb(),
@@ -92,12 +92,12 @@ private fun Year(state: WidgetState?) {
     Column(
         GlanceModifier.fillMaxSize().appWidgetBackground()
             .cornerRadius(android.R.dimen.system_app_widget_background_radius)
-            .background(scheme.background).padding(12.dp)
+            .background(scheme.background).padding(14.dp)
             .clickable(actionStartActivity(open)),
     ) {
         Text(
             day.year.toString(),
-            style = TextStyle(color = ColorProvider(scheme.onBackground), fontSize = 13.sp, fontWeight = FontWeight.Medium),
+            style = TextStyle(color = ColorProvider(scheme.onBackground), fontSize = 20.sp, fontWeight = FontWeight.Normal),
         )
         Spacer(GlanceModifier.height(8.dp))
         Box(GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {

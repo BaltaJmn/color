@@ -54,13 +54,13 @@ fun renderDayCard(
 ): ImageBitmap = picture(CARD_W, CARD_H) {
     val ink = inkColorFor(entry.color)
     drawRect(colorOf(entry.color))
-    var y = text(measurer, S.colorName(entry.name), TextStyle(fontSize = 96.sp, fontWeight = FontWeight.Medium, color = ink), MARGIN, 72f + 96f, maxWidth = (CARD_W - 2 * MARGIN).toInt())
-    y = text(measurer, entry.color, TextStyle(fontSize = 40.sp, color = ink), MARGIN, y.bottom + 52f)
+    var y = text(measurer, S.colorName(entry.name), TextStyle(fontSize = 104.sp, fontWeight = FontWeight.SemiBold, letterSpacing = (-2).sp, color = ink), MARGIN, 72f + 96f, maxWidth = (CARD_W - 2 * MARGIN).toInt())
+    y = text(measurer, entry.color, TextStyle(fontSize = 40.sp, fontWeight = FontWeight.Medium, letterSpacing = 3.sp, fontFeatureSettings = "tnum", color = ink), MARGIN, y.bottom + 52f)
     entry.word?.let {
         text(measurer, it, TextStyle(fontSize = 56.sp, fontStyle = FontStyle.Italic, color = ink), MARGIN, y.bottom + 90f, maxWidth = (CARD_W - 2 * MARGIN).toInt())
     }
     val dateBaseline = if (watermark) CARD_H - MARGIN - 56f else CARD_H - MARGIN
-    text(measurer, S.shortDate(date) + ", " + date.year, TextStyle(fontSize = 40.sp, color = ink), MARGIN, dateBaseline)
+    text(measurer, S.dayMonthYear(date).uppercase(), TextStyle(fontSize = 34.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 4.sp, color = ink), MARGIN, dateBaseline)
     if (watermark) text(measurer, "Chroma", TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Medium, color = ink), MARGIN, CARD_H - MARGIN)
     photo?.let { thumbnail(it, Offset(CARD_W - MARGIN - THUMB, CARD_H - MARGIN - THUMB), THUMB, ink) }
 }
@@ -142,7 +142,7 @@ private fun DrawScope.bands(colors: List<Color>, area: Rect, vertical: Boolean) 
 }
 
 private fun DrawScope.posterTitle(year: Int, measurer: TextMeasurer) =
-    text(measurer, year.toString(), TextStyle(fontSize = 72.sp, fontWeight = FontWeight.Medium, color = PAPER_INK), MARGIN, MARGIN + 72f)
+    text(measurer, year.toString(), TextStyle(fontSize = 120.sp, fontWeight = FontWeight.ExtraLight, letterSpacing = (-4).sp, color = PAPER_INK), MARGIN, MARGIN + 110f)
 
 private fun DrawScope.posterMark(measurer: TextMeasurer) =
     text(measurer, "Chroma", TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Medium, color = PAPER_INK), MARGIN, CARD_H - MARGIN)

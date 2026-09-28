@@ -105,9 +105,9 @@ fun ChromaCard(
     ) {
         val thumb = maxWidth * 0.3f
         Column(Modifier.align(Alignment.TopStart).padding(pad).padding(end = 40.dp).alpha(words)) {
-            Text(S.colorName(entry.name), style = (if (compact) Styles.title else Styles.display).copy(color = ink))
-            // A little air between the characters: it reads as a code, like the one on a paint chip.
-            Text(entry.color, style = Styles.label.copy(color = ink, fontWeight = FontWeight.Normal, letterSpacing = 0.5.sp))
+            Text(S.colorName(entry.name), style = (if (compact) Styles.title else Styles.display.copy(fontSize = 40.sp, lineHeight = 44.sp, fontWeight = FontWeight.SemiBold)).copy(color = ink))
+            // Tabular figures and a little air: it reads as a code, like the one on a paint chip.
+            Text(entry.color, style = Styles.code.copy(color = ink), modifier = Modifier.padding(top = 2.dp))
             entry.word?.let {
                 Text(
                     it,
@@ -130,7 +130,7 @@ fun ChromaCard(
                     contentAlignment = Alignment.CenterStart,
                 ) { Text(it, style = Styles.body.copy(color = ink, fontWeight = FontWeight.Medium)) }
             }
-            Text(S.shortDate(date), style = Styles.label.copy(color = ink, fontWeight = FontWeight.Normal))
+            Text(S.shortDate(date).uppercase(), style = Styles.eyebrow.copy(color = ink))
         }
         photo?.let { image ->
             Box(

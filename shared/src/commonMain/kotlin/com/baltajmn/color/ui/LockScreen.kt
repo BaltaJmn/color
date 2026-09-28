@@ -35,9 +35,11 @@ fun LockScreen(onUnlocked: () -> Unit) {
 
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            GlyphTile(Glyph.LOCK)
+            Spacer(Modifier.height(16.dp))
             Text("Chroma", style = Styles.display)
             Spacer(Modifier.height(32.dp))
-            OutlinedAction(S.unlock, { Lock.authenticate { if (it) onUnlocked() } })
+            PrimaryAction(S.unlock, { Lock.authenticate { if (it) onUnlocked() } })
         }
     }
 }

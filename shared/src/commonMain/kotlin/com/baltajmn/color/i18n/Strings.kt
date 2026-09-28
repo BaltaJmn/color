@@ -634,6 +634,10 @@ object S {
 
     fun dayMonthYear(d: LocalDate) = shortDate(d) + yearSuffix(d.year)
 
+    /** The two halves of the masthead beside the big day number. */
+    fun weekday(d: LocalDate) = weekdayNames()[d.dayOfWeek.ordinal]
+    fun monthOf(d: LocalDate, withYear: Boolean = false) = monthNames()[d.month.ordinal] + if (withYear) " ${d.year}" else ""
+
     fun longDateWithYear(d: LocalDate) = longDate(d) + yearSuffix(d.year)
 
     fun abbrDateWithYear(d: LocalDate): String {

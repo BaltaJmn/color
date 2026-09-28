@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +39,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
@@ -97,8 +104,13 @@ fun SettingsScreen(onBack: () -> Unit) {
     ) {
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-                GlyphButton(Glyph.BACK, S.a11yBack, onBack, Modifier.padding(end = 8.dp))
-                Text(S.settingsTitle, style = Styles.title)
+                GlyphButton(Glyph.BACK, S.a11yBack, onBack, Modifier.offset(x = (-12).dp), tint = MaterialTheme.colorScheme.onBackground)
+            }
+            Text(S.settingsTitle, style = Styles.display, modifier = Modifier.semantics { heading() })
+
+            if (!settings.pro) {
+                Spacer(Modifier.height(20.dp))
+                ProCard { Paywall.open = true }
             }
 
             Section(S.sectionReminder) {
@@ -113,6 +125,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                     // Off: tapping the row turns it on, the same path as the switch. On: it opens the
                     // time picker, and only the switch itself turns it back off.
                     onClick = if (settings.reminderOn) ({ pickTime = true }) else ({ setReminder(true) }),
+                    glyph = Glyph.BELL,
                 ) {
                     SoftSwitch(settings.reminderOn, onChange = setReminder)
                 }
@@ -142,22 +155,23 @@ fun SettingsScreen(onBack: () -> Unit) {
                     subtitle = if (canLock) S.lockSubtitle else S.lockUnavailable,
                     checked = settings.lockOn,
                     enabled = canLock,
+                    glyph = Glyph.LOCK,
                 ) { on ->
                     // Turning it on proves who is asking: otherwise whoever has the phone in their
                     // hand could lock the owner out of their own year.
                     val store = { ChromaRepository.updateSettings { it.copy(lockOn = on) } }
                     if (on) Lock.authenticate { if (it) store() } else store()
                 }
-                SettingRow(S.privacyRow, onClick = { AppInfo.open(PRIVACY_URL) })
-                if (Social.available) SettingRow(S.termsRow, onClick = { AppInfo.open(TERMS_URL) })
+                SettingRow(S.privacyRow, onClick = { AppInfo.open(PRIVACY_URL) }, glyph = Glyph.DOC)
+                if (Social.available) SettingRow(S.termsRow, onClick = { AppInfo.open(TERMS_URL) }, glyph = Glyph.DOC)
             }
 
             Section(S.sectionCard) {
-                ToggleRow(S.watermarkRow, checked = settings.watermark) { on ->
+                ToggleRow(S.watermarkRow, checked = settings.watermark, glyph = Glyph.STAMP) { on ->
                     ChromaRepository.updateSettings { it.copy(watermark = on) }
                 }
                 val week = weekColor(today())
-                ToggleRow(S.weekColorRow, S.colorName(week.key), checked = settings.weekColorOn, swatch = week.hex) { on ->
+                ToggleRow(S.weekColorRow, S.colorName(week.key), checked = settings.weekColorOn, swatch = week.hex, glyph = Glyph.DIAMOND) { on ->
                     ChromaRepository.updateSettings { it.copy(weekColorOn = on) }
                 }
             }
@@ -175,11 +189,13 @@ fun SettingsScreen(onBack: () -> Unit) {
                     onClick = {
                         startExport(today()) { result -> if (result == PickResult.Failed) failure = null to S.exportFailed }
                     },
+                    glyph = Glyph.EXPORT,
                 )
                 SettingRow(
                     title = S.importRow,
                     subtitle = S.importSubtitle,
                     enabled = FilePicker.available && !busy,
+                    glyph = Glyph.IMPORT,
                     onClick = {
                         busy = true
                         var read: Result<Backup>? = null
@@ -207,16 +223,18 @@ fun SettingsScreen(onBack: () -> Unit) {
             }
 
             Section(S.sectionPro) {
-                SettingRow(
-                    title = S.proRow,
-                    subtitle = if (settings.pro) S.proOwned else S.proSubtitle,
-                    enabled = !settings.pro,
-                    onClick = { Paywall.open = true },
-                )
+                // Not yet bought, the card at the top sells it; here it only says it is done.
+                if (settings.pro) {
+                    SettingRow(title = S.proRow, subtitle = S.proOwned, glyph = Glyph.SPARK) {
+                        GlyphIcon(Glyph.CHECK, tint = MaterialTheme.colorScheme.onBackground)
+                    }
+                }
                 // Both stores ask for this to be reachable without buying anything first.
                 SettingRow(
                     title = S.restoreRow,
+                    subtitle = if (restoring) S.working else null,
                     enabled = !restoring,
+                    glyph = Glyph.RESTORE,
                     onClick = {
                         restoring = true
                         scope.launch {
@@ -231,12 +249,15 @@ fun SettingsScreen(onBack: () -> Unit) {
             val siblings = SIBLINGS.filter { it.storeUrl != null }
             if (siblings.isNotEmpty()) {
                 Section(S.sectionMoreApps) {
-                    siblings.forEach { app -> SettingRow(app.name, app.tagline, onClick = { AppInfo.open(app.storeUrl!!) }) }
+                    siblings.forEach { app -> SettingRow(app.name, app.tagline, onClick = { AppInfo.open(app.storeUrl!!) }, glyph = Glyph.APPS) }
                 }
             }
 
-            Section(S.sectionAbout) {
-                SettingRow(S.version(AppInfo.version))
+            // The version is a fact about the app, not a setting: it goes at the foot, not in a card.
+            Spacer(Modifier.height(36.dp))
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Chroma", style = Styles.label.copy(color = MaterialTheme.colorScheme.onBackground))
+                Text(S.version(AppInfo.version), style = Styles.caption)
             }
             Spacer(Modifier.height(32.dp))
         }
@@ -375,35 +396,105 @@ private fun TimeDialog(hour: Int, minute: Int, onDismiss: () -> Unit, onPick: (I
     )
 }
 
+/**
+ * A named group of rows on one card, like the settings of the system, so the list reads as a few
+ * things to decide rather than one long run of text. Rows are split by hairlines that start where
+ * the text starts.
+ */
 @Composable
 fun Section(label: String, content: @Composable () -> Unit) {
     Spacer(Modifier.height(28.dp))
-    Text(label, style = Styles.label)
-    Spacer(Modifier.height(4.dp))
-    content()
+    Text(label.uppercase(), style = Styles.eyebrow, modifier = Modifier.padding(start = 4.dp).semantics { heading() })
+    Spacer(Modifier.height(8.dp))
+    val line = MaterialTheme.colorScheme.outlineVariant
+    val cuts = remember { mutableListOf<Int>() }
+    Layout(
+        content,
+        Modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .drawWithContent {
+                drawContent()
+                val start = ROW_TEXT_START.toPx()
+                cuts.forEach { y -> drawLine(line, Offset(start, y.toFloat()), Offset(size.width, y.toFloat()), 1.dp.toPx()) }
+            },
+    ) { measurables, constraints ->
+        val rows = measurables.map { it.measure(constraints.copy(minHeight = 0)) }
+        layout(constraints.maxWidth, rows.sumOf { it.height }) {
+            cuts.clear()
+            var y = 0
+            rows.forEachIndexed { i, row ->
+                if (i > 0) cuts += y
+                row.placeRelative(0, y)
+                y += row.height
+            }
+        }
+    }
 }
 
-/** A row of the list: title, subtitle and whatever sits at the end. The whole row answers. */
+// Where the words of a row begin: after the padding, the glyph tile and the gap.
+private val ROW_TEXT_START = 64.dp
+
+/** The card that sells Pro, at the top of Settings until it is bought. The whole card opens the paywall. */
+@Composable
+private fun ProCard(onOpen: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    val year = today().year
+    val mine = ChromaRepository.journal.filterKeys { it.startsWith("$year-") }
+    Column(
+        Modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(colors.surface)
+            .clickable(role = Role.Button, onClick = onOpen)
+            .padding(18.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            GlyphTile(Glyph.SPARK)
+            Spacer(Modifier.width(12.dp))
+            Text(S.proRow, style = Styles.title, modifier = Modifier.weight(1f))
+            GlyphIcon(Glyph.FORWARD, size = 16.dp, tint = colors.onSurfaceVariant)
+        }
+        Spacer(Modifier.height(10.dp))
+        Text(S.proSubtitle, style = Styles.muted)
+        // What the poster is made of: the user's own days, so the offer shows their year, not a stock picture.
+        if (mine.size >= 2) {
+            Spacer(Modifier.height(14.dp))
+            YearStrip(year, mine.mapValues { it.value.color }, Modifier.height(28.dp).clip(RoundedCornerShape(8.dp)), fill = true)
+        }
+    }
+}
+
+/** A row of the list: glyph, title, subtitle and whatever sits at the end. The whole row answers. */
 @Composable
 fun SettingRow(
     title: String,
     subtitle: String? = null,
     enabled: Boolean = true,
     onClick: (() -> Unit)? = null,
+    glyph: Glyph? = null,
     trailing: @Composable (() -> Unit)? = null,
 ) {
     Row(
         Modifier.fillMaxWidth()
-            .heightIn(min = 56.dp)
+            .heightIn(min = 60.dp)
             .then(if (onClick != null && enabled) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
-            .alpha(if (enabled) 1f else 0.4f),
+            .alpha(if (enabled) 1f else 0.4f)
+            .padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
+        glyph?.let {
+            GlyphTile(it)
+            Spacer(Modifier.width(14.dp))
+        }
+        Column(Modifier.weight(1f).padding(vertical = 10.dp)) {
             Text(title, style = Styles.body)
             if (subtitle != null) Text(subtitle, style = Styles.caption)
         }
-        trailing?.invoke()
+        when {
+            trailing != null -> trailing()
+            // A row that goes somewhere says so, the way a system list does.
+            onClick != null -> GlyphIcon(Glyph.FORWARD, size = 16.dp, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }
 
@@ -416,7 +507,9 @@ fun SoftSwitch(checked: Boolean, enabled: Boolean = true, onChange: ((Boolean) -
         colors = SwitchDefaults.colors(
             checkedThumbColor = MaterialTheme.colorScheme.onPrimary,
             checkedTrackColor = MaterialTheme.colorScheme.primary,
+            uncheckedThumbColor = MaterialTheme.colorScheme.surface,
             uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant,
+            uncheckedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
     )
 }
@@ -433,16 +526,22 @@ fun ToggleRow(
     enabled: Boolean = true,
     // The hex of a color to show as a dot before the subtitle, e.g. this week's color.
     swatch: String? = null,
+    glyph: Glyph? = null,
     onCheckedChange: (Boolean) -> Unit,
 ) {
     Row(
         Modifier.fillMaxWidth()
-            .heightIn(min = 56.dp)
+            .heightIn(min = 60.dp)
             .toggleable(value = checked, enabled = enabled, role = Role.Switch, onValueChange = onCheckedChange)
-            .alpha(if (enabled) 1f else 0.4f),
+            .alpha(if (enabled) 1f else 0.4f)
+            .padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(Modifier.weight(1f).padding(vertical = 8.dp)) {
+        glyph?.let {
+            GlyphTile(it)
+            Spacer(Modifier.width(14.dp))
+        }
+        Column(Modifier.weight(1f).padding(vertical = 10.dp)) {
             Text(title, style = Styles.body)
             if (subtitle != null) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -460,6 +559,7 @@ fun ToggleRow(
                 }
             }
         }
+        Spacer(Modifier.width(8.dp))
         SoftSwitch(checked, enabled = enabled, onChange = null)
     }
 }

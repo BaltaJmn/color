@@ -124,9 +124,10 @@ fun YearGrid(year: Int, days: Map<String, String>, today: LocalDate, onOpenDay: 
 
 /** The year as thin columns, one per day with a color, blank days left out: its barcode. */
 @Composable
-fun YearStrip(year: Int, days: Map<String, String>, modifier: Modifier = Modifier) {
+fun YearStrip(year: Int, days: Map<String, String>, modifier: Modifier = Modifier, fill: Boolean = false) {
     val colors = remember(year, days) { days.filterKeys { it.startsWith("$year-") }.entries.sortedBy { it.key }.map { colorOf(it.value) } }
-    Canvas(modifier.fillMaxWidth().aspectRatio(4f / 5f).clip(RoundedCornerShape(20.dp))) {
+    // [fill]: take the height the caller gives, as a thin band, instead of the 4:5 picture of My year.
+    Canvas(modifier.fillMaxWidth().then(if (fill) Modifier else Modifier.aspectRatio(4f / 5f).clip(RoundedCornerShape(24.dp)))) {
         if (colors.isEmpty()) return@Canvas
         val w = size.width / colors.size
         colors.forEachIndexed { i, c -> drawRect(c, Offset(i * w, 0f), Size(w + 0.5f, size.height)) }

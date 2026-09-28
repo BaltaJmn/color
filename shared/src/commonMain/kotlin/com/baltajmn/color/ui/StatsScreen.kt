@@ -1,6 +1,7 @@
 package com.baltajmn.color.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -54,12 +57,20 @@ fun StatsScreen(year: Int, onClose: () -> Unit) {
     }
 }
 
+/** One sentence to a card: read one at a time, like a short list of findings, not a paragraph. */
 @Composable
 private fun Line(text: String, swatch: String? = null) {
-    Row(Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        Modifier.fillMaxWidth()
+            .padding(vertical = 5.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 18.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         swatch?.let {
-            Box(Modifier.size(14.dp).clip(CircleShape).background(colorOf(it)))
-            Spacer(Modifier.width(12.dp))
+            Box(Modifier.size(22.dp).clip(CircleShape).background(colorOf(it)).border(1.dp, MaterialTheme.colorScheme.outline, CircleShape))
+            Spacer(Modifier.width(14.dp))
         }
         Text(text, style = Styles.body)
     }

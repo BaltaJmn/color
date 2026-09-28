@@ -68,7 +68,7 @@ private struct YearView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(String(ChromaStore.year(day))).font(.system(size: 13, weight: .medium))
+            Text(String(ChromaStore.year(day))).font(.system(size: 20, weight: .light))
             ZStack {
                 YearGrid(days: pro ? entry.state?.days ?? [:] : [:], year: ChromaStore.year(day), today: ChromaStore.key(day))
                     .accessibilityElement(children: .ignore)

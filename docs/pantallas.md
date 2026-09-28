@@ -17,12 +17,13 @@ imprimen, se ponen de fondo o se ven en el móvil de otro.
 
 | Token | Claro | Oscuro | Uso |
 |---|---|---|---|
-| `background` | `#F3F3F3` | `#121212` | Fondo de pantalla |
-| `surface` | `#FFFFFF` | `#1C1C1C` | Hojas, diálogos, filas, avisos |
-| `surfaceVariant` | `#E5E5E5` | `#262626` | Días vacíos de la rejilla, campos |
+| `background` | `#F1F1F1` | `#0E0E0E` | Fondo de pantalla |
+| `surface` | `#FFFFFF` | `#1A1A1A` | Tarjetas de ajustes, avisos, diálogos, la cápsula de navegación |
+| `surfaceVariant` | `#E6E6E6` | `#252525` | Días vacíos de la rejilla, campos, la ficha en blanco, las teselas de icono |
 | `onBackground` | `#111111` | `#F2F2F2` | Texto principal |
-| `onMuted` | `#595959` | `#A8A8A8` | Texto secundario (contraste 6,3:1 en claro, 7,9:1 en oscuro) |
-| `outline` | `#D0D0D0` | `#333333` | Separadores, bordes de los círculos de color |
+| `onMuted` | `#5E5E5E` | `#A3A3A3` | Texto secundario (contraste 6:1 en claro, 7,5:1 en oscuro) |
+| `outline` | `#D6D6D6` | `#303030` | Bordes de los círculos de color y de los botones con borde |
+| `outlineVariant` | `#EAEAEA` | `#222222` | Filetes entre filas de una tarjeta de ajustes |
 | `accent` | `#111111` | `#F2F2F2` | Botón principal: relleno del color del texto, texto del color de fondo |
 | `error` | `#B3261E` | `#F2B8B5` | Avisos de error y el botón que confirma algo que no se deshace |
 
@@ -31,15 +32,21 @@ plena: la jerarquía es de tamaño y peso, no de transparencia.
 
 ### Tipografía
 
-La del sistema (Roboto, SF Pro). Sin fuente propia: el color es el protagonista.
+La del sistema (Roboto, SF Pro). Sin fuente propia: el color es el protagonista. La voz sale del
+peso y del espaciado: los números, enormes y finos como la lectura de un instrumento de medir color;
+las etiquetas, en versalitas espaciadas; los códigos, con cifras tabulares como el de una muestra de
+pintura.
 
 | Estilo | Tamaño / peso | Uso |
 |---|---|---|
-| `display` | 34 / Medium | Nombre del color en la tarjeta de pantalla completa, la pregunta de Hoy vacío |
-| `title` | 22 / Medium | Títulos de pantalla |
-| `body` | 17 / Regular | Texto normal, el de los botones (el cuerpo de iOS; 16 se queda corto para leer sin gafas) |
-| `label` | 14 / Medium | Hex, fechas, subtítulos |
-| `caption` | 13 / Regular | Notas pequeñas; nada baja de 13 |
+| `numeral` | 64 / ExtraLight, espaciado -2,5 | El día en la cabecera de Hoy y del día abierto, el año en Mi año |
+| `display` | 34 / Medium, espaciado -0,6 | Nombre del color en la tarjeta (40 SemiBold), la pregunta de la ficha en blanco, el título de Ajustes |
+| `title` | 22 / SemiBold, espaciado -0,3 | Títulos de capa (compartir, póster, En palabras) |
+| `body` | 17 / Regular | Texto normal, el de los botones en SemiBold (el cuerpo de iOS; 16 se queda corto para leer sin gafas) |
+| `label` | 14 / Medium | Subtítulos, la cápsula de navegación |
+| `eyebrow` | 12 / SemiBold, espaciado 1,4, en mayúsculas | Nombres de sección, el día de la semana, `pickColor`, la fecha en la tarjeta |
+| `code` | 14 / Medium, espaciado 1, cifras tabulares | El hex, en la tarjeta y en la ficha en blanco (`#------`) |
+| `caption` | 13 / Regular | Notas pequeñas; nada baja de 13 (salvo `eyebrow`, que va en mayúsculas y seminegrita) |
 
 Todo escala con el tamaño de letra del sistema. Por eso ninguna fila con texto tiene alto fijo, solo
 mínimo: con letra grande, la fila crece en vez de cortar. La excepción son las etiquetas dibujadas
@@ -48,7 +55,7 @@ dentro de la rejilla del año, que no escalan porque la rejilla tampoco.
 ### Forma y espacio
 
 Rejilla de 4. Márgenes laterales 20. Radio de tarjeta 28, de hoja 28 arriba, de botón 24 (píldora),
-de miniatura 14. Tocables de 48 como mínimo, sin excepción de estilo: el botón principal mide 52, el
+de tarjeta de ajustes y de tesela 20, de miniatura 14, de tesela de icono 11 (36 de lado, glifo de 18). Tocables de 48 como mínimo, sin excepción de estilo: el botón principal mide 52, el
 de borde, el de texto y cada opción de un segmentado, 48. La única excepción es la celda de la
 rejilla del año (unos 22), porque el año entero tiene que caber de un vistazo; cada día se puede
 abrir igual con el lector de pantalla.
@@ -90,8 +97,10 @@ pasan una vez; un tic ligero al cambiar el color después. Nada más vibra.
 
 ## 2. Navegación
 
-Barra inferior con tres destinos: **Hoy**, **Mi año** y **Amigos** (Amigos aparece en v1.1). Ajustes
-es un icono arriba a la derecha de Hoy.
+Una cápsula flotante abajo, centrada, en `surface` con sombra suave: dos o tres sitios no piden una
+banda de marco de lado a lado. Destinos: **Hoy**, **Mi año** y **Amigos** (Amigos aparece en v1.1),
+cada uno con icono y nombre; el elegido va relleno de tinta, como el botón principal. Ajustes es un
+icono arriba a la derecha de Hoy.
 
 El icono de Hoy es un punto. Con el color del día elegido, el punto es ese color (14, con borde
 `outline` de 1 para que un blanco no desaparezca): es el único sitio donde el marco de la app toma
@@ -107,14 +116,18 @@ paywall y el bloqueo.
 
 ### Sin entrada
 
-- Arriba, la fecha larga (`longDate`) en `title` y el icono de Ajustes.
-- A 64 del encabezado, `todayPrompt` ("¿De qué color es hoy?") en `display`, centrado. Sin
-  ilustración: el círculo con cámara que hubo aquí era un segundo botón sin texto que hacía lo mismo
-  que el de debajo.
-- Botón principal a lo ancho: `takePhoto`. Debajo, botón de texto: `fromGallery`.
-- Primera sesión: bajo el prompt, `firstHelp` en `onMuted`.
-- Con el color de la semana encendido (v1.2): un punto de 12 con ese color y `weekHint(nombre)` en
-  `caption`. Una pista, no una tarea. Nada más.
+- Arriba, la cabecera de las pantallas con fecha: el día en `numeral` y, a su lado, el día de la
+  semana en `eyebrow` sobre el mes en `title` sin negrita. Al final de la fila, el icono de Ajustes.
+- Debajo, **la ficha en blanco**: la tarjeta antes de tener color, del mismo tamaño y forma (4:5,
+  radio 28) en `surfaceVariant`, con `todayPrompt` en `display` donde irá el nombre y `#------` en
+  `code` donde irá el hex. Sin ilustración ni icono dentro: el círculo con cámara que hubo aquí era un
+  segundo botón sin texto que hacía lo mismo que el de debajo.
+- Primera sesión: bajo la ficha, `firstHelp` en `onMuted`.
+- Botón principal a lo ancho con el icono de cámara: `takePhoto`. Debajo, botón de texto:
+  `fromGallery`.
+- Con el color de la semana encendido (v1.2): arriba a la izquierda de la ficha, una píldora en
+  `surface` con un punto de 12 de ese color y `weekHint(nombre)` en `caption`. Una pista, no una
+  tarea. Nada más.
 
 ### Eligiendo color
 
@@ -127,7 +140,7 @@ Tras la foto, en la misma pantalla:
 - Tocar un candidato lo elige y guarda al momento. No hay botón de confirmar.
 - Debajo, siempre, `cancel`: vuelve a lo que había antes de la foto, también con la primera del día.
   Nada se guarda hasta tocar un color.
-- Sobre los círculos, `pickColor` en `label`: la primera vez no es obvio que hay que tocar uno.
+- Sobre los círculos, `pickColor` en `eyebrow`: la primera vez no es obvio que hay que tocar uno.
 - Mientras se analiza la foto (menos de 100 ms), los botones se desactivan y sale `working`.
 - Si la foto de galería no es de hoy: aviso `galleryNotToday` y se vuelve al estado sin entrada.
 
@@ -145,11 +158,14 @@ Tras la foto, en la misma pantalla:
 
 ## 4. Mi año
 
-- Título: el año, con flechas a los lados si hay más de uno con entradas.
-- Selector de vista segmentado: `viewGrid` y `viewStrip`. Solo con entradas: en un año vacío no hay
-  nada que ver de otra forma.
-- Justo debajo, `poster` y `stats` (v1.2) lado a lado. Van antes de la rejilla, que mide unos 800 y
-  los dejaba fuera de la pantalla. Sin Pro, `stats` lleva `proTag` y abre el paywall.
+- Cabecera: `navYear` en `eyebrow` y el año en `numeral`, la misma lectura que el día en Hoy. Con
+  más de un año con entradas, las flechas al final de la fila.
+- Debajo, `poster` y `stats` (v1.2) como dos teselas lado a lado (en `surface`, radio 20, icono y
+  nombre). Van antes de la rejilla, que mide unos 800 y las dejaba fuera de la pantalla. Sin Pro,
+  `stats` lleva `proTag` y abre el paywall.
+- Después, el segmentado de vista: `viewGrid` y `viewStrip`, con el elegido relleno de tinta. Solo con
+  entradas: en un año vacío no hay nada que ver de otra forma.
+- La rejilla va sobre una tarjeta en `surface`, radio 24.
 - **Rejilla**: una columna por mes y una fila por día (12 x 31), como Purl: en un móvil da celdas de
   unos 24, que se tocan bien; girada saldrían de 10. Celdas cuadradas con 3 de separación y radio 3;
   inicial del mes arriba y los días 1, 10, 20 y 30 a la izquierda, en `caption`. Días sin color en
@@ -173,9 +189,9 @@ Tras la foto, en la misma pantalla:
 
 ## 5. El día abierto
 
-Hoja modal con la tarjeta a lo ancho. Título: la fecha larga, con el año solo si no es el actual
-(como Hoy; dos líneas de fecha sobre una tarjeta que ya lleva la suya pesan demasiado). Acciones:
-`share` y `deleteDay` (con confirmación). Un día
+Hoja modal con la tarjeta a lo ancho. Arriba, cerrar; debajo, la misma cabecera que Hoy (el día en
+`numeral`, día de la semana y mes), con el año tras el mes solo si no es el actual. Acciones, al
+final de la cabecera: `share` y `deleteDay` (con confirmación). Un día
 pasado no se edita.
 
 Tocar la miniatura abre la foto a pantalla completa, sobre negro, con cerrar arriba a la izquierda
@@ -183,15 +199,17 @@ sobre un círculo negro al 40 %: sin él, una foto de cielo o de nieve se comía
 
 ### Compartir
 
-Capa a pantalla completa desde el menú de Hoy o desde el día abierto. Arriba, cerrar; a 8, como en
-el resto de capas, la imagen. El lector de pantalla la lee como el color, su hex y la fecha (el póster,
+Capa a pantalla completa desde el menú de Hoy o desde el día abierto. Arriba, cerrar y el título
+(`share`, o `poster` en el póster); a 8, como en el resto de capas, la imagen, sobre un escenario en
+`surfaceVariant` de radio 28 y con una sombra suave, como una copia que se mira antes de llevársela. El lector de pantalla la lee como el color, su hex y la fecha (el póster,
 como el año y su estilo): es todo lo que hay en la pantalla. En medio, la
-tarjeta de 1080x1350 (`tecnico.md` 6.9) a 320 de ancho como mucho, con radio 14 y borde `outline`.
-Debajo, si el día tiene foto, una fila con interruptor, `includePhoto` (empieza encendido): apagarlo
+tarjeta de 1080x1350 (`tecnico.md` 6.9) a 320 de ancho como mucho, con radio 12.
+Debajo, si el día tiene foto, una fila con interruptor en su tarjeta, `includePhoto` (empieza encendido): apagarlo
 quita la miniatura de la imagen, no del día. No usa las palabras de compartir con amigos
 (`shareColorOnly`, `shareWithPhoto`) porque son dos ajustes distintos y con las mismas palabras
-parecían uno. Después, `share` (hoja del
-sistema) y `saveToPhotos` (en Android solo desde la 10, que no pide permiso). La marca "Chroma" la
+parecían uno. Después, lado a lado, `share` como botón principal con su icono (hoja del sistema) y
+`saveToPhotos` con borde (en Android solo desde la 10, que no pide permiso). Sin Pro, en el póster,
+los dos van con borde y `proTag`. La marca "Chroma" la
 decide el ajuste `watermarkRow`, no esta pantalla.
 
 ---
@@ -204,11 +222,11 @@ margen 16 y miniatura a 12 del borde (rejilla de 4).
 | Elemento | Posición | Estilo |
 |---|---|---|
 | Fondo | Todo | El color |
-| Nombre del color | Arriba izquierda, margen 24 | `display` (`title` si `compact`), tinta |
-| Hex | Bajo el nombre | `label` en peso normal, con 0,5 de espaciado entre letras (se lee como el código de una muestra de pintura), tinta |
+| Nombre del color | Arriba izquierda, margen 24 | `display` a 40 SemiBold (`title` si `compact`), tinta |
+| Hex | Bajo el nombre, a 2 | `code` (se lee como el código de una muestra de pintura), tinta |
 | Palabra | Bajo el hex, a 12 | `body` en cursiva, tinta |
 | Autor (feed) | Abajo izquierda, sobre la fecha | `body` Medium, tinta; tocable de 48 de alto |
-| Fecha | Abajo izquierda, margen 24 | `label` en peso normal, tinta |
+| Fecha | Abajo izquierda, margen 24 | `eyebrow`, en mayúsculas, tinta |
 | Miniatura | Abajo derecha, margen 20, lado 30 % del ancho | Radio 14, borde de 2 en tinta al 24 % |
 | Marca de sintonía (v1.1) | Arriba derecha | Dos aros solapados de 10 (16 de ancho, trazo 1,5), tinta; se lee `inTune` |
 | Marca de la semana (v1.2) | Arriba derecha, a la izquierda de la sintonía | Un rombo de 10 relleno, tinta; se lee `weekColorRow` |
@@ -219,7 +237,16 @@ Sin foto (día compartido solo con color, o foto caducada en el servidor), no ha
 
 ## 7. Ajustes
 
-Lista de secciones, como Purl:
+Cerrar arriba y el título `settingsTitle` en `display`. Sin Pro, justo debajo, **la tarjeta de Pro**:
+`proRow` en `title` con su icono, `proSubtitle`, y, con dos días o más este año, una tira de 28 de alto
+con los colores del usuario: el póster se hace con sus días, no con una foto de catálogo. Toda la
+tarjeta abre el paywall.
+
+Después, las secciones: cada una con su nombre en `eyebrow` y sus filas juntas en una tarjeta en
+`surface` de radio 20, separadas por un filete `outlineVariant` que empieza donde empieza el texto.
+Cada fila, de 60 como mínimo, lleva delante una tesela con su icono (campana, candado, documento,
+sello, rombo, exportar, importar, restaurar, apps) y al final su interruptor o, si lleva a otro sitio,
+una flecha. Una lista de opciones se lee como unas pocas cosas que decidir, no como un párrafo:
 
 1. **Recordatorio**: interruptor y hora (`reminderRow`).
 2. **Amigos** (v1.1): cuenta y nombre visible, `defaultShareRow`, `friendsRow`, `inviteFriend` (el
@@ -239,9 +266,10 @@ Lista de secciones, como Purl:
 4. **Tarjeta**: `watermarkRow`, `weekColorRow` (v1.2, interruptor con el nombre del color de esta
    semana debajo, precedido de un punto de 12 de ese color: el nombre solo no dice qué violeta es).
 5. **Copia**: exportar (con fecha de la última) e importar.
-6. **Chroma Pro**: comprar o "ya lo tienes", restaurar.
+6. **Chroma Pro**: "ya lo tienes" con una marca (sin Pro lo vende la tarjeta de arriba), restaurar.
 7. **Más apps**: una fila por hermana publicada en esa tienda.
-8. **Acerca de**: versión.
+
+Al pie, fuera de las tarjetas y centrado, "Chroma" y la versión: es un dato de la app, no un ajuste.
 
 ---
 
@@ -317,9 +345,11 @@ Abrir un enlace de otra persona lleva a Amigos y deja un aviso tranquilo con el 
 
 ## 9. Paywall
 
-El `ProDialog` de Purl: título `proTitle`, lo que incluye (`proPoster`, `proYearWidget`, y en v1.2
-`proStats`), `proOnce` (con `proFriendsFree` solo cuando Amigos existe, v1.1), el precio leído de la
-tienda, comprar, restaurar y cerrar.
+Un diálogo propio en `surface`, radio 28: `proTitle` con su icono; con dos días o más este año, una
+tira de 56 de alto con los colores del usuario; lo que incluye, una fila por cosa con su icono
+(`proPoster`, `proYearWidget`, y en v1.2 `proStats`); `proOnce` en `caption` (con `proFriendsFree`
+solo cuando Amigos existe, v1.1); el botón principal a lo ancho con el precio leído de la tienda
+(`buy`), y debajo `restore` y `notNow` como botones de texto en gris.
 
 ---
 
@@ -327,12 +357,12 @@ tienda, comprar, restaurar y cerrar.
 
 | Widget | Tamaño | Contenido |
 |---|---|---|
-| Hoy | Pequeño (2x2) | Con entrada: el color a sangre y su nombre en tinta. Sin entrada: `surfaceVariant`, `widgetEmpty`. v1.2: tira de amigos de 8 de alto y radio 4 abajo, con o sin entrada, en orden de hora y sin nombres; sin amigos, no hay tira |
+| Hoy | Pequeño (2x2) | La misma lectura que la app: el día grande y fino arriba. Con entrada: el color a sangre, abajo su nombre en negrita y el hex, en tinta. Sin entrada: `surfaceVariant`, `widgetEmpty` y `#------`, como la ficha en blanco. v1.2: tira de amigos de 8 de alto y radio 4 abajo, con o sin entrada, en orden de hora y sin nombres; sin amigos, no hay tira |
 | Año | Mediano (4x2) | El año arriba y la rejilla tumbada: 12 filas de meses por 31 columnas, porque el widget es más ancho que alto. Días futuros más tenues. Sin Pro: la rejilla vacía con `proTitle` y `widgetUnlock` encima |
 
 Tocar abre Hoy o Mi año; el del año sin Pro abre el paywall, que explica más que una rejilla vacía.
 La rejilla del año es una imagen: el lector de pantalla la anuncia como `a11yYearWidget`, y la tira de
-amigos como `a11yFriendsToday`. Margen interior 12. En los widgets rige el mismo suelo de 13 y el gris
+amigos como `a11yFriendsToday`. Margen interior 14. El año del widget grande va a 20, fino. En los widgets rige el mismo suelo de 13 y el gris
 secundario es el token (`WidgetMuted` en iOS, `widget_muted` en Android), no el del sistema.
 
 ---
