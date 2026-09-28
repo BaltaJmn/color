@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.baltajmn.color.billing.Billing
 import com.baltajmn.color.billing.PurchaseOutcome
 import com.baltajmn.color.i18n.S
+import com.baltajmn.color.social.Social
 import com.baltajmn.color.ui.theme.Styles
 import com.revenuecat.purchases.kmp.models.Package
 import kotlinx.coroutines.launch
@@ -50,7 +51,8 @@ fun ProDialog(onDismiss: () -> Unit) {
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 listOf(S.proPoster, S.proYearWidget, S.proStats).forEach { Text("- $it", style = Styles.body) }
-                Text(S.proOnce, style = Styles.body)
+                // Friends only exists with the server (v1.1): promising it before then sells something absent.
+                Text(if (Social.available) "${S.proOnce} ${S.proFriendsFree}" else S.proOnce, style = Styles.body)
                 note?.let { Text(it, style = Styles.muted) }
             }
         },

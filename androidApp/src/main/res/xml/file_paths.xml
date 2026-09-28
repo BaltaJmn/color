@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <!-- La foto recien hecha, mientras la camara la escribe. -->
-    <cache-path name="capture" path="capture/" />
+    <!-- La foto recien hecha, mientras la camara la escribe. En files y no en cache: con poco
+         espacio el sistema vacia la cache mientras la camara esta abierta y la foto se pierde. -->
+    <files-path name="capture" path="capture/" />
     <!-- Solo la tarjeta recien pintada. El diario no vive aqui. -->
     <cache-path name="share" path="share/" />
 </paths>

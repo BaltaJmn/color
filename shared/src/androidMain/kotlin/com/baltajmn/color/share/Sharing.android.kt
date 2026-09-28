@@ -1,5 +1,6 @@
 package com.baltajmn.color.share
 
+import android.content.ClipData
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
@@ -30,6 +31,9 @@ actual object Sharing {
         val send = Intent(Intent.ACTION_SEND).apply {
             type = "image/png"
             putExtra(Intent.EXTRA_STREAM, uri)
+            // Without ClipData the grant reaches the chosen app but not the chooser, which then
+            // shows the sheet with no preview of the card.
+            clipData = ClipData.newRawUri(null, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         context.startActivity(Intent.createChooser(send, null).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))

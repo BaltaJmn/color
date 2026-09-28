@@ -358,11 +358,18 @@ object S {
     )
     val proYearWidget get() = t("The year widget", "El widget del año", "O widget do ano", "Das Jahres-Widget", "Le widget de l'année")
     val proOnce get() = t(
-        "One-time payment, no subscription. Friends are always free.",
-        "Pago único, sin suscripción. Los amigos siempre son gratis.",
-        "Pagamento único, sem assinatura. Os amigos são sempre grátis.",
-        "Einmalzahlung, kein Abo. Freunde sind immer kostenlos.",
-        "Paiement unique, sans abonnement. Les amis sont toujours gratuits.",
+        "One-time payment, no subscription.",
+        "Pago único, sin suscripción.",
+        "Pagamento único, sem assinatura.",
+        "Einmalzahlung, kein Abo.",
+        "Paiement unique, sans abonnement.",
+    )
+    val proFriendsFree get() = t(
+        "Friends are always free.",
+        "Los amigos siempre son gratis.",
+        "Os amigos são sempre grátis.",
+        "Freunde sind immer kostenlos.",
+        "Les amis sont toujours gratuits.",
     )
     val restore get() = t("Restore", "Restaurar", "Restaurar", "Wiederherstellen", "Restaurer")
     val storeUnavailable get() = t(

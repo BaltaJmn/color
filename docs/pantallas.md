@@ -122,7 +122,8 @@ Tras la foto, en la misma pantalla:
 
 - La foto ocupa el ancho con radio 28 y proporción 4:5.
 - Debajo, los candidatos: círculos de 56 con borde `outline` de 1, separados 12, centrados. El
-  elegido lleva un anillo de 3 en `onBackground` a 4 de distancia.
+  elegido lleva un anillo de 3 en `onBackground` a 4 de distancia. Si no caben (cinco piden unos 400
+  y un móvil deja unos 320), encogen todos por igual y siguen redondos.
 - Tocar un candidato lo elige y guarda al momento. No hay botón de confirmar.
 - Debajo, siempre, `cancel`: vuelve a lo que había antes de la foto, también con la primera del día.
   Nada se guarda hasta tocar un color.
@@ -317,7 +318,8 @@ Abrir un enlace de otra persona lleva a Amigos y deja un aviso tranquilo con el 
 ## 9. Paywall
 
 El `ProDialog` de Purl: título `proTitle`, lo que incluye (`proPoster`, `proYearWidget`, y en v1.2
-`proStats`), `proOnce`, el precio leído de la tienda, comprar, restaurar y cerrar.
+`proStats`), `proOnce` (con `proFriendsFree` solo cuando Amigos existe, v1.1), el precio leído de la
+tienda, comprar, restaurar y cerrar.
 
 ---
 

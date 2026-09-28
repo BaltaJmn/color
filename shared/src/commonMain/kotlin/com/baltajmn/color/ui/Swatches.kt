@@ -6,9 +6,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -46,9 +48,13 @@ fun SwatchRow(
     ) {
         colors.forEach { hex ->
             val isSelected = hex == selected
+            // Five candidates of 56 need about 400 and a phone leaves about 320: they share the
+            // width and stay round, instead of the last one being squeezed into an oval.
             Box(
                 Modifier
-                    .size(size + 14.dp)
+                    .weight(1f, fill = false)
+                    .widthIn(max = size + 14.dp)
+                    .aspectRatio(1f)
                     .clip(CircleShape)
                     .then(if (isSelected) Modifier.border(3.dp, MaterialTheme.colorScheme.onBackground, CircleShape) else Modifier)
                     .semantics {

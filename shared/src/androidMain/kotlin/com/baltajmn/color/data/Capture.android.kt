@@ -31,8 +31,9 @@ actual object Capture {
     actual val cameraAvailable: Boolean
         get() = AndroidContext.value.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
 
+    // Not cacheDir: low on space, the system empties it while the camera is open and the photo is lost.
     private val shot: File
-        get() = File(AndroidContext.value.cacheDir, "capture").apply { mkdirs() }.resolve("shot.jpg")
+        get() = File(AndroidContext.value.filesDir, "capture").apply { mkdirs() }.resolve("shot.jpg")
 
     actual suspend fun camera(): Picked? {
         val launch = launchCamera ?: return null
