@@ -30,7 +30,7 @@ Espera dentro `01_hoy.png` a `06_poster.png` y deja el resultado en
 
 | Fichero | Pantalla | Qué tiene que verse |
 |---|---|---|
-| `01_hoy` | Hoy, con color | La tarjeta de hoy con la foto en la esquina y la fila de candidatos debajo. La foto, una propia de hoy elegida desde la galería (el simulador no tiene cámara) |
+| `01_hoy` | Hoy, con color | La tarjeta de hoy con la foto en la esquina y la fila de candidatos debajo. La foto, elegida desde la galería (el simulador no tiene cámara) y sin personas ni sitios reconocibles: la de 2026-09 es un atardecer generado con PIL, en `tools/demo/fotos/` (fuera del repo) |
 | `02_ano` | Mi año, rejilla | La rejilla llena hasta hoy, con huecos sueltos |
 | `03_tira` | Mi año, tira | La tira del año, del gris del invierno al verano |
 | `04_tarjeta` | Compartir | La tarjeta de 1080x1350 en la vista previa con "Incluir la foto" apagado |

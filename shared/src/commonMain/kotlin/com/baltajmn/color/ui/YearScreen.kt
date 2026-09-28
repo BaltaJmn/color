@@ -55,7 +55,9 @@ fun YearScreen(today: LocalDate, onOpenDay: (LocalDate) -> Unit, onPoster: (Int)
     ) {
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
             // The year as the same light numeral as the day on Today: the two screens are one instrument.
-            Row(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            // More top room than Today's masthead: here the small eyebrow sits first, not the numeral with
+            // its own built-in leading, and at 8 dp it pressed against the status bar.
+            Row(Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 val i = years.indexOf(year)
                 Column(Modifier.weight(1f)) {
                     Text(S.navYear.uppercase(), style = Styles.eyebrow)

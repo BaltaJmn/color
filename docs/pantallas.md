@@ -159,7 +159,9 @@ Tras la foto, en la misma pantalla:
 ## 4. Mi año
 
 - Cabecera: `navYear` en `eyebrow` y el año en `numeral`, la misma lectura que el día en Hoy. Con
-  más de un año con entradas, las flechas al final de la fila.
+  más de un año con entradas, las flechas al final de la fila. Empieza 20 dp bajo la barra de estado,
+  no 8 como Hoy: aquí lo primero es el `eyebrow`, pequeño y sin el aire propio del `numeral`, y a 8 dp
+  quedaba pegado a la barra (y el recorte de las capturas de la ficha se lo comía).
 - Debajo, `poster` y `stats` (v1.2) como dos teselas lado a lado (en `surface`, radio 20, icono y
   nombre). Van antes de la rejilla, que mide unos 800 y las dejaba fuera de la pantalla. Sin Pro,
   `stats` lleva `proTag` y abre el paywall.
