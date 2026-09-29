@@ -90,6 +90,20 @@ class StorageTest {
     }
 
     @Test
+    fun aReceiverOrARecreatedActivityKeepsWhatIsInMemory() {
+        File(dir, "entries.json").writeText(good)
+        ChromaRepository.load()
+        // The disk behind memory, as while a pick waits out its debounce with its photo already written.
+        File(dir, "entries.json").writeText("""{"version":1,"entries":{}}""")
+        Storage.writePhoto("p-00000002.jpg", byteArrayOf(1))
+
+        ChromaRepository.ensureLoaded()
+
+        assertEquals("#3A6EA5", ChromaRepository.journal["2026-09-22"]?.color)
+        assertEquals(listOf("p-00000002.jpg"), Storage.listPhotos())
+    }
+
+    @Test
     fun widgetStateNeverCarriesThePhotoOrTheWord() {
         File(dir, "entries.json").writeText(
             """{"version":1,"entries":{"2026-09-22":{"color":"#3A6EA5","name":"x","word":"secret","photo":"p-1.jpg"}}}""",

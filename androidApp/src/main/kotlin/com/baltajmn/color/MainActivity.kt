@@ -9,7 +9,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
-import com.baltajmn.color.data.AndroidContext
 import com.baltajmn.color.data.Capture
 import com.baltajmn.color.data.FilePicker
 import com.baltajmn.color.data.Lock
@@ -22,8 +21,7 @@ import java.lang.ref.WeakReference
 // FragmentActivity and not ComponentActivity: the biometric lock of v1.2 needs a fragment host.
 class MainActivity : FragmentActivity() {
 
-    // The Activity only carries the answer across: what is waiting for it lives in Capture, which
-    // outlives this instance when the system recreates it behind the camera.
+    // The Activity only carries the answer across: what is waiting for it lives in Capture.
     private val takePicture =
         registerForActivityResult(ActivityResultContracts.TakePicture(), Capture::onCamera)
 
@@ -42,7 +40,6 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        AndroidContext.init(this)
         Lock.host = WeakReference(this)
         Review.host = WeakReference(this)
         // The permission is asked the moment the reminder is switched on and never before.
@@ -58,8 +55,12 @@ class MainActivity : FragmentActivity() {
         Capture.launchGallery = {
             pickPhoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
-        Route.pending = intent?.getStringExtra("screen")
-        handleLinkIntent(intent)
+        // A recreated Activity is handed the intent it was launched with again, and following it a
+        // second time would reopen the paywall out of nowhere.
+        if (savedInstanceState == null) {
+            Route.pending = intent?.getStringExtra("screen")
+            handleLinkIntent(intent)
+        }
         setContent { App() }
     }
 

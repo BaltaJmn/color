@@ -24,8 +24,12 @@ actual object Capture {
     var launchCamera: ((Uri) -> Unit)? = null
     var launchGallery: (() -> Unit)? = null
 
-    // The answer comes back to the Activity, which may be a new instance by then, so what is waiting
-    // for it lives here.
+    // The answer comes back to the Activity, and what is waiting for it lives here.
+    //
+    // ponytail: the wait belongs to Today's composition, so an Activity recreated behind the camera
+    // (process killed, or the language or dark mode changed meanwhile) drops the photo as if
+    // cancelled. Turning the phone no longer recreates it (configChanges). Keeping shot.jpg for the
+    // next Today would save it, if that ever shows up in the wild.
     private var waiting: ((Uri?) -> Unit)? = null
 
     actual val cameraAvailable: Boolean

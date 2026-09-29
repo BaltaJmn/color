@@ -77,9 +77,20 @@ object ChromaRepository {
     private val writeLock = Mutex()
     private var saveJob: Job? = null
     private var written: JournalFile? = null
+    private var loaded = false
+
+    /**
+     * What the app, the receivers and a recreated Activity call. Once read, memory is ahead of the disk
+     * while a save waits out its debounce: reading again would drop that change and sweep away the
+     * photo it brought.
+     */
+    fun ensureLoaded() {
+        if (!loaded) load()
+    }
 
     /** Reads the journal, falling back to the backup, and never writes over a file it could not read. */
     fun load() {
+        loaded = true
         val main = Storage.read()
         var loaded = decode(main)
         var previous: String? = null

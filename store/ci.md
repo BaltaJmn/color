@@ -14,7 +14,8 @@ testers.
 
 1. Subir el `versionCode` en `androidApp/build.gradle.kts` (y `versionName` si toca).
 2. Reescribir `store/whatsnew/whatsnew-<idioma>` si cambia algo visible (tope 500).
-3. Commit, y la etiqueta:
+3. Mientras dure la prueba cerrada, su fila en `store/prueba-cerrada.md`.
+4. Commit, y la etiqueta:
 
 ```bash
 git tag v1.0 && git push origin v1.0

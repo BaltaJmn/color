@@ -451,10 +451,11 @@ prueba cerrada previa: **12 testers** con la prueba aceptada durante **14 días 
 5. Manda el enlace a los 12. Cada uno tiene que abrirlo, pulsar *Convertirme en tester* e instalar desde
    Play. Cuentan desde que aceptan; que no la desinstalen en esos 14 días.
 6. Durante la prueba, si arreglas algo, versión nueva con `versionCode` siguiente al mismo canal. No
-   reinicia el contador.
+   reinicia el contador. Cada versión y cada comentario de un tester se apuntan en
+   `prueba-cerrada.md`.
 7. Pasados los 14 días: *Panel > Solicitar acceso a producción*. Pregunta cómo reclutaste a los
-   testers, qué te dijeron y qué cambiaste. Respuestas cortas y sinceras. La revisión tarda hasta 7
-   días.
+   testers, qué te dijeron y qué cambiaste: el borrador está en `prueba-cerrada.md`. Respuestas
+   cortas y sinceras. La revisión tarda hasta 7 días.
 8. Con el acceso concedido: *Producción > Países y regiones* (todos), *Crear versión > Añadir de la
    biblioteca* > la última versión > *Guardar y publicar*. Puedes lanzar por fases (por ejemplo un 20 %)
    y subir al 100 % cuando veas que no hay fallos en *Android vitals*.

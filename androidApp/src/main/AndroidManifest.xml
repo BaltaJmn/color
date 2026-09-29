@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
+        android:name=".ChromaApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,8 +16,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Chroma">
 
+        <!-- Girar el movil no recrea la Activity: Compose se repinta solo, y recrearla perdia la foto
+             hecha en horizontal, devolvia a Hoy y volvia a pedir el bloqueo. El idioma y el modo oscuro
+             si la recrean, porque los textos y la barra de estado se leen al crearla. -->
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:exported="true"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize">

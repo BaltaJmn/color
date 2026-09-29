@@ -1,0 +1,48 @@
+# Prueba cerrada
+
+Lo que cambia mientras dura la prueba cerrada (canal *Alpha*), apuntado según se sube. Sirve para
+dos cosas: contestar a Play al pedir acceso a producción, que pregunta qué cambió a raíz de la prueba
+(`lanzamiento-play.md` 8), y contar en producción qué se arregló.
+
+Cada versión que sube a la prueba añade su fila aquí en el mismo commit que sube el `versionCode`.
+
+## Estado
+
+| | |
+|---|---|
+| Canal | Prueba cerrada - Alpha, grupo `chroma-testers` (`formularios.md` 3b) |
+| 12 testers con la prueba aceptada | Cumplido el 29-09-2026 |
+| 14 días seguidos | Como pronto el 13-10-2026 |
+| Fallos y ANR en Android vitals | 0 a 29-09-2026 |
+| Comentarios privados de testers en Play | 0 a 29-09-2026 |
+
+## Versiones
+
+| versionCode | Versión | Fecha | Qué cambió | De dónde salió |
+|---|---|---|---|---|
+| 3 | 1.0 | 24-09-2026 | Primera versión de la prueba cerrada: la misma 1.0 de la prueba interna. | - |
+| 4 | 1.0.1 | 24-09-2026 | Pide una valoración una sola vez, al llegar a 7 días con color. | Decisión propia |
+| 5 | 1.0.2 | 28-09-2026 | Los círculos de color se aplastaban en móviles estrechos. La foto de la cámara se perdía con el móvil justo de espacio (se escribía en la caché). El paywall prometía Amigos, que no llega hasta la v1.1. Compartir no enseñaba la vista previa de la tarjeta. | Probando la versión de la prueba el primer día |
+| 6 | 1.0.3 | 28-09-2026 | Lavado de cara: fecha en grande, barra de navegación flotante, ajustes por grupos y widgets nuevos. La vista previa del widget del año no cargaba en el selector. | Decisión propia: la app se sentía sosa, y los testers tenían que valorar la de verdad |
+| 7 | 1.0.4 | 29-09-2026 | La foto hecha con el móvil en horizontal se perdía al volver de la cámara. Girar el móvil devolvía a Hoy y volvía a pedir el desbloqueo. El widget de Hoy enseñaba "Can't show content" cuando Android arrancaba la app solo para refrescarlo. Un recordatorio o un cambio de hora con la app abierta podía llevarse el último cambio sin guardar y la foto recién hecha. | Revisión del código antes de subir versión; los tres primeros reproducidos en el emulador |
+
+## Comentarios de los testers
+
+Llegan por los comentarios privados de Play (*Valoraciones y reseñas > Comentarios de pruebas*), por
+`baltajmn@gmail.com` y por los hilos del intercambio de pruebas. Una línea por comentario: fecha, qué
+dijo (sin nombre) y qué se hizo.
+
+Ninguno a 29-09-2026.
+
+## Para la solicitud de acceso a producción
+
+Borrador de las respuestas, que se termina al pedir el acceso con lo que haya arriba.
+
+- **Cómo se reclutó a los testers:** intercambio de pruebas con otros desarrolladores, en grupos de
+  Google y por correo. Cada tester entra en el grupo `chroma-testers` y acepta la prueba desde el
+  enlace de Play.
+- **Qué cambió a raíz de la prueba:** las filas de la tabla desde el `versionCode` 4, en una frase cada
+  una.
+- **Por qué está lista:** los fallos y ANR de Android vitals durante la prueba (comprobarlos al pedir
+  el acceso), los tests comunes en verde en cada versión, y cada fallo arreglado reproducido antes en
+  el emulador y comprobado después con la versión nueva.

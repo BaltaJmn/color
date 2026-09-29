@@ -1,4 +1,3 @@
-- Nouveau look : la date en grand, des cartes plus nettes et une nouvelle barre de navigation.
-- Réglages regroupés par sections, avec une icône pour chaque option.
-- Widgets repensés : le jour en haut, la couleur et son code en bas.
-- L'aperçu du widget de l'année s'affiche maintenant quand tu l'ajoutes.
+- Les photos prises avec le téléphone à l'horizontale ne se perdent plus.
+- Tourner le téléphone ne te renvoie plus à Aujourd'hui et ne te demande plus de déverrouiller à nouveau.
+- Le widget La couleur du jour n'affiche plus d'erreur quand tu n'as pas ouvert l'app depuis un moment.

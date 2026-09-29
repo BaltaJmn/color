@@ -91,7 +91,7 @@ val RELOCK_AFTER = 60.seconds
 @Composable
 fun App() {
     remember {
-        ChromaRepository.load()
+        ChromaRepository.ensureLoaded()
         Billing.configure()
         // Whatever was saved and shared goes out after the save, never before it.
         ChromaRepository.afterSave += { Outbox.kick() }

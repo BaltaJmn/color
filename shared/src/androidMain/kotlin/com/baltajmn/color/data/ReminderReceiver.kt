@@ -21,8 +21,7 @@ private const val NOTIFICATION_ID = 1
 /** Fires the daily nudge unless the day already has its color, then books the next one. */
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        AndroidContext.init(context)
-        ChromaRepository.load()
+        ChromaRepository.ensureLoaded()
         if (ChromaRepository.entryOn(today()) == null) notify(context)
         Reminder.sync(askPermission = false)
     }
@@ -58,8 +57,7 @@ class ReminderReceiver : BroadcastReceiver() {
 /** Alarms do not survive a reboot, a reinstall or a change of clock, so book it again. */
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        AndroidContext.init(context)
-        ChromaRepository.load()
+        ChromaRepository.ensureLoaded()
         Reminder.sync(askPermission = false)
     }
 }
