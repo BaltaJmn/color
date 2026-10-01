@@ -19,6 +19,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 
 private const val JPEG_QUALITY = 85
+private const val LEFTOVER_MS = 15 * 60_000L
 
 actual object Capture {
 
@@ -26,13 +27,12 @@ actual object Capture {
     var launchCamera: ((Uri) -> Unit)? = null
     var launchGallery: (() -> Unit)? = null
 
-    // The answer comes back to the Activity, and what is waiting for it lives here.
-    //
-    // ponytail: the wait belongs to Today's composition, so an Activity recreated behind the camera
-    // (process killed, or the language or dark mode changed meanwhile) drops the photo as if
-    // cancelled. Turning the phone no longer recreates it (configChanges). Keeping shot.jpg for the
-    // next Today would save it, if that ever shows up in the wild.
+    // The answer comes back to the Activity, and what is waiting for it lives here. The wait belongs
+    // to Today's composition, so a process killed behind the camera (or an Activity rebuilt, say by
+    // a language change) finds nobody waiting: shot.jpg stays, and leftover() hands it to the next
+    // Today instead of losing the photo of the moment.
     private var waiting: ((Uri?) -> Unit)? = null
+    private var shooting = false
 
     // A camera is not enough: a work profile or a disabled camera app leaves nobody to answer the
     // intent. Seeing that answer needs the <queries> entry in the manifest. Asked once per process,
@@ -61,12 +61,33 @@ actual object Capture {
         val launch = launchCamera ?: return null
         val file = shot.apply { delete() }
         val uri = FileProvider.getUriForFile(AndroidContext.value, "${AndroidContext.value.packageName}.fileprovider", file)
-        val answer = await { launch(uri) }
-        if (launchFailed) cameraFailed = true
-        if (answer == null) return null
+        shooting = true
+        try {
+            val answer = await { launch(uri) }
+            if (launchFailed) cameraFailed = true
+            if (answer == null) {
+                // A cancel, not the process dying behind the camera: some cameras leave the photo
+                // anyway, and leftover() must not bring back what the user threw away.
+                file.delete()
+                return null
+            }
+            return withContext(Dispatchers.IO) {
+                runCatching { process { AndroidContext.value.contentResolver.openInputStream(answer) } }.getOrNull()
+                    .also { file.delete() }
+            }
+        } finally {
+            shooting = false
+        }
+    }
+
+    actual suspend fun leftover(): Picked? {
+        if (shooting || waiting != null) return null
+        val file = shot
+        if (!file.exists()) return null
+        // An old one is a photo the user already gave up on.
+        val fresh = file.length() > 0 && System.currentTimeMillis() - file.lastModified() in 0..LEFTOVER_MS
         return withContext(Dispatchers.IO) {
-            runCatching { process { AndroidContext.value.contentResolver.openInputStream(answer) } }.getOrNull()
-                .also { file.delete() }
+            (if (fresh) runCatching { process { file.inputStream() } }.getOrNull() else null).also { file.delete() }
         }
     }
 

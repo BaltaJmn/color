@@ -53,8 +53,26 @@ actual object Storage {
 
     actual fun quarantinedCount(): Int = corrupt.list()?.count { it.endsWith(".json") } ?: 0
 
+    actual fun readPending(): String? = temp.textOrNull()
+
+    actual fun promotePending() {
+        if (!temp.renameTo(file)) error("could not move the pending write into place")
+    }
+
+    // Written aside and renamed, like the journal: a full disk or a power cut leaves no half photo
+    // under a name the journal may already point at, and the space goes back at once.
     actual fun writePhoto(name: String, bytes: ByteArray) {
-        File(photos, name).writeBytes(bytes)
+        val part = File(photos, "$name.part")
+        try {
+            FileOutputStream(part).use {
+                it.write(bytes)
+                it.fd.sync()
+            }
+            if (!part.renameTo(File(photos, name))) error("could not move the photo into place")
+        } catch (e: Exception) {
+            part.delete()
+            throw e
+        }
     }
 
     actual fun readPhoto(name: String): ByteArray? =

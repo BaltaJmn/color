@@ -5,19 +5,33 @@ import androidx.compose.ui.graphics.ImageBitmap
 /** Decode a JPEG that came from the camera, the gallery or photos/. */
 expect fun decodeImage(bytes: ByteArray): ImageBitmap?
 
-/** Decoded photos, kept in memory so a day that is drawn twice is not read from disk twice. */
+/** Photos kept decoded: about 3.5 MB each, so enough for a few screens and not a year of them. */
+private const val PHOTOS_KEPT = 12
+
+/**
+ * Decoded photos, kept in memory so a day that is drawn twice is not read from disk twice. The
+ * least recently drawn goes first.
+ *
+ * ponytail: decoded on the thread that draws, a short stall the first time a day opens. Loading
+ * off it would need a placeholder and a fade, if the stall ever shows on slow phones.
+ */
 object Photos {
-    private val cache = mutableMapOf<String, ImageBitmap?>()
+    private val cache = LinkedHashMap<String, ImageBitmap?>()
 
     fun get(name: String?): ImageBitmap? {
         if (name == null) return null
         // containsKey, not getOrPut: a photo whose file went missing has to be remembered as
         // missing, or every frame goes back to the disk looking for it.
-        if (cache.containsKey(name)) return cache[name]
+        if (cache.containsKey(name)) {
+            val hit = cache.remove(name)
+            cache[name] = hit
+            return hit
+        }
         // A read that fails is drawn as no photo and tried again next time, never a crash mid-frame.
         val bytes = runCatching { Storage.readPhoto(name) }.getOrElse { return null }
         val decoded = bytes?.let(::decodeImage)
         cache[name] = decoded
+        if (cache.size > PHOTOS_KEPT) cache.remove(cache.keys.first())
         return decoded
     }
 

@@ -96,7 +96,7 @@ fun TodayScreen(
 ) {
     val journal = ChromaRepository.journal
     val entry = journal[today.isoKey()]
-    var pending by remember(today) { mutableStateOf<Pending?>(null) }
+    var pending by remember { mutableStateOf<Pending?>(null) }
     var notice by remember { mutableStateOf<String?>(null) }
     var working by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
@@ -107,7 +107,6 @@ fun TodayScreen(
 
     fun capture(from: suspend () -> Picked?) {
         if (working) return
-        Trip.start()
         scope.launch {
             working = true
             val picked = from()
@@ -121,7 +120,8 @@ fun TodayScreen(
             working = false
             when {
                 picked == null -> if (Capture.launchFailed) notice = S.captureFailed
-                !isFromToday(picked.takenOn, today) -> notice = S.galleryNotToday
+                // 03:00 passed while the camera was open: the photo belongs to the day that ended.
+                !isFromToday(picked.takenOn, today) || !ChromaRepository.isStillToday(today) -> notice = S.galleryNotToday
                 result == null || result.swatches.isEmpty() -> notice = S.photoUnreadable
                 else -> pending = result
             }
@@ -133,10 +133,22 @@ fun TodayScreen(
         if (Capture.cameraDenied) {
             cameraDenied = true
         } else {
+            Trip.start()
             capture { Capture.camera().also { if (it == null && Capture.cameraDenied) cameraDenied = true } }
         }
     }
-    val gallery = { capture { Capture.gallery() } }
+    val gallery = {
+        Trip.start()
+        capture { Capture.gallery() }
+    }
+    LaunchedEffect(Unit) { capture { Capture.leftover() } }
+    // A photo still waiting for its color when the day turns is yesterday's: dropped, and said.
+    LaunchedEffect(today) {
+        if (pending != null) {
+            pending = null
+            notice = S.galleryNotToday
+        }
+    }
 
     Column(
         Modifier.fillMaxSize().screenInsets().verticalScroll(rememberScrollState()),
@@ -195,21 +207,29 @@ fun TodayScreen(
             val waiting = pending
             when {
                 waiting != null -> Picking(waiting, onPick = { hex ->
-                    ChromaRepository.pick(hex, waiting.swatches, nearestName(hex).key, waiting.jpeg)
+                    // The day turns at 03:00 up to a minute before App notices: the photo is then
+                    // yesterday's, and says so like one from the gallery.
+                    if (ChromaRepository.isStillToday(today)) {
+                        ChromaRepository.pick(today, hex, waiting.swatches, nearestName(hex).key, waiting.jpeg) {
+                            notice = S.photoNotSaved
+                        }
+                        justPicked = true
+                    } else {
+                        notice = S.galleryNotToday
+                    }
                     pending = null
-                    justPicked = true
                 }, onCancel = { pending = null })
                 entry != null -> {
                     ChromaCard(entry, today, onPhoto = onPhoto, reveal = justPicked) { WeekMark(entry.color, today) }
                     Spacer(Modifier.height(20.dp))
                     SwatchRow(entry.swatches, entry.color, 40.dp) { hex ->
-                        ChromaRepository.pick(hex, entry.swatches, nearestName(hex).key)
+                        ChromaRepository.pick(today, hex, entry.swatches, nearestName(hex).key)
                     }
                     Spacer(Modifier.height(12.dp))
                     WordField(today, entry.word)
                     if (Social.available && Social.me != null) {
                         Spacer(Modifier.height(20.dp))
-                        ShareSwitch(entry.share, entry.photo != null) { ChromaRepository.setShare(it) }
+                        ShareSwitch(entry.share, entry.photo != null) { ChromaRepository.setShare(today, it) }
                     }
                 }
                 else -> Empty(
@@ -341,7 +361,7 @@ private fun WordField(today: LocalDate, word: String?) {
                 onValueChange = { next ->
                     val edit = limitEdit(value.text, next.text, next.selection.end, WORD_MAX)
                     value = if (edit.text == next.text) next else TextFieldValue(edit.text, TextRange(edit.cursor))
-                    ChromaRepository.setWord(edit.text)
+                    ChromaRepository.setWord(today, edit.text)
                 },
                 singleLine = true,
                 textStyle = Styles.body,

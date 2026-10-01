@@ -41,12 +41,54 @@ class StorageTest {
         ChromaRepository.load()
 
         assertEquals("#3A6EA5", ChromaRepository.journal["2026-09-22"]?.color)
-        assertFalse(ChromaRepository.corrupt)
         assertEquals(good, File(dir, "entries.json").readText())
         assertEquals(good, File(dir, "entries.bak.json").readText())
-        // The unreadable one is kept, and so is a photo only it could have pointed at.
+        // The unreadable one went aside before the backup took its place, the user is told, and a
+        // photo only it could have pointed at is kept.
         assertEquals(listOf("not json"), File(dir, "corrupt").listFiles().orEmpty().map { it.readText() })
+        assertTrue(ChromaRepository.corrupt)
         assertTrue("p-newest.jpg" in Storage.listPhotos())
+    }
+
+    @Test
+    fun aCountBroughtFromAnotherPhoneDoesNotHideANewQuarantine() {
+        // Restored from the cloud: the settings remember two files left in the old phone's corrupt/.
+        File(dir, "entries.json").writeText("not json")
+        File(dir, "entries.bak.json").writeText("""{"version":1,"entries":{},"settings":{"quarantineSeen":2}}""")
+
+        ChromaRepository.load()
+
+        assertTrue(ChromaRepository.corrupt)
+    }
+
+    @Test
+    fun aCutBetweenTheTwoRenamesKeepsTheNewestWrite() {
+        // Main already moved to .bak, the new version whole in the temp file.
+        val newest = """{"version":1,"entries":{"2026-09-23":{"color":"#112233","name":"x"}}}"""
+        File(dir, "entries.bak.json").writeText(good)
+        File(dir, "entries.tmp.json").writeText(newest)
+
+        ChromaRepository.load()
+
+        assertEquals("#112233", ChromaRepository.journal["2026-09-23"]?.color)
+        assertFalse(ChromaRepository.corrupt)
+        assertTrue(File(dir, "entries.json").exists())
+    }
+
+    @Test
+    fun photosAreNotSweptOnceAnythingWasQuarantined() {
+        File(dir, "entries.json").writeText("garbage one")
+        File(dir, "entries.bak.json").writeText("garbage two")
+        Storage.writePhoto("p-0000000a.jpg", byteArrayOf(1))
+        ChromaRepository.load()
+        // A new journal written over the empty start, as after the first new day.
+        File(dir, "entries.json").writeText(good)
+
+        ChromaRepository.load()
+
+        assertEquals(listOf("p-0000000a.jpg"), Storage.listPhotos())
+        // Read from the disk, so a fresh process still tells the user.
+        assertTrue(ChromaRepository.corrupt)
     }
 
     @Test

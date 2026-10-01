@@ -57,11 +57,16 @@ actual object Sharing {
             put(MediaStore.Images.Media.DISPLAY_NAME, "chroma-${System.currentTimeMillis()}.png")
             put(MediaStore.Images.Media.MIME_TYPE, "image/png")
             put(MediaStore.Images.Media.RELATIVE_PATH, "${Environment.DIRECTORY_PICTURES}/Chroma")
+            // Hidden from the gallery until it is whole: a full disk would leave an empty image there.
+            put(MediaStore.Images.Media.IS_PENDING, 1)
         }
         val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
         if (uri == null) return onResult(false)
-        onResult(
-            runCatching { resolver.openOutputStream(uri)?.use { it.write(png) } ?: error("no stream") }.isSuccess,
-        )
+        val ok = runCatching {
+            resolver.openOutputStream(uri)?.use { it.write(png) } ?: error("no stream")
+            check(resolver.update(uri, ContentValues().apply { put(MediaStore.Images.Media.IS_PENDING, 0) }, null, null) > 0)
+        }.isSuccess
+        if (!ok) runCatching { resolver.delete(uri, null, null) }
+        onResult(ok)
     }
 }

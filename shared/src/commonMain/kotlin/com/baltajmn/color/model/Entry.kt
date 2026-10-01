@@ -55,6 +55,8 @@ data class Settings(
     val hiddenCards: List<String> = emptyList(),
     /** The once-ever in-app rating prompt already fired. Never reset, even if it failed to show. */
     val reviewRequested: Boolean = false,
+    /** Files in corrupt/ the user was already told about: more than this shows the notice again. */
+    val quarantineSeen: Int = 0,
 )
 
 /** Local ISO date ("2026-09-22") of the logical day to its entry. */

@@ -90,7 +90,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var pending by remember { mutableStateOf<Pair<MergeResult, Set<String>>?>(null) }
     // Title and text together: an export that fails is not an import that fails.
     var failure by remember { mutableStateOf<Pair<String?, String>?>(null) }
-    var imported by remember { mutableStateOf<Int?>(null) }
+    var imported by remember { mutableStateOf<Pair<Int, Int>?>(null) }
     var restoring by remember { mutableStateOf(false) }
     var restored by remember { mutableStateOf<String?>(null) }
     var renaming by remember { mutableStateOf(false) }
@@ -212,7 +212,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                                     failure = S.importFailedTitle to S.importDamaged
                                 }
                                 else -> answer.fold(
-                                    onSuccess = { pending = merge(ChromaRepository.journal, it.journal) to it.photos },
+                                    onSuccess = { pending = merge(ChromaRepository.journal, it.journal, ChromaRepository.missingPhotos()) to it.photos },
                                     onFailure = {
                                         // The photos it had already parked go with the refusal.
                                         abandonImport()
@@ -267,9 +267,11 @@ fun SettingsScreen(onBack: () -> Unit) {
     }
 
     pending?.let { (result, delivered) ->
+        // Only a photo the zip actually carries comes back.
+        val photosBack = result.recovered.values.count { it in delivered }
         Ask(
             title = S.importTitle,
-            text = S.importSummary(result.added, result.kept),
+            text = S.importSummary(result.added, result.kept, photosBack),
             // The button says so while the photos are copied and the journal rewritten.
             confirm = if (applying) S.working else S.importAction,
             onConfirm = {
@@ -277,7 +279,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                     applying = true
                     ChromaRepository.applyImport(result, delivered) {
                         applying = false
-                        imported = result.added
+                        imported = result.added to photosBack
                         pending = null
                     }
                 }
@@ -340,7 +342,7 @@ fun SettingsScreen(onBack: () -> Unit) {
 
     failure?.let { (title, text) -> Ask(title = title, text = text, confirm = S.ok, onConfirm = { failure = null }) }
 
-    imported?.let { n -> Ask(title = S.importTitle, text = S.importDone(n), confirm = S.ok, onConfirm = { imported = null }) }
+    imported?.let { (days, photos) -> Ask(title = S.importTitle, text = S.importDone(days, photos), confirm = S.ok, onConfirm = { imported = null }) }
 
     if (pickTime) {
         TimeDialog(settings.reminderHour, settings.reminderMinute, onDismiss = { pickTime = false }) { h, m ->

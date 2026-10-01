@@ -29,6 +29,15 @@ expect object Storage {
     /** Journal files waiting in corrupt/. They are the user's and nothing ever deletes them. */
     fun quarantinedCount(): Int
 
+    /**
+     * The newest complete write when a cut fell between the two renames of [write] (Android's
+     * entries.tmp.json). Null on iOS, where a write is a single atomic replace.
+     */
+    fun readPending(): String?
+
+    /** Renames that pending write into place, never rewriting it: it is the only complete copy. */
+    fun promotePending()
+
     fun writePhoto(name: String, bytes: ByteArray)
     fun readPhoto(name: String): ByteArray?
     fun deletePhoto(name: String)

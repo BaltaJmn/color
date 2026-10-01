@@ -66,7 +66,10 @@ object ChromaRepository {
     var saveFailed by mutableStateOf(false)
         private set
 
-    /** Neither file could be read. Both were moved aside and the journal starts empty. */
+    /**
+     * A file could not be read and went to corrupt/. Read from the disk and not only remembered: a
+     * receiver may be the one that found it, in a process that dies before the user looks.
+     */
     var corrupt by mutableStateOf(false)
         private set
 
@@ -91,9 +94,17 @@ object ChromaRepository {
     /** Reads the journal, falling back to the backup, and never writes over a file it could not read. */
     fun load() {
         loaded = true
+        // Counted before anything moves: a journal restored on a new phone remembers files that
+        // stayed in the old phone's corrupt/, and a new one here would not look new against them.
+        val before = Storage.quarantinedCount()
         val main = Storage.read()
         var loaded = decode(main)
         var previous: String? = null
+        if (loaded == null && main == null) {
+            // A cut between the two renames of a write: the newest version is still whole.
+            loaded = decode(Storage.readPending())
+            if (loaded != null) runCatching { Storage.promotePending() }
+        }
         if (loaded == null) {
             previous = Storage.readPrevious()
             loaded = decode(previous)
@@ -105,7 +116,6 @@ object ChromaRepository {
                 }
             }
         }
-        corrupt = false
         when {
             loaded != null -> {
                 file = loaded
@@ -115,15 +125,22 @@ object ChromaRepository {
             else -> {
                 Storage.quarantine()
                 file = JournalFile()
-                corrupt = true
             }
         }
+        val seen = minOf(file.settings.quarantineSeen, before)
+        if (seen != file.settings.quarantineSeen) {
+            file = file.copy(settings = file.settings.copy(quarantineSeen = seen))
+            runCatching { Storage.write(encode(file)) }
+        }
+        corrupt = Storage.quarantinedCount() > seen
         written = file
         syncWidgets(file)
     }
 
     fun dismissCorrupt() {
         corrupt = false
+        val seen = Storage.quarantinedCount()
+        updateSettings { it.copy(quarantineSeen = seen) }
     }
 
     fun edit(change: (JournalFile) -> JournalFile) {
@@ -165,16 +182,22 @@ object ChromaRepository {
 
     fun entryOn(date: LocalDate): ChromaEntry? = journal[date.isoKey()]
 
+    /** False once 03:00 has passed since [date] was shown: the screen showing it is a day behind. */
+    fun isStillToday(date: LocalDate): Boolean = date == today()
+
     /**
-     * Today's pick. With [jpeg], a new photo replaces today's: it is stored under a name nobody used
-     * before, so a cached image is never served for a photo that was replaced, and the old file goes
-     * when the save lands. Without it, only the color changes.
+     * The pick for [date], the day the screen shows; written only while it is still today, so a
+     * screen left open across 03:00 cannot write into a day it is not showing. With [jpeg], a new
+     * photo replaces today's: it is stored under a name nobody used before, so a cached image is never
+     * served for a photo that was replaced, and the old file goes when the save lands. Without it, only
+     * the color changes. If the photo does not fit on the disk, a first pick keeps its color without
+     * it, a retake leaves the day as it was, and [onPhotoFailed] says so.
      */
-    fun pick(color: String, swatches: List<String>, name: String, jpeg: ByteArray? = null) {
-        val day = today()
-        val key = day.isoKey()
+    fun pick(date: LocalDate, color: String, swatches: List<String>, name: String, jpeg: ByteArray? = null, onPhotoFailed: () -> Unit = {}) {
+        val key = date.isoKey()
+        if (!isStillToday(date)) return
         if (jpeg == null) {
-            val next = journal.withPick(key, key, color, swatches, name, nowMillis(), settings.defaultShare) ?: return
+            val next = journal.withPick(key, today().isoKey(), color, swatches, name, nowMillis(), settings.defaultShare) ?: return
             edit { it.copy(entries = next) }
             return
         }
@@ -185,10 +208,13 @@ object ChromaRepository {
                 if (runCatching { Storage.writePhoto(free, jpeg) }.isSuccess) free else null
             }
             if (photo == null) {
-                saveFailed = true
+                onPhotoFailed()
+                if (key !in journal) pick(date, color, swatches, name)
                 return@launch
             }
             edit { f ->
+                // 03:00 may have passed while the photo was written: then the day is not touched.
+                if (key != today().isoKey()) return@edit f
                 val picked = f.entries.withPick(key, key, color, swatches, name, nowMillis(), f.settings.defaultShare)
                     ?: f.entries
                 val entry = picked[key] ?: return@edit f
@@ -198,14 +224,14 @@ object ChromaRepository {
         }
     }
 
-    fun setWord(word: String) {
-        val key = today().isoKey()
-        val next = journal.withWord(key, key, word, nowMillis()) ?: return
+    fun setWord(date: LocalDate, word: String) {
+        val next = journal.withWord(date.isoKey(), today().isoKey(), word, nowMillis()) ?: return
         edit { it.copy(entries = next) }
     }
 
-    fun setShare(share: Share) {
-        val key = today().isoKey()
+    fun setShare(date: LocalDate, share: Share) {
+        val key = date.isoKey()
+        if (date != today()) return
         val entry = journal[key] ?: return
         if (entry.share == share) return
         edit { it.copy(entries = it.entries + (key to entry.copy(share = share, at = nowMillis()))) }
@@ -216,6 +242,9 @@ object ChromaRepository {
         journal[key]?.photo?.let(Photos::forget)
         if (key in journal) edit { it.copy(entries = it.entries - key) }
     }
+
+    /** Photos the journal points at and the disk does not have: what a zip can bring back (merge). */
+    fun missingPhotos(): Set<String> = photosOf(file) - Storage.listPhotos().toSet()
 
     /** Asked once, a month in, and never again after a backup or after being waved away. */
     fun needsBackupNotice(today: LocalDate): Boolean {
@@ -244,8 +273,14 @@ object ChromaRepository {
             }
             val merged = result.journal.mapValues { (key, entry) ->
                 val photo = entry.photo
-                // Named but not delivered: the color is kept, the photo that does not exist is not.
-                if (key in before || photo == null) entry else entry.copy(photo = renamed[photo])
+                val back = result.recovered[key]?.let(renamed::get)
+                when {
+                    // A day of this phone getting back the photo it lost: only the photo changes.
+                    back != null -> entry.copy(photo = back)
+                    // Named but not delivered: the color is kept, the photo that does not exist is not.
+                    key in before || photo == null -> entry
+                    else -> entry.copy(photo = renamed[photo])
+                }
             }
             edit { it.copy(entries = merged) }
             flush()

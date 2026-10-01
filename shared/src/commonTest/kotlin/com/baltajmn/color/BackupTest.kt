@@ -23,25 +23,51 @@ class BackupTest {
     // 11. Merge. docs/tecnico.md 4.3
     @Test
     fun theDayOfThisPhoneWinsAndOnlyNewDaysBringPhotos() {
-        val device = mapOf("2027-01-17" to entry("#3A6EA5", photo = "p-1.jpg"))
+        val device = mapOf("2026-01-17" to entry("#3A6EA5", photo = "p-1.jpg"))
         val incoming = mapOf(
-            "2027-01-17" to entry("#EFE8DA", photo = "p-2.jpg"),
-            "2027-01-18" to entry("#112233", photo = "p-3.jpg"),
+            "2026-01-17" to entry("#EFE8DA", photo = "p-2.jpg"),
+            "2026-01-18" to entry("#112233", photo = "p-3.jpg"),
         )
         val r = merge(device, incoming)
-        assertEquals("#3A6EA5", r.journal.getValue("2027-01-17").color)
-        assertEquals("#112233", r.journal.getValue("2027-01-18").color)
+        assertEquals("#3A6EA5", r.journal.getValue("2026-01-17").color)
+        assertEquals("#112233", r.journal.getValue("2026-01-18").color)
         assertEquals(1, r.added)
         assertEquals(1, r.kept)
         assertEquals(setOf("p-3.jpg"), r.photosFromIncoming)
     }
 
     @Test
+    fun aDayWhosePhotoFileIsGoneTakesTheBackupsPhotoAndNothingElse() {
+        // Restored from the cloud copy, which carries the days but not the photos.
+        val device = mapOf(
+            "2026-01-17" to entry("#3A6EA5", photo = "p-1.jpg"),
+            "2026-01-18" to entry("#445566", photo = "p-4.jpg"),
+        )
+        val incoming = mapOf(
+            "2026-01-17" to entry("#EFE8DA", photo = "p-1.jpg"),
+            "2026-01-18" to entry("#778899", photo = "p-5.jpg"),
+        )
+        val r = merge(device, incoming, missing = setOf("p-1.jpg"))
+        assertEquals(mapOf("2026-01-17" to "p-1.jpg"), r.recovered)
+        assertEquals(setOf("p-1.jpg"), r.photosFromIncoming)
+        assertEquals("#3A6EA5", r.journal.getValue("2026-01-17").color)
+        assertEquals(0, r.added)
+    }
+
+    @Test
+    fun aDayFromTheFutureIsLeftOut() {
+        val backup = readBackup(
+            sourceOf("""{"version":1,"entries":{"2026-01-17":{"color":"#3A6EA5","name":"x"},"2999-01-01":{"color":"#3A6EA5","name":"x"}}}"""),
+        )
+        assertEquals(setOf("2026-01-17"), backup.journal.keys)
+    }
+
+    @Test
     fun anImportedDayArrivesPrivateAndUpperCase() {
         val backup = readBackup(
-            sourceOf("""{"version":1,"entries":{"2027-01-17":{"color":"#3a6ea5","swatches":["#3a6ea5"],"name":"storm_blue","share":"photo"}}}"""),
+            sourceOf("""{"version":1,"entries":{"2026-01-17":{"color":"#3a6ea5","swatches":["#3a6ea5"],"name":"storm_blue","share":"photo"}}}"""),
         )
-        val day = backup.journal.getValue("2027-01-17")
+        val day = backup.journal.getValue("2026-01-17")
         assertEquals(Share.Private, day.share)
         assertEquals("#3A6EA5", day.color)
         assertEquals(listOf("#3A6EA5"), day.swatches)
@@ -54,18 +80,18 @@ class BackupTest {
         assertEquals(ImportProblem.NotBackup, refusal("""{"version":[1],"entries":{}}"""))
         assertEquals(ImportProblem.NotBackup, refusal("not a file at all"))
         // A Purl backup: same shape, days without a color.
-        assertEquals(ImportProblem.NotBackup, refusal("""{"version":1,"entries":{"2027-01-17":{"text":"Cafe"}}}"""))
+        assertEquals(ImportProblem.NotBackup, refusal("""{"version":1,"entries":{"2026-01-17":{"text":"Cafe"}}}"""))
     }
 
     @Test
     fun aBackupThatCannotBePaintedIsRefusedWhole() {
-        assertEquals(ImportProblem.TooNew, refusal("""{"version":99,"entries":{"2027-01-17":{"color":"#112233","name":"x"}}}"""))
+        assertEquals(ImportProblem.TooNew, refusal("""{"version":99,"entries":{"2026-01-17":{"color":"#112233","name":"x"}}}"""))
         assertEquals(ImportProblem.Empty, refusal("""{"version":1,"entries":{}}"""))
         assertEquals(ImportProblem.Damaged, refusal("""{"version":1,"entries":{"manana":{"color":"#112233","name":"x"}}}"""))
-        assertEquals(ImportProblem.Damaged, refusal("""{"version":1,"entries":{"2027-01-17":{"color":"red","name":"x"}}}"""))
+        assertEquals(ImportProblem.Damaged, refusal("""{"version":1,"entries":{"2026-01-17":{"color":"red","name":"x"}}}"""))
         assertEquals(
             ImportProblem.Damaged,
-            refusal("""{"version":1,"entries":{"2027-01-17":{"color":"#112233","name":"x","photo":"../entries.json"}}}"""),
+            refusal("""{"version":1,"entries":{"2026-01-17":{"color":"#112233","name":"x","photo":"../entries.json"}}}"""),
         )
     }
 

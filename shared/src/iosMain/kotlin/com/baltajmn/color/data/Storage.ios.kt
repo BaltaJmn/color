@@ -89,6 +89,10 @@ actual object Storage {
     actual fun quarantinedCount(): Int =
         fm.contentsOfDirectoryAtPath(corruptDir, null)?.filterIsInstance<String>()?.count { it.endsWith(".json") } ?: 0
 
+    actual fun readPending(): String? = null
+
+    actual fun promotePending() = Unit
+
     actual fun writePhoto(name: String, bytes: ByteArray) = writeAtomically("$photosDir/$name", bytes)
 
     actual fun readPhoto(name: String): ByteArray? = NSData.dataWithContentsOfFile("$photosDir/$name")?.toByteArray()

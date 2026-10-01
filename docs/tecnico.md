@@ -154,15 +154,27 @@ data class ChromaEntry(
   `lastBackup`, `backupNoticeDone`, `pro` (como Purl), más `defaultShare: Share = Private`,
   `shareAsked: Boolean`, `weekColorOn: Boolean = true`, `watermark: Boolean = true`,
   `hiddenCards: List<String>` (`<author>/<day>` de cada día reportado: oculto para siempre, porque
-  los reportes no se pueden leer desde la app).
+  los reportes no se pueden leer desde la app), `quarantineSeen: Int` (ficheros de `corrupt/` de los
+  que el usuario ya fue avisado).
 - `JournalJson`: `ignoreUnknownKeys`, sin valores por defecto ni nulos explícitos. Igual que Purl.
 - `entries.bak.json`, cuarentena en `corrupt/` y un único escritor con rebote de 800 ms: Purl 6.12,
-  con dos diferencias (1.0.6):
+  con cuatro diferencias (1.0.6 y 1.0.7):
   - Si `entries.json` no se lee y la `.bak` sí, el ilegible va a `corrupt/` antes de restaurar la
     `.bak` en su sitio; Purl lo pisaba. Si no se puede apartar, tampoco se restaura.
+  - En Android, sin `entries.json` y con `entries.tmp.json` legible (un corte entre los dos renombres
+    de la escritura), se toma ese, que es la última escritura completa, y se renombra a su sitio sin
+    reescribirlo.
+  - El aviso `noticeCorrupt` sale mientras `corrupt/` tenga más ficheros que `quarantineSeen`: se lee
+    del disco, porque puede haberlo encontrado un receiver en un proceso que muere antes de que el
+    usuario abra la app. Si `quarantineSeen` es mayor que lo que había en `corrupt/` (un diario
+    restaurado en otro móvil, sin su `corrupt/`), se baja antes de comparar.
   - El barrido de fotos huérfanas solo corre con el diario leído del principal y nada en `corrupt/`:
     si no, esas fotos pueden ser de los días del fichero que no se leyó. Los borrados normales los
     hace la escritura, no el barrido.
+- Las fotos se escriben aparte (`.part`) y se renombran, como el diario: un disco lleno no deja media
+  foto. Si no cabe, una primera elección guarda el color sin foto, rehacer la foto deja el día como
+  estaba, y Hoy lo avisa (`photoNotSaved`).
+- `Photos` guarda decodificadas las 12 últimas fotos dibujadas, no todas: cada una son unos 3,5 MB.
 
 ### 4.2 `widget.json`
 
@@ -185,6 +197,14 @@ Zip STORED con CRC32 (Purl 6.9): `entries.json` con `ExportFile(version, entries
 Importar **fusiona**: un día que solo está en la copia entra; un día que está en los dos se queda
 con el del teléfono. Nunca se borra nada. `share` se importa siempre como `private`: un día no se
 publica por restaurar una copia.
+
+Una excepción, solo para la foto: un día del teléfono cuyo fichero de foto no existe toma la foto de
+la copia, sin tocar color, palabra ni `share`. Es el móvil restaurado desde la copia en la nube de
+Android, que lleva los días y no las fotos; sin esto, el zip no las devolvía nunca. El resumen y el
+aviso final cuentan las fotos recuperadas.
+
+Los días posteriores a mañana se descartan al leer la copia: son un reloj mal puesto donde se hizo,
+o un fichero escrito a mano, y abrirían un año que no existe y callarían el aviso de ese día.
 
 Antes de fusionar se comprueba la forma a mano: `version` numérica y no mayor que la nuestra,
 `entries` no vacío, fechas válidas y colores `#RRGGBB` (un color mal escrito rompería la primera
@@ -228,6 +248,16 @@ Al mes del primer día, si nunca se hizo copia, Hoy lo ofrece una vez (`noticeBa
 `logicalDate` de Purl: la hora local se compara con 03:00, nunca un instante menos tres horas. Solo
 existe una entrada editable, la de `today()`. Un día pasado se ve pero no se cambia; se puede borrar
 entero.
+
+Las escrituras (`pick`, `setWord`, `setShare`) reciben el día que la pantalla enseña y solo escriben
+si sigue siendo `today()`: con la app abierta al pasar las 03:00, tocar un color escribía en el día
+siguiente, que la pantalla no enseñaba. `App` mira cada minuto si el día cambió y pasa al nuevo. Una
+foto que vuelve de la cámara después de las 03:00 es del día que acabó y se rechaza como las de la
+galería (`galleryNotToday`), y lo mismo una que espera su color cuando cambia el día.
+
+En Android, si el proceso muere con la cámara abierta (o la Activity se rehace), nadie espera la
+foto: `shot.jpg` se queda en `capture/` y `Capture.leftover()` se la da al siguiente Hoy si tiene
+menos de 15 minutos. Cancelar la cámara sí lo borra: algunas lo dejan escrito aunque se cancele.
 
 ### 6.2 Color: sRGB, Lab y distancia
 

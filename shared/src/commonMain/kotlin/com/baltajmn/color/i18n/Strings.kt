@@ -137,6 +137,13 @@ object S {
         "Chroma darf die Kamera nicht nutzen. Du kannst es in den Einstellungen erlauben oder aus den Fotos von heute wählen.",
         "Chroma n'a pas accès à l'appareil photo. Tu peux l'autoriser dans Réglages, ou choisir parmi les photos du jour.",
     )
+    val photoNotSaved get() = t(
+        "The phone is out of space: the photo couldn't be saved.",
+        "El teléfono no tiene espacio: no se ha podido guardar la foto.",
+        "O telefone está sem espaço: não foi possível salvar a foto.",
+        "Das Handy hat keinen Platz mehr: Das Foto konnte nicht gespeichert werden.",
+        "Le téléphone n'a plus de place : la photo n'a pas pu être enregistrée.",
+    )
     val captureFailed get() = t(
         "Couldn't open that on this phone.",
         "No se ha podido abrir en este móvil.",
@@ -788,7 +795,7 @@ object S {
     fun version(v: String) = t("Version $v", "Versión $v", "Versão $v", "Version $v", "Version $v")
 
     /** The phone wins every day both have, so only the new ones are worth counting. */
-    fun importSummary(added: Int, kept: Int): String {
+    fun importSummary(added: Int, kept: Int, photos: Int = 0): String {
         val new = if (added == 1) {
             t("1 new day", "1 día nuevo", "1 dia novo", "1 neuen Tag", "1 nouveau jour")
         } else {
@@ -806,10 +813,43 @@ object S {
                 " Les jours déjà sur ce téléphone restent tels quels.",
             )
         }
-        return head + tail
+        val back = when (photos) {
+            0 -> ""
+            1 -> t(
+                " It also brings back 1 photo missing from this phone.",
+                " También devuelve 1 foto que faltaba en este teléfono.",
+                " Também devolve 1 foto que faltava neste telefone.",
+                " Außerdem bringt sie 1 Foto zurück, das auf diesem Handy fehlte.",
+                " Elle rend aussi 1 photo qui manquait sur ce téléphone.",
+            )
+            else -> t(
+                " It also brings back $photos photos missing from this phone.",
+                " También devuelve $photos fotos que faltaban en este teléfono.",
+                " Também devolve $photos fotos que faltavam neste telefone.",
+                " Außerdem bringt sie $photos Fotos zurück, die auf diesem Handy fehlten.",
+                " Elle rend aussi $photos photos qui manquaient sur ce téléphone.",
+            )
+        }
+        return head + tail + back
     }
 
-    fun importDone(n: Int) = when (n) {
+    fun importDone(n: Int, photos: Int = 0): String {
+        val recovered = when (photos) {
+            0 -> null
+            1 -> t("1 photo recovered.", "1 foto recuperada.", "1 foto recuperada.", "1 Foto wiederhergestellt.", "1 photo récupérée.")
+            else -> t(
+                "$photos photos recovered.",
+                "$photos fotos recuperadas.",
+                "$photos fotos recuperadas.",
+                "$photos Fotos wiederhergestellt.",
+                "$photos photos récupérées.",
+            )
+        }
+        if (n == 0 && recovered != null) return recovered
+        return listOfNotNull(importedDays(n), recovered).joinToString(" ")
+    }
+
+    private fun importedDays(n: Int) = when (n) {
         0 -> t(
             "Up to date: there was nothing new.",
             "Al día: no había nada nuevo.",

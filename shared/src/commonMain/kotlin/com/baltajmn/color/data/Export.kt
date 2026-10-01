@@ -8,7 +8,9 @@ import com.baltajmn.color.model.JournalJson
 import com.baltajmn.color.model.Share
 import com.baltajmn.color.model.WORD_MAX
 import com.baltajmn.color.model.clampCodePoints
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.plus
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
@@ -131,8 +133,14 @@ private fun journalOf(text: String): Journal {
         !HEX.matches(e.color) || e.swatches.any { !HEX.matches(it) } || e.photo?.let { !isSafePhotoName(it) } == true
     }
     if (bad) throw ImportFailed(ImportProblem.Damaged)
+    // A day that has not come yet is a clock that was wrong where the copy was made, or a hand
+    // written file: it would open a year that does not exist and silence that day's reminder.
+    // Tomorrow still counts, for a copy made a few time zones east.
+    val latest = today().plus(1, DateTimeUnit.DAY)
+    val days = file.entries.filterKeys { LocalDate.parse(it) <= latest }
+    if (days.isEmpty()) throw ImportFailed(ImportProblem.Empty)
     // Restoring a backup never publishes a day: whatever it was, it arrives private.
-    return file.entries.mapValues { (_, e) ->
+    return days.mapValues { (_, e) ->
         e.copy(
             color = e.color.uppercase(),
             swatches = e.swatches.map { it.uppercase() },

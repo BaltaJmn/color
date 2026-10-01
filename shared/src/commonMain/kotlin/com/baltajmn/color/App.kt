@@ -86,6 +86,7 @@ import com.baltajmn.color.ui.theme.ChromaTheme
 import com.baltajmn.color.ui.theme.Styles
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
 
 /** Four screens do not justify a navigation library. Friends stays hidden until v1.1. */
@@ -140,6 +141,18 @@ fun App() {
         if (ChromaRepository.settings.lockOn && relocks(leftAt?.let { elapsedMillis() - it }, leftOnTrip)) locked = true
     }
     LaunchedEffect(proCheck) { Billing.refresh() }
+    // The screen can stay on across 03:00, and the new day must not keep showing the old one. A poll
+    // and not a timer to the cut: a clock or a time zone changed meanwhile is caught as well.
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(60_000)
+            val now = today()
+            if (now != day) {
+                day = now
+                ChromaRepository.syncWidgets()
+            }
+        }
+    }
     // A widget asked for a screen, maybe before the app existed.
     LaunchedEffect(Route.pending) {
         when (Route.pending) {

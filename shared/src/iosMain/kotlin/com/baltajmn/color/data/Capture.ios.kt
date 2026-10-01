@@ -100,6 +100,8 @@ actual object Capture {
         presenter.presentViewController(controller, true, null)
     }
 
+    actual suspend fun leftover(): Picked? = null
+
     /** PHPicker needs no photo-library permission: the user hands over one image and nothing else. */
     actual suspend fun gallery(): Picked? = suspendCancellableCoroutine { cont ->
         val presenter = root

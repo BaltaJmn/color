@@ -43,6 +43,13 @@ expect object Capture {
     suspend fun camera(): Picked?
 
     suspend fun gallery(): Picked?
+
+    /**
+     * A photo the camera handed back while nobody was waiting for it: the process died behind the
+     * camera, or the Activity was rebuilt. Fresh ones only, and only once. Null on iOS, where the
+     * camera lives inside the app.
+     */
+    suspend fun leftover(): Picked?
 }
 
 /**
