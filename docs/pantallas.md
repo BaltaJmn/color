@@ -19,7 +19,7 @@ imprimen, se ponen de fondo o se ven en el móvil de otro.
 |---|---|---|---|
 | `background` | `#F1F1F1` | `#0E0E0E` | Fondo de pantalla |
 | `surface` | `#FFFFFF` | `#1A1A1A` | Tarjetas de ajustes, avisos, diálogos, la cápsula de navegación |
-| `surfaceVariant` | `#E6E6E6` | `#252525` | Días vacíos de la rejilla, campos, la ficha en blanco, las teselas de icono |
+| `surfaceVariant` | `#E6E6E6` | `#252525` | Días vacíos de la rejilla, campos, la ficha en blanco, las teselas de icono. También los contenedores de Material (`surfaceContainerHighest`...), que si no salen en lavanda en el selector de hora. `primaryContainer` va un paso más oscuro (`#D0D0D0` / `#3A3A3A`): es la hora elegida del selector, y con el mismo gris que la esfera no se distinguía |
 | `onBackground` | `#111111` | `#F2F2F2` | Texto principal |
 | `onMuted` | `#5E5E5E` | `#A3A3A3` | Texto secundario (contraste 6:1 en claro, 7,5:1 en oscuro) |
 | `outline` | `#D6D6D6` | `#303030` | Bordes de los círculos de color y de los botones con borde |
@@ -49,8 +49,14 @@ pintura.
 | `caption` | 13 / Regular | Notas pequeñas; nada baja de 13 (salvo `eyebrow`, que va en mayúsculas y seminegrita) |
 
 Todo escala con el tamaño de letra del sistema. Por eso ninguna fila con texto tiene alto fijo, solo
-mínimo: con letra grande, la fila crece en vez de cortar. La excepción son las etiquetas dibujadas
-dentro de la rejilla del año, que no escalan porque la rejilla tampoco.
+mínimo: con letra grande, la fila crece en vez de cortar. Las excepciones: las etiquetas dibujadas
+dentro de la rejilla del año, que no escalan porque la rejilla tampoco; la tarjeta, de alto fijo, que
+escala hasta 1,3 y encoge el nombre antes de partir una palabra; y la cabecera de fecha, cuyo
+`numeral` escala hasta 1,15 (también el año de Mi año) y cuyo mes y día de la semana encogen en vez
+de partirse ("septiembre" no tiene dónde cortar; un mes de dos palabras sí puede ir en dos líneas). Un segmentado iguala la altura de sus opciones si una etiqueta pasa a dos
+líneas, y un botón centra su texto y encoge una palabra que no cabe en vez de partirla. Los dos botones
+de compartir y del póster van lado a lado, a medias y con la misma altura, solo si cada etiqueta cabe
+en una línea a su tamaño; si no (letra grande), uno encima del otro a todo el ancho.
 
 ### Forma y espacio
 
@@ -93,7 +99,10 @@ pasan una vez; un tic ligero al cambiar el color después. Nada más vibra.
 - El teclado nunca tapa lo que se escribe, y el hueco que deja no se descuenta dos veces sobre la
   barra inferior, que el teclado ya cubre.
 - Lo que solo es forma lleva descripción para el lector de pantalla (el QR, la tira de amigos, el
-  widget del año) o se calla si es de adorno (la tira de ejemplo).
+  widget del año, la vista Tira de Mi año con el año y sus días) o se calla si es de adorno (la tira
+  de ejemplo, el `#------` de la ficha en blanco). El campo de la palabra se llama como su texto de
+  ayuda, y cada candidato dice su sitio ("2 de 5"), porque dos suelen compartir nombre. Con una capa
+  abierta, lo que queda debajo no se lee.
 
 ---
 
@@ -175,7 +184,10 @@ Tras la foto, en la misma pantalla:
 - **Rejilla**: una columna por mes y una fila por día (12 x 31), como Purl: en un móvil da celdas de
   unos 24, que se tocan bien; girada saldrían de 10. Celdas cuadradas con 3 de separación y radio 3;
   inicial del mes arriba y los días 1, 10, 20 y 30 a la izquierda, en `caption`. Días sin color en
-  `surfaceVariant` (los futuros, más claros); días que no existen (31 de febrero), vacíos. Hoy lleva
+  `surfaceVariant` (los futuros, más claros); días que no existen (31 de febrero), vacíos. Un día cuyo
+  color casi no se distingue de la tarjeta o del vacío (contraste por debajo de 1,3: una pared blanca,
+  una noche) lleva un borde de 1 en `outline`, o se leería como un día sin color; el póster hace lo
+  mismo sobre el papel. Hoy lleva
   un borde de 1,5 en `onBackground`. Las celdas no pasan de 24: en un móvil ancho sobra sitio y el bloque
   (números de día incluidos) va centrado, no pegado a la izquierda.
 - **Tira**: el año como columnas de 1 día, sin separación, a toda la altura disponible (proporción
@@ -201,7 +213,9 @@ final de la cabecera: `share` y `deleteDay` (con confirmación). Un día
 pasado no se edita.
 
 Tocar la miniatura abre la foto a pantalla completa, sobre negro, con cerrar arriba a la izquierda
-sobre un círculo negro al 40 %: sin él, una foto de cielo o de nieve se comía la única salida.
+sobre un círculo negro al 40 %: sin él, una foto de cielo o de nieve se comía la única salida. Se
+amplía con dos dedos hasta 4x, alrededor del punto entre los dedos, y se mueve sin salirse de la
+foto; doble toque amplía hacia donde se toca, o vuelve.
 
 ### Compartir
 
@@ -228,7 +242,7 @@ margen 16 y miniatura a 12 del borde (rejilla de 4).
 | Elemento | Posición | Estilo |
 |---|---|---|
 | Fondo | Todo | El color |
-| Nombre del color | Arriba izquierda, margen 24 | `display` a 40 SemiBold (`title` si `compact`), tinta |
+| Nombre del color | Arriba izquierda, margen 24 | `display` a 40 SemiBold (`title` si `compact`), tinta. Una línea por palabra como mucho: una palabra que no cabe (alemán a 360 dp) encoge hasta 24 en vez de partirse; si ni a 24 cabe, se parte antes que perder el final |
 | Hex | Bajo el nombre, a 2 | `code` (se lee como el código de una muestra de pintura), tinta |
 | Palabra | Bajo el hex, a 12 | `body` en cursiva, tinta |
 | Autor (feed) | Abajo izquierda, sobre la fecha | `body` Medium, tinta; tocable de 48 de alto |
@@ -238,6 +252,9 @@ margen 16 y miniatura a 12 del borde (rejilla de 4).
 | Marca de la semana (v1.2) | Arriba derecha, a la izquierda de la sintonía | Un rombo de 10 relleno, tinta; se lee `weekColorRow` |
 
 Sin foto (día compartido solo con color, o foto caducada en el servidor), no hay miniatura.
+
+En la tarjeta propia, tocar el nombre o el hex copia el hex: el hex dice `copied` un momento y el móvil
+vibra corto. En la de un amigo, no.
 
 ---
 
@@ -386,7 +403,7 @@ se desplaza: el botón de compra nunca se queda fuera.
 | Widget | Tamaño | Contenido |
 |---|---|---|
 | Hoy | Pequeño (2x2) | La misma lectura que la app: el día grande y fino arriba. Con entrada: el color a sangre, abajo su nombre en negrita y el hex, en tinta. Sin entrada: `surfaceVariant`, `widgetEmpty` y `#------`, como la ficha en blanco. v1.2: tira de amigos de 8 de alto y radio 4 abajo, con o sin entrada, en orden de hora y sin nombres; sin amigos, no hay tira |
-| Año | Mediano (4x2) | El año arriba y la rejilla tumbada: 12 filas de meses por 31 columnas, porque el widget es más ancho que alto. Días futuros más tenues. Sin Pro: la rejilla vacía con `proTitle` y `widgetUnlock` encima |
+| Año | Mediano (4x2) | El año arriba y la rejilla tumbada: 12 filas de meses por 31 columnas, porque el widget es más ancho que alto. Días futuros más tenues. En Android la rejilla es una imagen que no sigue el modo oscuro, así que un día casi blanco o casi negro lleva siempre un borde gris tenue. Sin Pro: la rejilla vacía con `proTitle` y `widgetUnlock` encima |
 
 Tocar abre Hoy o Mi año; el del año sin Pro abre el paywall, que explica más que una rejilla vacía.
 La rejilla del año es una imagen: el lector de pantalla la anuncia como `a11yYearWidget`, y la tira de

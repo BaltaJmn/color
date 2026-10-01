@@ -29,6 +29,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.baltajmn.color.color.blendsInto
 import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.color.nearestName
 import com.baltajmn.color.i18n.S
@@ -54,6 +55,8 @@ private const val ROWS = 31
 @Composable
 fun YearGrid(year: Int, days: Map<String, String>, today: LocalDate, onOpenDay: (LocalDate) -> Unit) {
     val empty = MaterialTheme.colorScheme.surfaceVariant
+    val card = MaterialTheme.colorScheme.surface
+    val edge = MaterialTheme.colorScheme.outline
     val ring = MaterialTheme.colorScheme.onBackground
     val caption = Styles.caption
     val initials = remember { S.monthInitials() }
@@ -94,7 +97,13 @@ fun YearGrid(year: Int, days: Map<String, String>, today: LocalDate, onOpenDay: 
                         val box = Size(side, side)
                         val hex = days[date.isoKey()]
                         when {
-                            hex != null -> drawRoundRect(colorOf(hex), at, box, radius)
+                            hex != null -> {
+                                val fill = colorOf(hex)
+                                drawRoundRect(fill, at, box, radius)
+                                if (blendsInto(fill, card) || blendsInto(fill, empty)) {
+                                    drawRoundRect(edge, at, box, radius, style = Stroke(1.dp.toPx()))
+                                }
+                            }
                             date > today -> drawRoundRect(empty.copy(alpha = 0.45f), at, box, radius)
                             else -> drawRoundRect(empty, at, box, radius)
                         }
@@ -122,12 +131,20 @@ fun YearGrid(year: Int, days: Map<String, String>, today: LocalDate, onOpenDay: 
     }
 }
 
-/** The year as thin columns, one per day with a color, blank days left out: its barcode. */
+/**
+ * The year as thin columns, one per day with a color, blank days left out: its barcode. As My year it
+ * is the screen and says so to a screen reader; as a band ([fill]) it is decoration and stays quiet.
+ */
 @Composable
 fun YearStrip(year: Int, days: Map<String, String>, modifier: Modifier = Modifier, fill: Boolean = false) {
     val colors = remember(year, days) { days.filterKeys { it.startsWith("$year-") }.entries.sortedBy { it.key }.map { colorOf(it.value) } }
     // [fill]: take the height the caller gives, as a thin band, instead of the 4:5 picture of My year.
-    Canvas(modifier.fillMaxWidth().then(if (fill) Modifier else Modifier.aspectRatio(4f / 5f).clip(RoundedCornerShape(24.dp)))) {
+    val shape = if (fill) {
+        Modifier
+    } else {
+        Modifier.aspectRatio(4f / 5f).clip(RoundedCornerShape(24.dp)).semantics { contentDescription = S.a11yYearStrip(year, colors.size) }
+    }
+    Canvas(modifier.fillMaxWidth().then(shape)) {
         if (colors.isEmpty()) return@Canvas
         val w = size.width / colors.size
         colors.forEachIndexed { i, c -> drawRect(c, Offset(i * w, 0f), Size(w + 0.5f, size.height)) }

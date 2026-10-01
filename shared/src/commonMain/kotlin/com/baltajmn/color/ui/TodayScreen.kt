@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -301,7 +302,8 @@ private fun Empty(week: ColorName?, firstTime: Boolean, working: Boolean, onCame
             Column(Modifier.align(Alignment.BottomStart)) {
                 Text(S.todayPrompt, style = Styles.display)
                 Spacer(Modifier.height(4.dp))
-                Text("#------", style = Styles.code)
+                // A blank to fill, not something to read out as six dashes.
+                Text("#------", style = Styles.code, modifier = Modifier.clearAndSetSemantics {})
             }
         }
         if (firstTime) {
@@ -365,21 +367,26 @@ private fun WordField(today: LocalDate, word: String?) {
             .padding(horizontal = 16.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.weight(1f)) {
-            if (value.text.isEmpty()) Text(S.wordPlaceholder, style = Styles.muted)
-            BasicTextField(
-                value = value,
-                onValueChange = { next ->
-                    val edit = limitEdit(value.text, next.text, next.selection.end, WORD_MAX)
-                    value = if (edit.text == next.text) next else TextFieldValue(edit.text, TextRange(edit.cursor))
-                    ChromaRepository.setWord(today, edit.text)
-                },
-                singleLine = true,
-                textStyle = Styles.body,
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
-                modifier = Modifier.fillMaxWidth().focusRequester(focus).onFocusChanged { focused = it.isFocused },
-            )
-        }
+        BasicTextField(
+            value = value,
+            onValueChange = { next ->
+                val edit = limitEdit(value.text, next.text, next.selection.end, WORD_MAX)
+                value = if (edit.text == next.text) next else TextFieldValue(edit.text, TextRange(edit.cursor))
+                ChromaRepository.setWord(today, edit.text)
+            },
+            singleLine = true,
+            textStyle = Styles.body,
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
+            modifier = Modifier.weight(1f).focusRequester(focus).onFocusChanged { focused = it.isFocused },
+            // Inside the field, the placeholder is also its name for a screen reader while it is empty,
+            // and gives way to the word once there is one.
+            decorationBox = { field ->
+                Box {
+                    if (value.text.isEmpty()) Text(S.wordPlaceholder, style = Styles.muted)
+                    field()
+                }
+            },
+        )
         Text(S.counter(value.text.codePointCount(), WORD_MAX), style = Styles.caption)
     }
 }

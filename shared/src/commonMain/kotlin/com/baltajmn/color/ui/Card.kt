@@ -20,11 +20,15 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -33,13 +37,20 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.color.inkColorFor
@@ -51,6 +62,7 @@ import com.baltajmn.color.model.ChromaEntry
 import com.baltajmn.color.ui.theme.CARD_RADIUS
 import com.baltajmn.color.ui.theme.Styles
 import kotlin.math.hypot
+import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
 
 /**
@@ -87,6 +99,20 @@ fun ChromaCard(
     val words = ((spread.value - 0.5f) / 0.5f).coerceIn(0f, 1f)
     val pad = if (compact) 16.dp else 24.dp
     val thumbMargin = if (compact) 12.dp else 20.dp
+    @Suppress("DEPRECATION") // LocalClipboard needs a platform ClipEntry for plain text; this does not.
+    val clipboard = LocalClipboardManager.current
+    val haptic = LocalHapticFeedback.current
+    var copied by remember(entry.color) { mutableStateOf(false) }
+    LaunchedEffect(copied) {
+        if (copied) {
+            delay(1500)
+            copied = false
+        }
+    }
+    // The card is a fixed 4:5: text that grew without a limit would run under the photo and the date.
+    // Up to 1.3 it grows like everywhere else, and the name shrinks to fit before breaking a word.
+    val density = LocalDensity.current
+    CompositionLocalProvider(LocalDensity provides Density(density.density, density.fontScale.coerceAtMost(1.3f))) {
     BoxWithConstraints(
         modifier
             .fillMaxWidth()
@@ -104,10 +130,35 @@ fun ChromaCard(
             },
     ) {
         val thumb = maxWidth * 0.3f
-        Column(Modifier.align(Alignment.TopStart).padding(pad).padding(end = 40.dp).alpha(words)) {
-            Text(S.colorName(entry.name), style = (if (compact) Styles.title else Styles.display.copy(fontSize = 40.sp, lineHeight = 44.sp, fontWeight = FontWeight.SemiBold)).copy(color = ink))
+        val name = S.colorName(entry.name)
+        Column(
+            Modifier.align(Alignment.TopStart).padding(pad).padding(end = 40.dp).alpha(words)
+                // Copies the code, for whoever wants this exact color in another app. Only on your own
+                // card: on a friend's, the top of the card is theirs, not a control.
+                .then(
+                    if (author != null) Modifier
+                    else Modifier.clickable(role = Role.Button, onClickLabel = S.a11yCopyHex) {
+                        @Suppress("DEPRECATION")
+                        clipboard.setText(AnnotatedString(entry.color))
+                        haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                        copied = true
+                    },
+                ),
+        ) {
+            val big = if (compact) Styles.title else Styles.display.copy(lineHeight = 1.1.em, fontWeight = FontWeight.SemiBold)
+            // One line per word at most: a word that does not fit shrinks instead of breaking. A word too
+            // long even at the smallest size breaks after all, rather than losing its end.
+            var broke by remember(name) { mutableStateOf(false) }
+            val shrinks = !compact && !broke
+            Text(
+                name,
+                style = big.copy(color = ink).let { if (broke) it.copy(fontSize = 24.sp) else it },
+                maxLines = if (shrinks) name.count { it == ' ' || it == '-' } + 1 else Int.MAX_VALUE,
+                autoSize = if (shrinks) TextAutoSize.StepBased(minFontSize = 24.sp, maxFontSize = 40.sp) else null,
+                onTextLayout = { if (shrinks && it.hasVisualOverflow) broke = true },
+            )
             // Tabular figures and a little air: it reads as a code, like the one on a paint chip.
-            Text(entry.color, style = Styles.code.copy(color = ink), modifier = Modifier.padding(top = 2.dp))
+            Text(if (copied) S.copied else entry.color, style = Styles.code.copy(color = ink), modifier = Modifier.padding(top = 2.dp))
             entry.word?.let {
                 Text(
                     it,
@@ -153,6 +204,7 @@ fun ChromaCard(
                 Image(image, null, contentScale = ContentScale.Crop, modifier = Modifier.matchParentSize())
             }
         }
+    }
     }
 }
 

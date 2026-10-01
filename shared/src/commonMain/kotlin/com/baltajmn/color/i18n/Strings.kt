@@ -151,6 +151,8 @@ object S {
         "Das ließ sich auf diesem Handy nicht öffnen.",
         "Impossible de l'ouvrir sur ce téléphone.",
     )
+    val copied get() = t("Copied", "Copiado", "Copiado", "Kopiert", "Copié")
+    val a11yCopyHex get() = t("Copy the code", "Copiar el código", "Copiar o código", "Code kopieren", "Copier le code")
     val addWord get() = t("Add a word", "Añadir una palabra", "Adicionar uma palavra", "Ein Wort hinzufügen", "Ajouter un mot")
     val wordPlaceholder get() = t("One word for today", "Una palabra para hoy", "Uma palavra para hoje", "Ein Wort für heute", "Un mot pour aujourd'hui")
     val retakePhoto get() = t("Another photo", "Otra foto", "Outra foto", "Anderes Foto", "Une autre photo")
@@ -885,7 +887,16 @@ object S {
     fun buy(price: String) =
         t("Buy for $price", "Comprar por $price", "Comprar por $price", "Für $price kaufen", "Acheter pour $price")
 
-    fun a11ySwatch(key: String, selected: Boolean) = colorName(key) + if (selected) ", $a11ySelected" else ""
+    /** Two candidates often share a nearest name: the place in the row tells them apart. */
+    fun a11ySwatch(key: String, selected: Boolean, n: Int, of: Int) =
+        colorName(key) + ", " + t("$n of $of", "$n de $of", "$n de $of", "$n von $of", "$n sur $of") +
+            if (selected) ", $a11ySelected" else ""
+
+    fun a11yYearStrip(year: Int, days: Int) = "$year, " + if (days == 1) {
+        t("1 day with a color", "1 día con color", "1 dia com cor", "1 Tag mit Farbe", "1 jour en couleur")
+    } else {
+        t("$days days with a color", "$days días con color", "$days dias com cor", "$days Tage mit Farbe", "$days jours en couleur")
+    }
 
     fun a11yDay(d: LocalDate, key: String?): String {
         val state = key?.let(::colorName)

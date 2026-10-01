@@ -3,7 +3,6 @@ package com.baltajmn.color.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,11 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFontFamilyResolver
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -146,13 +145,13 @@ fun PictureScreen(
                     Sharing.savePngToPhotos(picture.encodeToPng()) { ok -> saved = if (ok) S.saved else S.saveFailed }
                 }
             }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            ActionRow(Modifier.fillMaxWidth()) {
                 if (locked) {
-                    OutlinedAction(S.share, share, Modifier.weight(1f), pro = true, glyph = Glyph.SHARE)
+                    OutlinedAction(S.share, share, pro = true, glyph = Glyph.SHARE)
                 } else {
-                    PrimaryAction(S.share, share, Modifier.weight(1f), glyph = Glyph.SHARE)
+                    PrimaryAction(S.share, share, glyph = Glyph.SHARE)
                 }
-                if (Sharing.canSaveToPhotos) OutlinedAction(S.saveToPhotos, save, Modifier.weight(1f), pro = locked)
+                if (Sharing.canSaveToPhotos) OutlinedAction(S.saveToPhotos, save, pro = locked)
             }
             Spacer(Modifier.height(32.dp))
         }

@@ -84,7 +84,7 @@ private fun Today(state: WidgetState?) {
             Text(day.day.toString(), style = TextStyle(color = ink, fontSize = 30.sp, fontWeight = FontWeight.Normal))
             Spacer(GlanceModifier.defaultWeight())
             Text(name, maxLines = 2, style = TextStyle(color = ink, fontSize = 17.sp, fontWeight = FontWeight.Bold))
-            Text(hex, style = TextStyle(color = ink, fontSize = 12.sp, fontWeight = FontWeight.Medium))
+            Text(hex, style = TextStyle(color = ink, fontSize = 13.sp, fontWeight = FontWeight.Medium))
             FriendsStrip(state.friends)
         }
     } else {
@@ -95,7 +95,7 @@ private fun Today(state: WidgetState?) {
             Text(day.day.toString(), style = TextStyle(color = ink, fontSize = 30.sp, fontWeight = FontWeight.Normal))
             Spacer(GlanceModifier.defaultWeight())
             Text(S.widgetEmpty, maxLines = 2, style = TextStyle(color = ink, fontSize = 14.sp, fontWeight = FontWeight.Medium))
-            Text("#------", style = TextStyle(color = DayNight(Light.onSurfaceVariant, Dark.onSurfaceVariant), fontSize = 12.sp))
+            Text("#------", style = TextStyle(color = DayNight(Light.onSurfaceVariant, Dark.onSurfaceVariant), fontSize = 13.sp))
             state?.let { FriendsStrip(it.friends) }
         }
     }

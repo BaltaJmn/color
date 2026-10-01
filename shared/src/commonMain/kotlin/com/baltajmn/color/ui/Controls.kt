@@ -15,20 +15,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.ui.theme.Styles
 
@@ -61,7 +70,7 @@ fun PrimaryAction(
             .clip(RoundedCornerShape(26.dp))
             .background(if (enabled) colors.primary else colors.surfaceVariant)
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 24.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -69,7 +78,7 @@ fun PrimaryAction(
                 GlyphIcon(it, tint = ink)
                 Spacer(Modifier.width(10.dp))
             }
-            Text(label, style = Styles.body.copy(color = ink, fontWeight = FontWeight.SemiBold))
+            ActionLabel(label, Styles.body.copy(color = ink, fontWeight = FontWeight.SemiBold))
         }
     }
 }
@@ -91,7 +100,7 @@ fun OutlinedAction(
             .clip(RoundedCornerShape(24.dp))
             .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(24.dp))
             .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 20.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -99,8 +108,52 @@ fun OutlinedAction(
                 GlyphIcon(it, size = 18.dp, tint = MaterialTheme.colorScheme.onBackground)
                 Spacer(Modifier.width(8.dp))
             }
-            Text(label, style = Styles.body.copy(fontWeight = FontWeight.Medium))
+            ActionLabel(label, Styles.body.copy(fontWeight = FontWeight.Medium))
             if (pro) ProTag(Modifier.padding(start = 8.dp))
+        }
+    }
+}
+
+/**
+ * A button's words, centred: two buttons side by side with large text leave each little room, and a
+ * word that does not fit shrinks instead of breaking ("Compar / tir"). The line count follows the words.
+ */
+@Composable
+private fun RowScope.ActionLabel(label: String, style: TextStyle) {
+    Text(
+        label,
+        style = style,
+        textAlign = TextAlign.Center,
+        maxLines = label.count { it == ' ' } + 1,
+        autoSize = TextAutoSize.StepBased(minFontSize = 12.sp, maxFontSize = style.fontSize),
+        modifier = Modifier.weight(1f, fill = false),
+    )
+}
+
+/**
+ * Buttons side by side, sharing the width and one height, while every label fits on one line at its
+ * own size; otherwise one above the other at full width. With large text a shared half is too narrow
+ * for "Compartir" even shrunk, and a cut word is worse than a taller screen.
+ */
+@Composable
+fun ActionRow(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Layout(content, modifier) { buttons, constraints ->
+        val gap = 10.dp.roundToPx()
+        val width = constraints.maxWidth
+        val share = (width - gap * (buttons.size - 1)) / buttons.size.coerceAtLeast(1)
+        if (buttons.all { it.maxIntrinsicWidth(Constraints.Infinity) <= share }) {
+            val height = buttons.maxOf { it.minIntrinsicHeight(share) }
+            val placed = buttons.map { it.measure(Constraints.fixed(share, height)) }
+            layout(width, height) { placed.forEachIndexed { i, p -> p.place(i * (share + gap), 0) } }
+        } else {
+            val placed = buttons.map { it.measure(Constraints(minWidth = width, maxWidth = width)) }
+            layout(width, placed.sumOf { it.height } + gap * (placed.size - 1).coerceAtLeast(0)) {
+                var y = 0
+                placed.forEach {
+                    it.place(0, y)
+                    y += it.height + gap
+                }
+            }
         }
     }
 }
@@ -157,12 +210,19 @@ fun ProTag(modifier: Modifier = Modifier) {
  */
 @Composable
 fun Masthead(day: Int, above: String, below: String, modifier: Modifier = Modifier, actions: @Composable RowScope.() -> Unit = {}) {
+    // With large text the numeral and the buttons leave the words little room, and "septiembre" has no
+    // space to wrap at: the numeral grows less, and a word that still does not fit shrinks, never breaks.
+    val density = LocalDensity.current
     Row(modifier.fillMaxWidth().padding(top = 8.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(day.toString(), style = Styles.numeral, modifier = Modifier.semantics { heading() })
+        CompositionLocalProvider(LocalDensity provides Density(density.density, density.fontScale.coerceAtMost(1.15f))) {
+            Text(day.toString(), style = Styles.numeral, modifier = Modifier.semantics { heading() })
+        }
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
-            Text(above.uppercase(), style = Styles.eyebrow)
-            Text(below, style = Styles.title.copy(fontWeight = FontWeight.Normal))
+            val eyebrow = Styles.eyebrow
+            val title = Styles.title.copy(fontWeight = FontWeight.Normal)
+            Text(above.uppercase(), style = eyebrow, maxLines = 1, autoSize = TextAutoSize.StepBased(minFontSize = 9.sp, maxFontSize = eyebrow.fontSize))
+            Text(below, style = title, maxLines = if (below.contains(' ')) 2 else 1, autoSize = TextAutoSize.StepBased(minFontSize = 14.sp, maxFontSize = title.fontSize))
         }
         actions()
     }

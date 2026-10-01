@@ -46,7 +46,7 @@ fun SwatchRow(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp, androidx.compose.ui.Alignment.CenterHorizontally),
     ) {
-        colors.forEach { hex ->
+        colors.forEachIndexed { i, hex ->
             val isSelected = hex == selected
             // Five candidates of 56 need about 400 and a phone leaves about 320: they share the
             // width and stay round, instead of the last one being squeezed into an oval.
@@ -58,7 +58,7 @@ fun SwatchRow(
                     .clip(CircleShape)
                     .then(if (isSelected) Modifier.border(3.dp, MaterialTheme.colorScheme.onBackground, CircleShape) else Modifier)
                     .semantics {
-                        contentDescription = S.a11ySwatch(nearestName(hex).key, isSelected)
+                        contentDescription = S.a11ySwatch(nearestName(hex).key, isSelected, i + 1, colors.size)
                         this.selected = isSelected
                     }
                     .clickable(role = Role.RadioButton) {

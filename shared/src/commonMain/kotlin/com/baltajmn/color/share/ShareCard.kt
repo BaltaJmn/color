@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
+import com.baltajmn.color.color.blendsInto
 import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.color.inkColorFor
 import com.baltajmn.color.i18n.S
@@ -106,8 +107,13 @@ private fun gridPoster(year: Int, days: Map<String, String>, watermark: Boolean,
         drawText(laid, topLeft = Offset(x + (cellW - laid.size.width) / 2, top - 16f - laid.size.height))
         val last = LocalDate(year, month, 1).plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY).day
         for (day in 1..last) {
-            val fill = days[LocalDate(year, month, day).isoKey()]?.let(::colorOf) ?: PAPER_EMPTY
-            drawRoundRect(fill, Offset(x, top + (day - 1) * (cellH + rowGap)), Size(cellW, cellH), radius)
+            val color = days[LocalDate(year, month, day).isoKey()]?.let(::colorOf)
+            val at = Offset(x, top + (day - 1) * (cellH + rowGap))
+            drawRoundRect(color ?: PAPER_EMPTY, at, Size(cellW, cellH), radius)
+            // A near white day would vanish into the paper, the same as in My year.
+            if (color != null && (blendsInto(color, PAPER) || blendsInto(color, PAPER_EMPTY))) {
+                drawRoundRect(PAPER_INK.copy(alpha = 0.13f), at, Size(cellW, cellH), radius, style = Stroke(2f))
+            }
         }
     }
     if (watermark) posterMark(measurer)

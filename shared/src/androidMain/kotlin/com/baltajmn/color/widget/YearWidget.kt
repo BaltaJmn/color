@@ -8,6 +8,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
@@ -36,6 +37,7 @@ import androidx.glance.layout.padding
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import com.baltajmn.color.color.blendsInto
 import com.baltajmn.color.color.rgbOf
 import com.baltajmn.color.data.WidgetState
 import com.baltajmn.color.data.readWidgetState
@@ -131,6 +133,14 @@ private fun yearBitmap(width: Int, height: Int, days: Map<String, String>, today
     val canvas = Canvas(bitmap)
     val radius = side / 5
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    // A near-white day vanishes on the light background and a near-black one on the dark. The bitmap
+    // cannot follow the mode, so either gets the faint edge it has on My year in both.
+    val edge = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 1f
+        color = EMPTY_CELL
+    }
+    val grounds = listOf(Light.background, Dark.background)
 
     for (month in 1..MONTHS) {
         for (day in 1..DAYS) {
@@ -141,7 +151,9 @@ private fun yearBitmap(width: Int, height: Int, days: Map<String, String>, today
             paint.color = color ?: EMPTY_CELL
             // The days still to come are fainter, so the year reads as far as it has got.
             if (color == null && date > today) paint.alpha = paint.alpha * 110 / 255
-            canvas.drawRoundRect(RectF(x, y, x + side, y + side), radius, radius, paint)
+            val cell = RectF(x, y, x + side, y + side)
+            canvas.drawRoundRect(cell, radius, radius, paint)
+            if (color != null && grounds.any { blendsInto(Color(color), it) }) canvas.drawRoundRect(cell, radius, radius, edge)
         }
     }
     return bitmap

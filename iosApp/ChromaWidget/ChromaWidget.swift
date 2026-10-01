@@ -47,7 +47,7 @@ private struct TodayView: View {
                 Text(dayNumber).font(.system(size: 30, weight: .light))
                 Spacer()
                 Text(name).font(.system(size: 17, weight: .bold)).lineLimit(2)
-                Text(hex).font(.system(size: 12, weight: .medium)).monospacedDigit()
+                Text(hex).font(.system(size: 13, weight: .medium)).monospacedDigit()
                 FriendsStrip(colors: entry.state?.friends ?? [])
             }
             .foregroundStyle(ChromaStore.ink(hex))
@@ -57,7 +57,7 @@ private struct TodayView: View {
                 Text(dayNumber).font(.system(size: 30, weight: .light))
                 Spacer()
                 Text(L.empty).font(.system(size: 14, weight: .medium)).lineLimit(2)
-                Text("#------").font(.system(size: 12)).foregroundStyle(Color("WidgetMuted"))
+                Text("#------").font(.system(size: 13)).foregroundStyle(Color("WidgetMuted")).accessibilityHidden(true)
                 FriendsStrip(colors: entry.state?.friends ?? [])
             }
             .frame(maxWidth: .infinity, alignment: .leading)

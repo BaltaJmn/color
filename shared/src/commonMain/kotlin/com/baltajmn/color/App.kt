@@ -211,7 +211,15 @@ fun App() {
             CompositionLocalProvider(LocalLocked provides locked) {
                 // Keys too: a hardware keyboard could still Tab to a button underneath and press it.
                 Box(Modifier.fillMaxSize().then(if (locked) Modifier.clearAndSetSemantics {}.onPreviewKeyEvent { true } else Modifier)) {
-                    Column(Modifier.fillMaxSize()) {
+                    // The layers, in the order they stack. Under one, the screen and the layers below stay
+                    // drawn but are not read aloud: a screen reader would otherwise walk from the top layer
+                    // straight into what it covers (a day under its photo, a friend's year under one day).
+                    val layers = listOf(
+                        openDay != null, sharing != null, poster != null, stats != null, Friends.inviteOpen, Friends.listOpen,
+                        Friends.viewing != null, Friends.viewing != null && Friends.viewingDay != null, photo != null,
+                    )
+                    fun quietUnder(above: Int) = if (layers.drop(above).any { it }) Modifier.clearAndSetSemantics {} else Modifier
+                    Column(Modifier.fillMaxSize().then(quietUnder(0))) {
                         // The keyboard rises over the bottom bar as well; the screens pad for it with
                         // imePadding, so what the bar already takes is consumed here, not padded twice.
                         val bar = if (screen != Screen.Settings) barHeight else 0.dp
@@ -237,15 +245,17 @@ fun App() {
                             ) { screen = it }
                         }
                     }
-                    openDay?.let { DaySheet(it, onClose = { openDay = null }, onPhoto = { photo = it }, onShare = { sharing = it }) }
-                    sharing?.let { ShareScreen(it, onClose = { sharing = null }) }
-                    poster?.let { PosterScreen(it, onClose = { poster = null }) }
-                    stats?.let { StatsScreen(it, onClose = { stats = null }) }
-                    if (Friends.inviteOpen) InviteScreen { Friends.inviteOpen = false }
-                    if (Friends.listOpen) FriendList { Friends.listOpen = false }
-                    Friends.viewing?.let { FriendYear(it, day, onClose = { Friends.viewing = null }) }
-                    Friends.viewingDay?.let { row ->
-                        Friends.viewing?.let { FriendDay(row, it, onClose = { Friends.viewingDay = null }, onPhoto = { photo = it }) }
+                    Box(quietUnder(1)) { openDay?.let { DaySheet(it, onClose = { openDay = null }, onPhoto = { photo = it }, onShare = { sharing = it }) } }
+                    Box(quietUnder(2)) { sharing?.let { ShareScreen(it, onClose = { sharing = null }) } }
+                    Box(quietUnder(3)) { poster?.let { PosterScreen(it, onClose = { poster = null }) } }
+                    Box(quietUnder(4)) { stats?.let { StatsScreen(it, onClose = { stats = null }) } }
+                    Box(quietUnder(5)) { if (Friends.inviteOpen) InviteScreen { Friends.inviteOpen = false } }
+                    Box(quietUnder(6)) { if (Friends.listOpen) FriendList { Friends.listOpen = false } }
+                    Box(quietUnder(7)) { Friends.viewing?.let { FriendYear(it, day, onClose = { Friends.viewing = null }) } }
+                    Box(quietUnder(8)) {
+                        Friends.viewingDay?.let { row ->
+                            Friends.viewing?.let { FriendDay(row, it, onClose = { Friends.viewingDay = null }, onPhoto = { photo = it }) }
+                        }
                     }
                     Friends.acting?.let { FriendActions(it) { Friends.acting = null } }
                     photo?.let { PhotoViewer(it) { photo = null } }

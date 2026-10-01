@@ -1,6 +1,7 @@
 package com.baltajmn.color.color
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import kotlin.math.pow
 
 /** WCAG relative luminance of an opaque 0xFFRRGGBB. */
@@ -33,3 +34,9 @@ fun inkFor(hex: String): Int {
 fun colorOf(hex: String): Color = Color(rgbOf(hex))
 
 fun inkColorFor(hex: String): Color = Color(inkFor(hex))
+
+/**
+ * True when [color] all but disappears on [ground]: the white of a wall on a white card, a night on a
+ * dark one. Such a day gets an outline, or it reads as a blank one.
+ */
+fun blendsInto(color: Color, ground: Color): Boolean = contrast(color.toArgb(), ground.toArgb()) < 1.3
