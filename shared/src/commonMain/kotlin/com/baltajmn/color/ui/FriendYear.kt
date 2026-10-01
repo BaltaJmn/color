@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -92,21 +91,29 @@ fun FriendList(onClose: () -> Unit) {
 
 /**
  * docs/pantallas.md 8.4: the grid of My year with only what this friend shared. Days older than the
- * photo's week on the server are just their color, and that is how they look here.
+ * photo's week on the server are just their color, and that is how they look here. One year is asked
+ * for at a time; the arrows span from the friend's first year to this one.
  */
 @Composable
 fun FriendYear(person: Profile, today: LocalDate, onClose: () -> Unit) {
-    var rows by remember(person.id) { mutableStateOf<List<FeedRow>?>(null) }
-    var failed by remember { mutableStateOf(false) }
+    var year by remember(person.id) { mutableStateOf(today.year) }
+    var first by remember(person.id) { mutableStateOf(today.year) }
+    var rows by remember(person.id, year) { mutableStateOf<List<FeedRow>?>(null) }
+    var failed by remember(person.id, year) { mutableStateOf(false) }
     var attempt by remember { mutableStateOf(0) }
     LaunchedEffect(person.id, attempt) {
-        runCatching { Friends.year(person.id) }
+        // Without it the arrows only span this year: not worth a notice of its own.
+        runCatching { Friends.firstYear(person.id) }.getOrNull()?.let { first = it.coerceIn(1, today.year) }
+    }
+    LaunchedEffect(person.id, year, attempt) {
+        runCatching { Friends.year(person.id, year) }
             .onSuccess { rows = it; failed = false }
             .onFailure { failed = true }
     }
-    val days = rows.orEmpty().filter { it.key !in ChromaRepository.settings.hiddenCards }.associate { it.day to it.color }
-    val years = remember(days.keys) { (days.keys.map { it.take(4).toInt() } + today.year).distinct().sorted() }
-    var year by remember(person.id) { mutableStateOf(today.year) }
+    val shown = rows.orEmpty().filter { it.key !in ChromaRepository.settings.hiddenCards }
+    val days = shown.associate { it.day to it.color }
+    val byDate = shown.associateBy { it.date }
+    val years = (first..today.year).toList()
 
     Overlay(person.displayName, onClose, { MoreButton(Acting(person)) }) {
         Spacer(Modifier.height(8.dp))
@@ -122,8 +129,8 @@ fun FriendYear(person: Profile, today: LocalDate, onClose: () -> Unit) {
         Spacer(Modifier.height(12.dp))
         when {
             rows == null && !failed -> Text(S.working, style = Styles.caption)
-            days.keys.none { it.startsWith("$year-") } -> Text(S.friendYearEmpty, style = Styles.muted, modifier = Modifier.padding(vertical = 24.dp))
-            else -> YearGrid(year, days, today) { date -> rows?.find { it.date == date }?.let { Friends.viewingDay = it } }
+            days.isEmpty() -> Text(S.friendYearEmpty, style = Styles.muted, modifier = Modifier.padding(vertical = 24.dp))
+            else -> YearGrid(year, days, today) { date -> byDate[date]?.let { Friends.viewingDay = it } }
         }
     }
 }
@@ -131,7 +138,7 @@ fun FriendYear(person: Profile, today: LocalDate, onClose: () -> Unit) {
 /** One of a friend's days, as big as your own. */
 @Composable
 fun FriendDay(row: FeedRow, person: Profile, onClose: () -> Unit, onPhoto: (ImageBitmap) -> Unit) {
-    val photo by produceState<ImageBitmap?>(null, row.cacheName) { value = Friends.photo(row) }
+    val photo = friendPhoto(row)
     Overlay(S.longDateWithYear(row.date), onClose, { MoreButton(Acting(person, row)) }) {
         Spacer(Modifier.height(8.dp))
         ChromaCard(row.entry(), row.date, author = person.displayName, photo = photo, onPhoto = onPhoto)
@@ -147,13 +154,28 @@ internal fun MoreButton(acting: Acting, tint: Color = MaterialTheme.colorScheme.
 private enum class Step { Menu, Remove, Block, Report, Busy, Failed }
 
 /**
+ * A friend's photo for [row], asked again whenever the feed loads while it is still missing: a
+ * card must not look like a day without a photo only because the first fetch had bad coverage.
+ */
+@Composable
+internal fun friendPhoto(row: FeedRow): ImageBitmap? {
+    val loads = Friends.refreshes
+    var photo by remember(row.cacheName) { mutableStateOf<ImageBitmap?>(null) }
+    // Once there is one the key stops moving, so a refresh never reloads a picture that is showing.
+    LaunchedEffect(row.cacheName, if (photo == null) loads else -1) {
+        if (photo == null) photo = Friends.photo(row)
+    }
+    return photo
+}
+
+/**
  * docs/pantallas.md 8.3: what can be done about a friend or one of their days. Quiet on purpose:
  * the other person is never told.
  */
 @Composable
 fun FriendActions(acting: Acting, onDone: () -> Unit) {
     val (person, day) = acting
-    var step by remember { mutableStateOf(Step.Menu) }
+    var step by remember { mutableStateOf(if (acting.request) Step.Block else Step.Menu) }
     val scope = rememberCoroutineScope()
     fun perform(block: suspend () -> Unit) {
         step = Step.Busy

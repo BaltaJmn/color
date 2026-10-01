@@ -21,11 +21,18 @@ Deno.serve(async (req) => {
     if (!files?.length) break;
     const removed = await admin.storage.from("photos").remove(files.map((f) => `${id}/${f.name}`));
     if (removed.error) return new Response(removed.error.message, { status: 500 });
+    // A folder entry, or a file the API will not delete, would be listed again on every pass. Each
+    // pass that removes something shrinks the folder, so this is the only guard the loop needs.
+    if (!removed.data.length) return new Response("could not empty the photo folder", { status: 500 });
   }
   // Reports about this person have no foreign key (the author may be gone before the report is
-  // read), so they go by hand too.
-  await admin.from("reports").delete().eq("author", id);
+  // read), so they go by hand too, and before the user: once the user is gone the retry cannot
+  // authenticate, and the reports would stay for good.
+  const reports = await admin.from("reports").delete().eq("author", id);
+  if (reports.error) return new Response(reports.error.message, { status: 500 });
 
+  // A photo that another device uploads between the last listing and this call has no row and no
+  // owner left; the orphan sweep of purge-photos removes it.
   const deleted = await admin.auth.admin.deleteUser(id);
   if (deleted.error) return new Response(deleted.error.message, { status: 500 });
   return new Response(null, { status: 204 });

@@ -10,11 +10,16 @@ interface Report {
 }
 
 Deno.serve(async (req) => {
-  // The webhook is configured to send this header; nothing else may make the developer's inbox ring.
-  if (req.headers.get("x-webhook-secret") !== Deno.env.get("REPORT_WEBHOOK_SECRET")) {
-    return new Response(null, { status: 401 });
-  }
-  const { record } = (await req.json()) as { record: Report };
+  // The database sends this header from the Vault; nothing else may make the developer's inbox ring.
+  // Without the variable there is nothing to compare with, so an empty header must not get in.
+  const secret = Deno.env.get("REPORT_WEBHOOK_SECRET");
+  if (!secret || req.headers.get("x-webhook-secret") !== secret) return new Response(null, { status: 401 });
+  // Better a 500 that names the cause than a mail to [undefined] that Resend refuses.
+  const to = Deno.env.get("REPORT_TO");
+  if (!to) return new Response("REPORT_TO is not set", { status: 500 });
+
+  const { record } = (await req.json()) as { record?: Report };
+  if (!record?.id) return new Response(null, { status: 400 });
   const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
   const { data: entry } = await db
@@ -42,7 +47,8 @@ Deno.serve(async (req) => {
     `Word: ${entry?.word ?? "-"}`,
     `Photo (24 h): ${photo}`,
     "",
-    "Act within 24 hours: remove the content or the account from the Supabase dashboard.",
+    "Act within 24 hours, from the Supabase dashboard: delete the shared_entries row and its photo in Storage, or the account.",
+    "A photo left in Storage is only removed by the nightly purge.",
   ].join("\n");
 
   const sent = await fetch("https://api.resend.com/emails", {
@@ -50,10 +56,16 @@ Deno.serve(async (req) => {
     headers: { Authorization: `Bearer ${Deno.env.get("RESEND_API_KEY")}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       from: Deno.env.get("REPORT_FROM") ?? "Chroma <reports@baltajmn.dev>",
-      to: [Deno.env.get("REPORT_TO")],
+      to: [to],
       subject: `Chroma: report #${record.id}`,
       text,
     }),
   });
-  return new Response(null, { status: sent.ok ? 200 : 502 });
+  // Not delivered stays without notified_at, and the hourly retry in the database sends it again.
+  if (!sent.ok) return new Response(null, { status: 502 });
+
+  const marked = await db.from("reports").update({ notified_at: new Date().toISOString() }).eq("id", record.id);
+  // The mail is out already: failing here only means the retry may send it a second time.
+  if (marked.error) return new Response(marked.error.message, { status: 500 });
+  return new Response(null, { status: 200 });
 });

@@ -74,6 +74,7 @@ import com.baltajmn.color.model.codePointCount
 import com.baltajmn.color.model.isoKey
 import com.baltajmn.color.model.limitEdit
 import com.baltajmn.color.social.Social
+import com.baltajmn.color.social.hasAccount
 import com.baltajmn.color.ui.theme.CARD_RADIUS
 import com.baltajmn.color.ui.theme.GUTTER
 import com.baltajmn.color.ui.theme.MAX_CONTENT_WIDTH
@@ -239,7 +240,8 @@ fun TodayScreen(
                     }
                     Spacer(Modifier.height(12.dp))
                     WordField(today, entry.word)
-                    if (Social.available && Social.me != null) {
+                    // On the session, not on the profile: that is only loaded once Friends has been opened.
+                    if (hasAccount() && !Social.needsName) {
                         Spacer(Modifier.height(20.dp))
                         ShareSwitch(entry.share, entry.photo != null) { ChromaRepository.setShare(today, it) }
                     }

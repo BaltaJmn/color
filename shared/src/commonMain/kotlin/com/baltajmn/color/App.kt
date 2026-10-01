@@ -113,6 +113,7 @@ fun App() {
         // Whatever was saved and shared goes out after the save, never before it. Once per process:
         // a recreated Activity composes App again.
         if (kickOutbox !in ChromaRepository.afterSave) ChromaRepository.afterSave += kickOutbox
+        Social.watchSession()
     }
     var day by remember { mutableStateOf(today()) }
     var screen by remember { mutableStateOf(Screen.Today) }

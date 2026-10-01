@@ -105,8 +105,16 @@ actual object Storage {
     /** Flushed to the disk before any rename, so a power cut cannot leave a renamed empty file. */
     actual fun readCached(name: String): ByteArray? = File(cached, name).takeIf { it.exists() }?.readBytes()
 
+    // Written aside and renamed: a full disk leaves no half photo under the name readCached trusts.
     actual fun writeCached(name: String, bytes: ByteArray) {
-        File(cached, name).writeBytes(bytes)
+        val part = File(cached, "$name.part")
+        try {
+            part.writeBytes(bytes)
+            if (!part.renameTo(File(cached, name))) error("could not move the cached photo into place")
+        } catch (e: Exception) {
+            part.delete()
+            throw e
+        }
     }
 
     actual fun keepCached(names: Set<String>) {

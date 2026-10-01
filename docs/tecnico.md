@@ -92,6 +92,7 @@ Nada más. No hay librería de imágenes: las fotos se decodifican con el sistem
 | `color/Week.kt`, `color/Stats.kt` | Color de la semana y estadísticas | Nuevo (v1.2) |
 | `ui/StatsScreen.kt` | El año en frases | Nuevo (v1.2) |
 | `ui/FriendYear.kt` | Lista de amigos, el año de uno, uno de sus días, y su menú (reportar, bloquear, quitar) | Nuevo (v1.1) |
+| `ui/FriendsBlocked.kt` | El diálogo de Ajustes > Amigos > Bloqueados: quién bloqueé y cómo deshacerlo | Nuevo (v1.1) |
 | `ui/Card.kt` | La tarjeta | Nuevo |
 | `ui/TodayScreen.kt`, `ui/YearScreen.kt`, `ui/SettingsScreen.kt`, `ui/FriendsScreen.kt` | Pantallas | Purl y nuevo |
 | `ui/DaySheet.kt`, `ui/ShareScreen.kt`, `ui/Pro.kt`, `ui/LockScreen.kt`, `ui/Icons.kt` | Capas y dibujos | Purl |
@@ -235,7 +236,11 @@ Al mes del primer día, si nunca se hizo copia, Hoy lo ofrece una vez (`noticeBa
 | `SYNC_DELTA_E` | 5.0 | `Friends.kt` |
 | `WEEK_DELTA_E` | 15.0 | `Week.kt` |
 | `MAX_FRIENDS` | 50 | Servidor (trigger) y cliente (mensaje) |
-| `PHOTO_TTL_DAYS` | 7 | Servidor (`purge-photos`) |
+| `PHOTO_TTL_DAYS` | 7 | Servidor (`purge-photos`; el límite duro, 8 días de fichero, en `orphan_photos`) |
+| `PHOTO_DAYS` | 7 | `Outbox.kt` (un día de más de esos días sube sin foto) |
+| `MAX_PENDING_REQUESTS` | 100 | Servidor (`request_friend`, escrito en el valor): solicitudes pendientes que puede tener una persona |
+| `INVITE_MISSES_PER_HOUR` | 20 | Servidor (`request_friend`, escrito en el valor): enlaces que no valen antes de `too_many` |
+| `MAX_REPORTS_PER_DAY` | 20 | Servidor (trigger `report_cap`, escrito en el valor) |
 | `SAVE_DEBOUNCE_MS` | 800 | `ChromaRepository.kt` |
 | `BACKUP_NOTICE_AFTER_DAYS` | 30 | `ChromaRepository.kt` |
 
@@ -482,9 +487,22 @@ class Picked(val jpeg: ByteArray, val takenOn: LocalDateTime?)
 ## 8. Servidor (v1.1)
 
 Todo en `supabase/migrations/` y `supabase/functions/`. La seguridad está en RLS y en funciones
-`security definer`; el cliente no tiene permisos directos sobre amistades ni bloqueos.
+`security definer`; el cliente no tiene permisos directos sobre amistades ni bloqueos. Nada depende de
+que la app se porte bien: un cliente modificado recibe lo mismo que el oficial.
 
 ### 8.1 Tablas
+
+Las migraciones son la fuente, en este orden. Una ya aplicada no se edita nunca: un cambio es un
+fichero nuevo, porque una base que aplicó las anteriores tiene que recibirlo también.
+
+| Migración | Qué trae |
+|---|---|
+| `20260923120000_friends.sql` | Las tablas, el tope de 50, las funciones de amistad y bloqueo, RLS y el bucket `photos` |
+| `20260923120100_purge.sql` | `pg_cron` y `pg_net`, y la purga de cada noche |
+| `20260923130000_hardening.sql` | El código de invitación solo lo lee su dueño (`my_profile`), y `photo_path` solo puede ser un fichero propio |
+| `20261001120000_review.sql` | La revisión antes del lanzamiento: lo que cambia en 8.2 a 8.4 |
+
+El esquema que dejan las cuatro:
 
 ```sql
 create table profiles (
@@ -501,18 +519,23 @@ create table friendships (
   status text not null check (status in ('pending', 'accepted')),
   created_at timestamptz not null default now(),
   primary key (a, b),
-  check (a < b)
+  check (a < b),                          -- una fila por pareja, pida quien pida
+  check (requested_by in (a, b))
 );
 
 create table shared_entries (
   author uuid not null references profiles on delete cascade,
   day date not null,
   color text not null check (color ~ '^#[0-9A-F]{6}$'),
-  name text not null,
+  name text not null check (char_length(name) between 1 and 40),   -- la clave de la tabla de nombres
   word text check (char_length(word) <= 24),
-  -- Solo un fichero de su propia carpeta: <author>/<día>.jpg (20260923130000_hardening.sql).
-  photo_path text check (photo_path is null or photo_path like author::text || '/%'),
-  updated_at timestamptz not null default now(),
+  -- Solo un fichero de su propia carpeta: <author>/<día>.jpg
+  photo_path text check (
+    photo_path is null
+    or (photo_path like author::text || '/%'
+        and photo_path ~ '^[0-9a-f-]{36}/[0-9]{4}-[0-9]{2}-[0-9]{2}\.jpg$')
+  ),
+  updated_at timestamptz not null default now(),   -- lo mueve el trigger touch, no el cliente
   primary key (author, day)
 );
 
@@ -525,52 +548,156 @@ create table blocks (
 create table reports (
   id bigint generated always as identity primary key,
   reporter uuid not null references profiles on delete cascade,
-  author uuid not null,
+  author uuid not null,                            -- sin clave: el autor puede irse antes de que se lea
   day date not null,
+  created_at timestamptz not null default now(),
+  notified_at timestamptz,                         -- lo rellena report-notify cuando el correo salió
+  constraint reports_once unique (reporter, author, day)
+);
+
+create table invite_attempts (                     -- los enlaces que no valen; sin permisos para nadie
+  user_id uuid not null references auth.users on delete cascade,
   created_at timestamptz not null default now()
 );
 ```
 
+Permisos de tabla: `anon` ninguno. `authenticated` lee `profiles` solo en `id` y `display_name`,
+inserta `id` y `display_name`, y actualiza `display_name`; lee `friendships` y `blocks`; lee, inserta,
+actualiza y borra `shared_entries`; inserta `reporter`, `author` y `day` en `reports`. Sobre
+`invite_attempts` no tiene nada.
+
 ### 8.2 Funciones
 
-- `is_friend(x uuid, y uuid) returns boolean`: hay amistad `accepted` y ningún bloqueo en ningún
-  sentido.
-- `request_friend(code text) returns text`: `'sent'`, `'accepted'` (si el otro ya te lo había
-  pedido), `'already'`, `'self'`, `'blocked'`, `'not_found'`, `'limit'`.
+Supabase da `execute` sobre cada función nueva de `public` a `anon` y a `authenticated`, así que
+cada migración dice de la suya quién la ejecuta. `anon` no ejecuta ninguna. `authenticated` ejecuta
+solo estas doce: `is_friend`, `has_open_request`, `request_friend`, `accept_friend`,
+`decline_friend`, `remove_friend`, `block_user`, `unblock_user`, `regenerate_code`, `my_profile`,
+`my_friendships` y `my_blocks`. `orphan_photos` es de `service_role`, y nadie con sesión ejecuta el
+resto (`is_blocked`, `accepted_count`, los triggers y `notify_report`). `supabase/tests` comprueba el
+conjunto entero.
+
+- `is_friend(y uuid) returns boolean`: hay amistad `accepted` entre `auth.uid()` e `y`, y ningún
+  bloqueo en ningún sentido. No lleva el primer uuid: con él, cualquiera con sesión podía preguntar
+  por cualquier pareja de uuids. Un `false` no dice cuál de las dos cosas falló, así que la ejecuta
+  `authenticated` (las políticas la llaman con sus permisos).
+- `is_blocked(y uuid)`: lo mismo para el bloqueo, simétrica (un bloqueo corta en los dos sentidos).
+  Por eso **no** la ejecuta nadie con sesión: un bloqueado podría preguntar si lo está. Solo la llaman
+  las funciones `security definer`.
+- `has_open_request(y uuid)`: hay solicitud `pending` con `y` y ningún bloqueo. Es lo que
+  `profiles_read` necesita para que aceptar sepa quién pide. La ejecuta `authenticated`.
+- `request_friend(code text) returns text`: `'sent'`, `'accepted'`, `'already'`, `'self'`,
+  `'blocked'`, `'not_found'`, `'limit'`, `'too_many'`.
+  - `'accepted'`: el otro ya lo había pedido. También si los dos piden a la vez: el segundo `insert`
+    choca con la clave, y la función relee la fila y sigue por la rama de la que ya existe.
+  - `'not_found'`: un código que no existe, o cuyo dueño me bloqueó. Se contestan igual y cuentan
+    igual como intento fallido: la respuesta no dice a nadie que lo bloquearon. `'blocked'` solo lo ve
+    quien bloqueó.
+  - `'limit'`: yo con 50 amigos, o la otra persona con 100 solicitudes pendientes recibidas. Al aceptar
+    una solicitud ya hecha, cualquiera de los dos con 50 (trigger `friend_limit`).
+  - `'too_many'`: 20 intentos fallidos en la última hora (`invite_attempts`). Un código son 40 bits,
+    y lo que impide recorrerlos es cuántos fallos tiene una cuenta. `'self'` y `'blocked'` no cuentan.
 - `accept_friend(other uuid)`, `decline_friend(other uuid)`, `remove_friend(other uuid)`: los dos
-  últimos borran la fila sin avisar.
+  últimos borran la fila sin avisar. Aceptar no hace nada si hay un bloqueo: una carrera entre
+  invitar y bloquear puede dejar una fila pendiente, y no debe volverse amistad.
 - `block_user(other uuid)`: borra la amistad o la solicitud y crea el bloqueo.
+- `unblock_user(other uuid)`: borra el bloqueo, sin avisar. No devuelve la amistad (la fila se fue con
+  el bloqueo): solo deja que las solicitudes entre los dos vuelvan a funcionar.
 - `regenerate_code() returns text`.
 - `my_profile() returns table (id, display_name, invite_code)`: la única forma de leer un código de
   invitación, y solo el propio. En `profiles` el cliente solo puede leer `id` y `display_name`: con la
   tabla entera, un amigo o alguien con una solicitud abierta podría leer tu código y repartirlo, que
   es justo lo que regenerarlo tiene que cortar.
-- Trigger en `friendships`: al pasar a `accepted`, si cualquiera de los dos ya tiene
-  `MAX_FRIENDS` aceptados, lanza `friend_limit`.
+- `my_friendships() returns table (id, display_name, status, requested_by)`: mis amistades, pendientes
+  y aceptadas, con el nombre ya unido y sin las de personas bloqueadas en ningún sentido. `id` es el
+  de la otra persona. Una sola llamada: pedir los nombres con `id in (...)` en la URL deja de caber
+  con unos cientos de solicitudes.
+- `my_blocks() returns table (id, display_name)`: las personas que yo bloqueé, con su nombre, que
+  `profiles_read` no deja leer.
+- `orphan_photos() returns setof text`: los nombres del bucket `photos` que hay que borrar, de más de
+  1 día y sin fila en `shared_entries` con ese `photo_path`, o de más de 8 días en cualquier caso. Como
+  mucho 1000 por llamada. La ejecuta solo `service_role` (la purga, 8.4).
+
+Triggers:
+
+| Trigger | En | Qué |
+|---|---|---|
+| `friend_limit` | `friendships` | Al pasar a `accepted`, si cualquiera de los dos ya tiene `MAX_FRIENDS` aceptados, lanza `friend_limit` |
+| `touch` | `shared_entries` | Mueve `updated_at` en cada cambio |
+| `entry_day` | `shared_entries` | Un `day` fuera de `[2026-01-01, current_date + 2]` se rechaza (`day_out_of_range`), pero solo al insertar o al cambiar el `day`: una fila anterior al trigger y fuera de rango deja que la purga le ponga `photo_path` a null. Con `day < current_date - 8`, `photo_path` se guarda a null, siempre: la foto de un día así no se conserva. El margen de una noche sobre los 7 días es porque `current_date` es UTC y la app, al oeste de UTC, sigue en su séptimo día |
+| `report_cap` | `reports` | Más de 20 reportes del mismo reportero en 24 h lanza `report_limit` |
+| `report_notify` | `reports` | Después de insertar, `notify_report(id)`: avisa por `pg_net` a `report-notify` (8.4) |
+
+Un segundo reporte de la misma tarjeta por la misma persona choca con `reports_once` (`23505`), y
+la app lo toma por hecho.
 
 ### 8.3 RLS
 
 | Tabla | select | insert / update / delete |
 |---|---|---|
-| `profiles` | yo, mis amigos y quien tenga una solicitud conmigo | solo mi fila, solo `display_name` |
+| `profiles` | yo, mis amigos (`is_friend`) y quien tenga una solicitud abierta conmigo (`has_open_request`), solo `id` y `display_name` | solo mi fila, solo `display_name` |
 | `friendships` | filas donde estoy | solo por funciones |
-| `shared_entries` | `author = auth.uid() or is_friend(auth.uid(), author)` | `author = auth.uid()` |
+| `shared_entries` | `author = auth.uid() or is_friend(author)` | `author = auth.uid()`, con los límites de `entry_day` |
 | `blocks` | las mías | solo por funciones |
-| `reports` | nadie | `reporter = auth.uid() and is_friend(auth.uid(), author)` |
+| `reports` | nadie | insert: `reporter = auth.uid() and is_friend(author)`, uno por tarjeta y 20 al día |
+| `invite_attempts` | nadie | solo por `request_friend` |
 
-Bucket `photos`, privado. Ruta `<author>/<day>.jpg`. Escribir y borrar: la primera carpeta es
-`auth.uid()`. Leer: la primera carpeta es mía o de un amigo (`is_friend`). Se sirve con URL firmadas
-de 1 hora.
+Bucket `photos`, privado, 1 MB, solo `image/jpeg`.
 
-### 8.4 Edge Functions
+- **Nombre**: obligatoriamente `<uid>/<AAAA-MM-DD>.jpg`, tanto al crear como al actualizar, y con un
+  día entre hace 10 días y dentro de 2. Así una cuenta tiene como mucho 13 nombres posibles: no puede
+  llenar el bucket, y no existe un nombre que la purga no alcance (un día de 2099).
+- **Escribir**: la primera carpeta es `auth.uid()`. **Borrar**: igual.
+- **Leer**: la propia carpeta, siempre (la foto sube antes que la fila que la señala), y la de un
+  amigo solo si existe una fila visible suya con ese `photo_path` (`is_friend`). Un fichero sin fila,
+  como el que queda al quitar una tarjeta desde el panel, no lo lee nadie más que su dueño.
+- Se sirve con **descarga autenticada con la sesión** (`downloadAuthenticated`); la única URL firmada
+  es la de 24 h del correo de reporte.
+
+### 8.4 Edge Functions y tareas
 
 | Función | Cuándo | Qué |
 |---|---|---|
-| `purge-photos` | Diaria, por `pg_cron` y `pg_net` | Borra del bucket las fotos con `day < current_date - 7` y pone `photo_path` a null |
-| `report-notify` | Webhook de base de datos al insertar en `reports` | Correo al autor de la app por Resend (`RESEND_API_KEY`, `REPORT_TO`) |
-| `delete-account` | Desde la app y desde la web | Con la clave de servicio: borra la carpeta del bucket y el usuario (el resto cae en cascada) |
+| `purge-photos` | Cada noche, por `pg_cron` y `pg_net` (con dos minutos para contestar) | Primero por filas: borra del bucket las fotos con `day < current_date - 7` y pone `photo_path` a null. Después el barrido de huérfanos: pide los nombres a `orphan_photos()` y los borra por la API de Storage, en lotes de 100. Las dos fases son independientes: un error en una (guarda el primero) no impide que corra la otra, y contesta 500 al final si alguna falló. Cada fase tiene un tope de 100 rondas por noche; si un lote no borra nada, esa fase falla en vez de girar. Responde `{purged, orphans}`, y con un fallo, 500 con `{purged, orphans, error}` |
+| `report-notify` | La base la llama al insertar en `reports` (trigger y `pg_net`) y cada hora para reintentar | Correo al autor de la app por Resend (`RESEND_API_KEY`, `REPORT_TO`, `REPORT_FROM`), con una URL firmada de 24 h para ver la foto. Al enviarlo rellena `reports.notified_at` |
+| `delete-account` | Desde la app y desde la web | Con la clave de servicio: vacía la carpeta del bucket, borra los reportes sobre esa persona y el usuario (el resto cae en cascada) |
 
-Los secretos viven en Supabase, nunca en el repositorio. La app solo lleva la URL del proyecto y la
+- **`purge-photos`**: la fecha de corte es UTC y el día de la foto es el local del autor, así que una
+  foto vive entre unos 6,5 y 8,7 días según el huso. El límite duro lo pone `orphan_photos`: ninguna
+  pasa de 8 días de fichero más la noche en que se barre. La app no sube foto de un día de más de 7
+  días (9.2) y el trigger `entry_day` no deja guardar su ruta con `day < current_date - 8` (una noche
+  de margen por el huso), así que una foto que entra es una que este corte alcanza. Si una fila no se
+  puede actualizar tras borrar el fichero, esa fase se detiene y la respuesta final es 500. El barrido
+  de huérfanos corre igualmente: es el único límite duro, y una fila que no se deja purgar no puede
+  dejarlo sin ejecutar noche tras noche.
+- **`report-notify`** no lleva JWT (`verify_jwt = false` en `supabase/config.toml`, que es lo que deja
+  entrar a `pg_net`): la protege la cabecera `x-webhook-secret`, que tiene que ser igual a
+  `REPORT_WEBHOOK_SECRET`, y esa variable tiene que existir: si falta, 401 siempre, también con la
+  cabecera vacía. Sin `REPORT_TO`, 500, y sin `record.id` en el cuerpo, 400. Si Resend falla (502) no
+  marca nada, y el reintento de cada hora lo vuelve a mandar. Si el marcado falla (500), el correo ya
+  salió y el reintento puede mandarlo dos veces.
+- **`delete-account`**: si una pasada no borra nada (una subcarpeta, o un fichero que la API no borra),
+  contesta 500 en vez de girar hasta el límite de tiempo. Una subida tardía entre el último listado y el
+  borrado del usuario queda sin dueño: la recoge el barrido de huérfanos. Los reportes sobre la persona
+  (`reports.author` no tiene clave foránea) se borran antes que el usuario y, si falla, contesta 500
+  sin borrarlo: con el usuario ya borrado el reintento no podría autenticarse y los reportes se
+  quedarían para siempre.
+
+Tareas de `pg_cron` (todas en UTC):
+
+| Tarea | Cuándo | Qué |
+|---|---|---|
+| `purge-photos` | 03:17 | Llama a la función del mismo nombre, con la clave de servicio del Vault |
+| `invite-attempts-trim` | 03:31 | Borra los intentos de `invite_attempts` de más de 1 día |
+| `report-retry` | Minuto 41 de cada hora | `notify_report` para los reportes sin `notified_at` y de más de 10 minutos, 50 como mucho |
+
+El aviso de un reporte sale de la base y no de un webhook del panel, para que un proyecto nuevo no
+pueda olvidarlo. `notify_report` lee del Vault `project_url` y `report_webhook_secret`; si falta uno,
+o `pg_net` falla, solo escribe un `warning` y el reporte se guarda igual: el reintento de cada hora lo
+manda cuando se arregla. Quien reporta nunca pierde su reporte por un fallo del correo.
+
+Los secretos viven en Supabase, nunca en el repositorio. En el Vault: `project_url`,
+`service_role_key` (la purga) y `report_webhook_secret` (el mismo valor que `REPORT_WEBHOOK_SECRET`
+de la función), a mano una vez (`store/servidor.md` 2). La app solo lleva la URL del proyecto y la
 clave pública (`anon`), que ya viajan en el binario, en `social/SupabaseConfig.kt`.
 
 ---
@@ -588,6 +715,39 @@ Apple y Google con `compose-auth`: nativos en su plataforma, y el otro por el fl
 Android, Google en iOS). Al crear la cuenta: nombre visible de 1 a 30 caracteres y casilla de 16
 años o más, obligatoria. Sin proyecto (`SupabaseConfig.url` nulo), la pestaña Amigos no existe.
 
+La sesión tiene cuatro estados y la pantalla Amigos los reparte uno a uno. `NotAuthenticated` enseña la
+presentación. `Initializing` (el cliente lee la sesión guardada en otra corrutina al crearse) enseña
+`working`. `RefreshFailure` (sesión guardada que no se renueva sin red) enseña `friendsOffline` sin
+botón: el cliente reintenta solo y la pantalla vuelve sola al conectar. `Authenticated` abre Amigos.
+`Social.loadMe` lanza si no hay una sesión viva, para que salga ese aviso y no una espera sin fin.
+
+`hasAccount()` (sesión viva, o `RefreshFailure`) es lo que decide qué se enseña en Ajustes (la sección
+Amigos, con cerrar sesión y borrar cuenta) y en Hoy (el interruptor de compartir). No depende de que
+el perfil (`Social.me`) esté cargado: antes solo se cargaba al abrir Amigos con red, y tras un
+arranque en frío faltaban justo los controles de privacidad. Lo que sí necesita el perfil o las
+listas (el nombre, `friendsRow`, `inviteFriend`) sale desactivado hasta que cargan, y Ajustes los
+pide cada vez que la sesión pasa a viva (`hasLiveSession()`, que es `Authenticated` y no `hasAccount()`):
+con el arranque en frío sin red la cuenta ya está pero no está viva, y el perfil se pide cuando el
+cliente renueva el token, no antes. Sin perfil (sesión iniciada y nunca llamada con nombre,
+`Social.needsName`), la sección enseña solo `signOut` y `deleteAccount`: son lo único que no necesita
+perfil, y Apple 5.1.1(v) pide poder borrar la cuenta desde la app en cualquier momento.
+
+Cerrar sesión deja la cuenta donde está: al volver a entrar vuelven los amigos. Sin red, el teléfono
+olvida la sesión igual (`clearSession`). Sin cuenta nada se comparte: `defaultShare` vuelve a `Private`
+y `shareAsked` a `false`, de modo que un día guardado ahora no entra en la cola, y la pregunta del
+valor por defecto sale otra vez con el primer amigo.
+
+Ese olvido (`Social.forget`) también se hace cuando el cliente suelta la sesión por su cuenta: el
+refresh token revocado, o el usuario borrado desde el panel. `Social.watchSession`, que arranca `App`
+una vez por proceso, lo ejecuta en la transición de `Authenticated` o `RefreshFailure` a
+`NotAuthenticated` (`sessionLost`), y no con el `NotAuthenticated` con el que arranca un teléfono sin
+cuenta. Ese lleva `isSignOut` a false; el cliente marca con true todo lo que borra (`clearSession`),
+también la sesión guardada que el servidor rechaza al arrancar, que pasa de `Initializing` directo a
+`NotAuthenticated` sin un `Authenticated` antes, y por eso también cuenta. Se ejecuta también tras
+`signOut` y `deleteAccount`, que ya habían olvidado: es idempotente. Sin esto, el nombre, los amigos y
+el feed de la cuenta anterior se le enseñarían a la siguiente, y sus fotos en caché y la tira del widget
+se quedarían en el teléfono.
+
 ### 9.2 Subida
 
 `Outbox` (`social/Outbox.kt`). La cola es el campo `outbox` de `entries.json` y no un fichero
@@ -595,15 +755,36 @@ aparte: un cambio y su sitio en la cola se escriben juntos o no se escriben. `Ch
 añade cada día cuyo contenido cambia y que está o estaba compartido (`sharedChanges`); un día
 privado no entra nunca.
 
-Se vacía en orden al arrancar, después de cada guardado y al abrir Amigos. Cada día se manda como
+La cola y las marcas de "compartido" son de una cuenta: `JournalFile.outboxOwner` guarda su uid. La
+primera cuenta que entra la toma, con lo que ya hubiera; otra distinta la descarta (todos los días
+quedan privados y la cola vacía), porque lo que se encoló para una no es de la otra. Las filas que la
+primera ya tenía en el servidor se quedan allí, en su cuenta: este teléfono no las toca. Si esa cuenta
+vuelve a entrar después de otra, se descarta de nuevo (el dueño de la cola es ya la otra): los días
+quedan privados en el teléfono aunque el servidor conserve sus filas viejas. Cerrar sesión conserva
+cola y dueño; borrar la cuenta vacía la cola, borra el dueño y deja todos los días privados, porque
+ahí sí el servidor ya no tiene copia que alcanzar.
+
+Se vacía en orden al arrancar, después de cada guardado, al abrir Amigos y cada vez que la sesión pasa
+a `Authenticated`: en un arranque en frío no hay uid hasta que el cliente lee la sesión, y con el
+token caducado hasta que la renueva por red. Cada día se manda como
 está ahora, no como estaba al entrar en la cola: privado o borrado quita la fila y después la foto;
 compartido sube primero la foto y después la fila, para que nadie reciba nunca una ruta sin fichero.
 Un fallo corta la ronda y deja el resto para la siguiente. Un día solo sale de la cola si no cambió
 mientras se mandaba (`synced`).
 
 La foto se sube solo con `share == Photo`: reducida a `UPLOAD_SIDE`, JPEG `UPLOAD_QUALITY`,
-recodificada (`reencodeJpeg`, sin metadatos), con `upsert` a `<uid>/<day>.jpg`. Con `Color`, la
-foto del servidor se borra.
+recodificada (`reencodeJpeg`, sin metadatos), con `upsert` a `<uid>/<day>.jpg`: el nombre que exige la
+política del bucket (8.3). Con `Color`, la foto del servidor se borra.
+
+Lo que el servidor no admite no se manda, o la cola se atascaría para siempre:
+
+- Un día de más de `PHOTO_DAYS` (7) días sube solo el color, aunque esté en `Photo` (una cola que
+  tarda en salir): el servidor dejaría su `photo_path` a null y el fichero quedaría huérfano. El
+  servidor guarda una noche más de margen que la app para los husos (su disparador anula la foto con
+  `day < current_date - 8`, y su fecha es UTC mientras el día es el local del autor). `photoFits`
+  sigue en 7: la app no gasta ese margen, que es para que un teléfono al oeste de UTC no vea anulada
+  una foto que, para él, aún está dentro de su semana.
+- Un día fuera de `[2026-01-01, hoy + 2]` (`inServerRange`) no se manda y sale de la cola.
 
 El interruptor de cada día (privado, solo el color, con la foto) está en Hoy bajo la palabra, solo
 con cuenta; el valor para los días nuevos, en Ajustes > Amigos.
@@ -612,13 +793,26 @@ con cuenta; el valor para los días nuevos, en Ajustes > Amigos.
 
 - `select * from shared_entries where day in (hoy, ayer) and author <> me order by updated_at desc`.
   `hoy` y `ayer` son los de quien mira.
-- Nombres: los de la lista de amigos, que se carga a la vez. Una fila de alguien que ya no es amigo
-  no se enseña aunque llegue.
-- Fotos: `downloadAuthenticated` con la sesión (las políticas del bucket deciden, igual que con una
-  URL firmada, y es una llamada en vez de dos), una vez, y caché en disco en la caché del sistema,
-  `friends/<author>-<day>-<updated_at>.jpg`. El `updated_at` en el nombre hace que una foto cambiada
-  nunca salga de la caché vieja. Tras cada carga se borra de la caché todo lo que el feed ya no
-  enseña, y al cerrar sesión, todo.
+- Amigos y solicitudes: `rpc my_friendships()`, una llamada con el nombre ya unido. Los amigos son los
+  `accepted`; las solicitudes, los `pending` que no pedí yo. Una fila de alguien que ya no es amigo no
+  se enseña aunque llegue.
+- Quitar o bloquear a alguien lo saca primero de las listas, del feed y de la tira del widget, y solo
+  después vuelve a pedir las listas: el `rpc` ya funcionó, y si ese refresco falla (sin red) no deja su
+  color en el widget ni dice "sin conexión" de algo que ya está hecho.
+- Fotos: `downloadAuthenticated` con la sesión (las políticas del bucket deciden, y es una llamada),
+  una vez, y caché en disco en la caché del sistema, `friends/<author>-<day>-<updated_at>.jpg`. El
+  `updated_at` en el nombre hace que una foto cambiada nunca salga de la caché vieja. Tras cada carga se
+  borra de la caché todo lo que el feed ya no enseña, y al cerrar sesión, todo.
+- La caché es solo una comodidad: se escribe a un `.part` y se renombra, y nada que falle (disco lleno,
+  un fichero que la limpieza borra mientras se lee, una copia que no decodifica, que se vuelve a bajar
+  y se sobrescribe) cuesta la foto ni cierra la app. Una tarjeta cuya foto no se pudo bajar la vuelve a
+  pedir en cada carga del feed (`Friends.refreshes`, un contador interno que no se enseña), así que tirar
+  hacia abajo también la recupera.
+- El año de un amigo se pide de uno en uno: `Friends.year(id, año)` con rango y orden por día, y
+  `Friends.firstYear(id)` para el primer año con algo compartido; las flechas van de ese a este. El
+  servidor corta en 1000 filas empezando por las más antiguas, y pedirlo todo perdería justo el año que
+  se ve. Un día que no se puede leer (un cliente modificado puede guardar uno que no parsea) se descarta
+  al recibirlo.
 - La tarjeta se decodifica al entrar en pantalla (`LazyColumn`): 50 amigos por dos días no caben
   decodificados a la vez.
 - Se refresca al abrir Amigos y al tirar hacia abajo. Sin sondeo en segundo plano.
@@ -633,12 +827,25 @@ cualquier ruta) lee el código y enseña los botones de las tiendas.
 - El código son 10 caracteres hexadecimales; `inviteCodeOf` solo acepta ese host y esa forma.
 - Un enlace abierto sin sesión, o antes de elegir nombre, se guarda en memoria (`Friends.pendingCode`)
   y se manda al llegar a Amigos con cuenta. No se guarda en disco: tras instalar, el enlace se vuelve a
-  abrir (SPEC 5).
-- `request_friend` contesta `blocked` igual que `not_found` en la app ("este enlace ya no vale"):
-  nadie averigua por un enlace que le han bloqueado.
-- Solo se listan las solicitudes recibidas. La enviada e ignorada se queda pendiente sin avisar.
+  abrir (SPEC 5). Se borra en cuanto el servidor contesta, no cuando acaba el refresco de listas.
+- `request`, `accept` y `decline` devuelven lo que contestó el `rpc`. El refresco de las listas que
+  viene detrás es solo ponerlas al día: si falla (la red cae justo después), no se convierte en
+  "sin conexión" ni pierde la respuesta; las listas se corrigen en la siguiente carga.
+- `request_friend` contesta `not_found` a quien está bloqueado, igual que ante un código que no existe, y
+  la app pinta `blocked` igual ("este enlace ya no vale"): nadie averigua por un enlace que le han
+  bloqueado. `too_many` (20 enlaces que no valen en una hora) dice `inviteTooMany`. `limit` dice
+  `inviteLimit`: puede ser el tope de amigos de uno o el de solicitudes en espera del otro, y no se sabe
+  cuál.
+- Solo se listan las solicitudes recibidas. La enviada e ignorada se queda pendiente sin avisar. Cada
+  solicitud se puede aceptar, ignorar o bloquear, y bloquear abre directamente la confirmación
+  (`blockText`): ignorar no impide que quien tenga el enlace mande otra.
 - Aceptar con alguno de los dos en 50 falla en el disparador (`friend_limit`) y la app lo dice con
   `friendLimit`, sin sugerir a quién quitar.
+- Bloqueados: Ajustes > Amigos > `blockedRow` abre un diálogo con los nombres de `my_blocks()` y
+  `unblock` en cada uno, con confirmación (`unblockText`). Desbloquear no avisa y no devuelve la
+  amistad.
+- Reportar inserta en `reports`. Un `23505` (la misma tarjeta otra vez) es éxito, y la tarjeta queda
+  oculta igual. El tope de 20 al día (`report_limit`) sí es un fallo, y la tarjeta vuelve.
 - Los marcadores de `assetlinks.json`, `apple-app-site-association` y `404.html` se rellenan como
   dice `store/servidor.md` 5.
 
@@ -664,10 +871,34 @@ Comunes (`commonTest`) salvo que se diga.
 14. Sintonía: justo por debajo y justo por encima del umbral.
 15. QR: la matriz de un texto conocido coincide con la de referencia.
 16. Color de la semana: semana 1 y semana 53.
-17. Servidor (`supabase/tests/`, pgTAP): sin amistad no se lee; un bloqueo corta; tope de 50; nadie
-    lee el código de invitación de otro; una tarjeta no puede apuntar a la foto de otra persona.
+17. Servidor (`supabase/tests/`, pgTAP): sin amistad no se lee; un bloqueo corta y se deshace; tope de 50
+    y de 100 solicitudes; nadie lee el código de invitación de otro; una tarjeta no puede apuntar a la
+    foto de otra persona. Y lo que cierra la revisión: fotos (lee un amigo solo con fila, no un
+    extraño ni un bloqueado; escribe solo con nombre `<uid>/<día>.jpg` y un día dentro de la ventana),
+    días de una tarjeta (hasta hoy + 2, el margen de una noche, mover el `day` fuera de rango, la fila
+    antigua a la que la purga le quita la ruta, y que una actualización que no toca el `day` también
+    quita la ruta de un día viejo), reportes (solo de un amigo y a nombre propio, duplicado,
+    `notified_at`, tope de 20 por persona en un día y no en una hora, uno que se guarda aunque el Vault
+    esté vacío y no deja nada en la cola, la llamada que `notify_report` deja en la cola de `pg_net`
+    con su URL, la cabecera `x-webhook-secret` y el reporte, y el reintento horario, que solo repite el
+    de más de 10 minutos y sin marcar), freno de códigos, cruce de solicitudes, `self`, el tope de 50
+    amigos de quien pide (también al pedir de vuelta una solicitud ya hecha), que quien pidió no
+    acepta su propia solicitud, que `my_friendships` y `my_blocks` son solo lo mío y que un bloqueado
+    no levanta el bloqueo, los guardas de un bloqueo con la fila de amistad todavía puesta (no lee
+    días ni fotos, no sale en la lista, no deja leer el perfil ni aceptar), el barrido de huérfanos
+    (también el fichero viejo al que sí apunta una tarjeta), que `anon` no ejecuta ni toca nada, el
+    conjunto exacto de funciones que ejecuta `authenticated`, y que el trigger y las tres tareas de
+    `pg_cron` existen.
+    `.github/workflows/db.yml` lo ejecuta (`supabase start` y `supabase test db`) en cada cambio de
+    `supabase/`.
 18. Estadísticas: calidez ordenada, mes más cálido y más frío, color repetido, estación más gris, pocos
     días no dicen nada, y la comparación con el año anterior en los tres sentidos.
+19. Amigos, lógica del cliente (`FriendsLogicTest`): amigos por nombre sin distinguir mayúsculas y solo
+    las solicitudes que me hicieron a mí; cada respuesta de `request_friend` tiene su resultado; un día
+    que no parsea se descarta; el servidor admite de 2026-01-01 a hoy + 2; una foto de más de 7 días
+    sube solo con el color; otra cuenta empieza sin nada compartido ni en cola; el dueño de la cola
+    sobrevive al fichero y los ficheros viejos no lo tienen; la sesión que el cliente suelta
+    (`sessionLost`) se distingue del `NotAuthenticated` con el que arranca un teléfono sin cuenta.
 
 `ExtractPreview` (`androidHostTest`) no es un test: con `CHROMA_PHOTOS=<carpeta>` escribe
 `shared/build/extract-preview.png`, una hoja con cada foto y sus candidatos, para juzgar la extracción a ojo.
@@ -702,6 +933,7 @@ Sin la variable no hace nada.
 | #32 Invitación | 6.10, 9.4; test 15 |
 | #33 a #35 Feed y mosaicos | 9.3 |
 | #36, #37 Seguridad y cuenta | 8.2, 8.4 |
+| Revisión de Amigos (v1.1) | 8, 9.1 a 9.4; tests 17 y 19; `pantallas.md` 7 y 8 |
 | #39 Sintonía | 6.11; test 14 |
 | #40 Color de la semana | 6.12; test 16 |
 | #41 Estadísticas | 6.13; test 18 |

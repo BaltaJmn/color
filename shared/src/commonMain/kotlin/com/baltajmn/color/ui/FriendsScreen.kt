@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,7 +38,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -57,6 +58,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.color.inkColorFor
@@ -84,6 +86,7 @@ import io.github.jan.supabase.compose.auth.composable.NativeSignInResult
 import io.github.jan.supabase.compose.auth.composable.rememberSignInWithApple
 import io.github.jan.supabase.compose.auth.composable.rememberSignInWithGoogle
 import io.github.jan.supabase.compose.auth.composeAuth
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
@@ -99,8 +102,13 @@ fun FriendsScreen(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
     val status by Social.client.auth.sessionStatus.collectAsState()
     when (status) {
         is SessionStatus.NotAuthenticated -> Page { Intro() }
-        // Initializing, or a refresh that failed offline: the stored session still stands.
-        else -> SignedIn(today, onPhoto)
+        // The stored session is being read: there is no one to ask for yet, and the screen follows
+        // the status, so it is on the next frame once there is.
+        is SessionStatus.Initializing -> Page { Text(S.working, style = Styles.caption) }
+        // The session stands but cannot be renewed without a network, and the client keeps trying by
+        // itself: asked now, everything would fail. This screen comes back with the connection.
+        is SessionStatus.RefreshFailure -> Page { Notice(S.friendsOffline) }
+        is SessionStatus.Authenticated -> SignedIn(today, onPhoto)
     }
 }
 
@@ -271,12 +279,11 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
         failed = runCatching {
             Friends.refresh()
             // A link opened before there was an account goes out now, once.
-            code?.let {
-                message = inviteResultText(Friends.request(it))
-                Friends.pendingCode = null
-            }
+            code?.let { message = inviteResultText(Friends.request(it)) }
             Friends.refreshFeed(today)
-        }.isFailure
+            // The request spends the code this effect is keyed on, which restarts it: a cancelled run
+            // is not a failed one, or "no connection" would flash before the restart.
+        }.onFailure { if (it is CancellationException) throw it }.isFailure
     }
     LaunchedEffect(code, attempt, today) { load() }
     // The default is asked when the first friend arrives, on whichever side of the request.
@@ -333,20 +340,18 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
                     Spacer(Modifier.height(8.dp))
                     Text(S.requestsTitle, style = Styles.label)
                     Friends.requests.forEach { person ->
-                        Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Text(person.displayName, style = Styles.body, modifier = Modifier.weight(1f))
-                            TextAction(S.ignore, { act { Friends.decline(person.id) } })
-                            OutlinedAction(
-                                S.accept,
-                                {
-                                    act {
-                                        // Once per friendship: the moment a request turns into a friend.
-                                        if (Friends.accept(person.id)) haptic.performHapticFeedback(HapticFeedbackType.Confirm)
-                                        else message = S.friendLimit
-                                    }
-                                },
-                            )
-                        }
+                        RequestRow(
+                            person.displayName,
+                            onBlock = { Friends.acting = Acting(person, request = true) },
+                            onIgnore = { act { Friends.decline(person.id) } },
+                            onAccept = {
+                                act {
+                                    // Once per friendship: the moment a request turns into a friend.
+                                    if (Friends.accept(person.id)) haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                                    else message = S.friendLimit
+                                }
+                            },
+                        )
                     }
                 }
             }
@@ -391,6 +396,29 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
     }
 }
 
+/**
+ * The name on a line of its own and the answers under it, wrapping: in a long language with big
+ * type three buttons leave a name beside them no width at all, and who is asking is the point.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun RequestRow(name: String, onBlock: () -> Unit, onIgnore: () -> Unit, onAccept: () -> Unit) {
+    Column(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+        Text(name, style = Styles.body, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        FlowRow(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+            verticalArrangement = Arrangement.Center,
+        ) {
+            // Quiet like Ignore, but for good: the link stays valid, so Ignore alone invites a repeat.
+            // The same three words for every person: each says whose request it answers.
+            TextAction(S.block, onBlock, Modifier.semantics { contentDescription = "${S.block}, $name" }, quiet = true)
+            TextAction(S.ignore, onIgnore, Modifier.semantics { contentDescription = "${S.ignore}, $name" })
+            OutlinedAction(S.accept, onAccept, Modifier.semantics { contentDescription = "${S.accept}, $name" })
+        }
+    }
+}
+
 private fun LazyListScope.block(content: @Composable ColumnScope.() -> Unit) = item {
     Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER), content = content)
 }
@@ -413,7 +441,7 @@ private fun LazyListScope.feedSection(
 /** A friend's day: the same card as your own, with their name and their date. No counts, no marks of being seen. */
 @Composable
 private fun FeedCard(row: FeedRow, author: String, onPhoto: (ImageBitmap) -> Unit) {
-    val photo by produceState<ImageBitmap?>(null, row.cacheName) { value = Friends.photo(row) }
+    val photo = friendPhoto(row)
     val person = Friends.friends.find { it.id == row.author }
     fun menu() {
         person?.let { Friends.acting = Acting(it, row) }
@@ -451,7 +479,8 @@ private fun inviteResultText(result: InviteResult): String = when (result) {
     InviteResult.Already -> S.inviteAlready
     InviteResult.Self -> S.inviteSelf
     InviteResult.Invalid -> S.inviteInvalid
-    InviteResult.Limit -> S.friendLimit
+    InviteResult.Limit -> S.inviteLimit
+    InviteResult.TooMany -> S.inviteTooMany
 }
 
 /** Two overlapping rings, 10 across: nothing to press, nothing to count (docs/pantallas.md 6). */

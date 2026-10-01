@@ -1,0 +1,40 @@
+name: Database
+
+# The security of the server lives in RLS and security definer functions (CLAUDE.md), and the
+# pgTAP suite is what stops a later migration from opening a policy. A workflow of its own, with
+# paths, and not a job in tests.yml: the local stack costs minutes that a change to the app does
+# not need, and this way the Gradle jobs never wait on it.
+on:
+  push:
+    branches: [main]
+    paths: ['supabase/**', '.github/workflows/db.yml']
+  pull_request:
+    paths: ['supabase/**', '.github/workflows/db.yml']
+
+concurrency:
+  group: db-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  pgtap:
+    runs-on: ubuntu-latest
+    env:
+      # config.toml enables Apple and Google with values that only exist in the hosted project, and
+      # the CLI refuses to start with an enabled provider whose client id is empty. The local stack
+      # never signs anyone in, so any non-empty value will do.
+      APPLE_CLIENT_ID: placeholder
+      APPLE_SECRET: placeholder
+      GOOGLE_CLIENT_ID: placeholder
+      GOOGLE_SECRET: placeholder
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      # Applies every migration to a fresh database, which is already a test: one that does not
+      # run stops the job here.
+      - run: supabase start
+      - run: supabase test db

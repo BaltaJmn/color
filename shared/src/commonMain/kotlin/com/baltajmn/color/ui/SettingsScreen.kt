@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,6 +75,8 @@ import com.baltajmn.color.data.today
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.social.Friends
 import com.baltajmn.color.social.Social
+import com.baltajmn.color.social.hasAccount
+import com.baltajmn.color.social.hasLiveSession
 import com.baltajmn.color.social.isValidName
 import com.baltajmn.color.ui.theme.GUTTER
 import com.baltajmn.color.ui.theme.MAX_CONTENT_WIDTH
@@ -99,6 +102,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     var erasing by remember { mutableStateOf(false) }
     var erasingNow by remember { mutableStateOf(false) }
     var choosingShare by remember { mutableStateOf(false) }
+    var viewingBlocked by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     Column(
         Modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()),
@@ -137,13 +141,32 @@ fun SettingsScreen(onBack: () -> Unit) {
                 }
             }
 
+            // On the session and not on the profile: after a cold start the profile is not loaded until
+            // Friends is opened with a network, and sign out and delete account must not wait for that.
+            val account = hasAccount()
+            val named = !Social.needsName
             val me = Social.me
-            if (Social.available && me != null) {
+            // Keyed on the live session, not on having an account: offline at start the account is
+            // there but not live, and the profile has to be asked for when the network renews it.
+            val live = hasLiveSession()
+            LaunchedEffect(live) {
+                if (live && Social.me == null) runCatching {
+                    Social.loadMe()
+                    Friends.refresh()
+                }
+            }
+            if (account) {
                 Section(S.sectionFriends) {
-                    SettingRow(S.nameRow, me.displayName, onClick = { renaming = true })
-                    SettingRow(S.defaultShareRow, shareLabel(settings.defaultShare), onClick = { choosingShare = true })
-                    SettingRow(S.friendsRow, onClick = { Friends.listOpen = true })
-                    SettingRow(S.inviteFriend, onClick = { Friends.inviteOpen = true })
+                    // Without a profile (signed in, never named) there is nothing to rename, share or list;
+                    // leaving and erasing stay, because the session is all they need (Apple 5.1.1(v)).
+                    if (named) {
+                        // What needs the profile or the lists waits for them; the rest is always there.
+                        SettingRow(S.nameRow, me?.displayName, enabled = me != null, onClick = { renaming = true })
+                        SettingRow(S.defaultShareRow, shareLabel(settings.defaultShare), onClick = { choosingShare = true })
+                        SettingRow(S.friendsRow, enabled = me != null, onClick = { Friends.listOpen = true })
+                        SettingRow(S.inviteFriend, enabled = me != null, onClick = { Friends.inviteOpen = true })
+                        SettingRow(S.blockedRow, onClick = { viewingBlocked = true })
+                    }
                     SettingRow(S.signOut, onClick = { leaving = true })
                     SettingRow(
                         S.deleteAccount,
@@ -317,6 +340,8 @@ fun SettingsScreen(onBack: () -> Unit) {
     }
 
     if (renaming) RenameDialog(Social.me?.displayName.orEmpty()) { renaming = false }
+
+    if (viewingBlocked) BlockedDialog { viewingBlocked = false }
 
     if (leaving) {
         Ask(

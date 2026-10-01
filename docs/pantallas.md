@@ -275,9 +275,26 @@ una flecha. Una lista de opciones se lee como unas pocas cosas que decidir, no c
    de Chroma apagadas en el sistema), debajo sale `reminderBlocked` con `openSystemSettings`, que abre
    los ajustes de notificaciones de la app (en un iPhone donde nunca se preguntó, la pregunta).
 2. **Amigos** (v1.1): cuenta y nombre visible, `defaultShareRow`, `friendsRow`, `inviteFriend` (el
-   mismo nombre que la pantalla que abre), `signOut`,
+   mismo nombre que la pantalla que abre), `blockedRow`, `signOut`,
    `deleteAccount` (confirmación `deleteAccountText`; mientras borra, `working`; sin conexión, el aviso
    de siempre y nada cambia).
+   - La sección sale con cuenta (una sesión viva, o guardada y a la espera de red), no cuando el
+     perfil ya se cargó: tras un arranque en frío está desde el primer momento, y cerrar sesión y
+     borrar la cuenta no esperan a la red. Lo que necesita el perfil o las listas (el nombre,
+     `friendsRow`, `inviteFriend`) sale desactivado hasta que cargan, y Ajustes los pide al abrirse y
+     otra vez cuando la sesión vuelve a estar viva (arranque en frío sin red, que luego se conecta).
+   - Con sesión pero sin perfil (se inició sesión y no se llegó a elegir nombre), la sección enseña solo
+     `signOut` y `deleteAccount`. El resto (`nameRow`, `defaultShareRow`, `friendsRow`, `inviteFriend`,
+     `blockedRow`) necesita un perfil y no sale. Cerrar sesión y borrar la cuenta nunca se esconden
+     con una sesión: Apple 5.1.1(v) pide poder borrarla desde la app.
+   - `blockedRow` abre un diálogo y no una pantalla: atrás lo cierra donde está. Título `blockedRow` y
+     una fila por persona bloqueada, por orden alfabético y sin número: su nombre en una línea propia
+     (hasta dos, como la solicitud de Amigos 8.3) y debajo, a la derecha, `unblock`: en un diálogo de
+     unos 264 de ancho, con letra grande, a su lado el nombre se quedaba sin ancho. Para el lector de
+     pantalla el botón dice "`unblock`, nombre", porque la lista repite la misma palabra por persona.
+     Pide confirmación (`unblockText`: podrá volver a enviar una solicitud, y nadie recibe
+     aviso) y no devuelve la amistad. Vacío dice `blockedEmpty`; sin conexión, `friendsOffline` con
+     `retry`. Cierra con `a11yClose`.
 3. **Privacidad**: bloqueo (v1.2), política, y `termsRow` si hay servidor.
    - `lockRow` con `lockSubtitle`, o `lockUnavailable` y desactivado si el teléfono no tiene bloqueo
      de pantalla. Apagado por defecto. Encenderlo pide antes la cara, la huella o el código: quien
@@ -326,6 +343,10 @@ primero (App Store 4.8: igual de visibles). Tras iniciar sesión, si
 es la primera vez: nombre visible (con tope visible `n/30`, como la palabra del día), casilla
 `age16`, `termsAgree` con el enlace `termsRow`, y `continue`. Los términos se aceptan ahí, antes de ver nada de nadie (Apple 1.2).
 
+Con una sesión guardada, la pantalla sigue el estado de la sesión en vez de adivinarlo. Mientras se
+lee, `working`. Si no se puede renovar sin red, `friendsOffline` sin botón: el cliente reintenta solo
+y la pantalla vuelve sola al conectar. Nunca una espera que no acaba.
+
 ### 8.2 Con cuenta y sin amigos
 
 `friendsEmpty` y el botón principal `inviteFriend`.
@@ -335,11 +356,18 @@ es la primera vez: nombre visible (con tope visible `n/30`, como la palabra del 
 - Arriba, **la paleta del círculo**: una tira de 24 de alto, radio 12, con un segmento por amigo con
   color hoy, en orden de hora (el primero del día a la izquierda). Sin nombres. Si nadie tiene color
   hoy, no hay tira. El lector de pantalla la anuncia como `a11yFriendsToday`, sin número.
-- Solicitudes recibidas, si las hay: bajo la etiqueta `requestsTitle`, una fila por persona con su
-  nombre, `ignore` y `accept`. Sin número. Ignorar no avisa a nadie.
+- Solicitudes recibidas, si las hay: bajo la etiqueta `requestsTitle`, una fila por persona. El nombre
+  va en su propia línea (hasta dos): con letra grande o un idioma largo, tres botones a su lado le
+  dejaban un ancho de cero, y quién pide es lo que importa. Debajo, a la derecha y en una fila que se
+  parte si no cabe, `block`, `ignore` y `accept`. Para el lector de pantalla cada uno lleva el nombre
+  ("`block`, nombre"): las tres palabras se repiten por persona y sin él no se sabe a quién contestan.
+  Sin número. Ignorar no avisa a nadie. Bloquear abre
+  directamente la confirmación (`blockText`) y está aquí porque el enlace sigue valiendo: tras Ignorar,
+  quien lo tenga puede mandar otra solicitud.
 - Las tarjetas (`compact`) de hoy y de ayer, separadas por los títulos `feedToday` y
   `feedYesterday`, en orden de hora: la última cambiada, arriba. Cada una con el nombre y la fecha de
-  su autor, que puede no ser la tuya cerca de medianoche.
+  su autor, que puede no ser la tuya cerca de medianoche. Si una foto no se pudo bajar, la tarjeta se
+  ve sin miniatura solo hasta la siguiente carga: tirar hacia abajo la pide otra vez.
 - Al final, `caughtUp`. Nada debajo. Por eso, con amigos, `inviteFriend` va arriba a la derecha,
   junto al título, y no al final.
 - Tirar hacia abajo refresca.
@@ -354,8 +382,8 @@ es la primera vez: nombre visible (con tope visible `n/30`, como la palabra del 
 ### 8.4 Mosaico de un amigo
 
 La rejilla de Mi año con los días que compartió. Título: su nombre. Menú: `removeFriend` y `block`.
-Sin contadores. Con más de un año, flechas de año bajo el título. Un año sin nada dice
-`friendYearEmpty`.
+Sin contadores. Con más de un año, flechas de año bajo el título, desde el primer año en que compartió
+algo hasta el actual; cada año se pide al servidor aparte. Un año sin nada dice `friendYearEmpty`.
 
 Tocar un día abre su tarjeta a tamaño completo, con su nombre y su fecha. Pasada la semana de la
 foto en el servidor, la tarjeta es solo el color.
@@ -367,8 +395,13 @@ compartido nada hoy ni ayer.
 ### 8.5 Compartir el día
 
 En Hoy, bajo la tarjeta, un segmentado de tres: `sharePrivate`, `shareColor`, `sharePhoto`. Solo se
-ve con cuenta. La primera vez que se acepta un amigo, un diálogo pregunta el valor por defecto
-(`askDefaultShare`).
+ve con cuenta, y la sesión basta: no espera a que el perfil se cargue. La primera vez que se acepta un
+amigo, un diálogo pregunta el valor por defecto (`askDefaultShare`). Al cerrar sesión o borrar la
+cuenta, el valor por defecto vuelve a `sharePrivate` y esa pregunta, a hacerse: sin cuenta, un día
+guardado no queda marcado como compartido.
+
+Un día que llega al servidor con más de 7 días (un teléfono que estuvo sin red) sube solo su color,
+aunque esté en `sharePhoto`: el servidor no guarda fotos tan viejas.
 
 ### 8.6 Invitar
 
@@ -382,7 +415,10 @@ El QR mide 240 de lado, radio 20, con cuatro módulos de margen, y es **siempre 
 QR invertido. Cada módulo ocupa píxeles enteros para que no queden líneas entre módulos.
 
 Abrir un enlace de otra persona lleva a Amigos y deja un aviso tranquilo con el resultado:
-`inviteSent`, `inviteAccepted`, `inviteAlready`, `inviteSelf`, `inviteInvalid` o `friendLimit`.
+`inviteSent`, `inviteAccepted`, `inviteAlready`, `inviteSelf`, `inviteInvalid`, `inviteLimit` (uno de
+los dos está en el límite de amigos, o la otra persona en el de solicitudes en espera, y no se dice
+cuál) o `inviteTooMany` (demasiados enlaces que no valen en una hora). Aceptar una solicitud estando
+uno de los dos en 50 amigos dice `friendLimit`.
 
 ---
 

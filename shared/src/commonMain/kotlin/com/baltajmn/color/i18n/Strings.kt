@@ -605,6 +605,20 @@ object S {
         "Chroma hält Kreise klein: höchstens 50 Freunde, und einer von euch hat sie erreicht.",
         "Chroma garde les cercles petits : 50 amis au plus, et l'un de vous y est déjà.",
     )
+    val inviteLimit get() = t(
+        "Chroma keeps circles small. One of you has reached the limit of friends or waiting requests.",
+        "Chroma mantiene los círculos pequeños. Uno de los dos ha llegado al límite de amigos o de solicitudes en espera.",
+        "O Chroma mantém os círculos pequenos. Um de vocês chegou ao limite de amigos ou de pedidos em espera.",
+        "Chroma hält Kreise klein. Einer von euch hat das Limit an Freunden oder offenen Anfragen erreicht.",
+        "Chroma garde les cercles petits. L'un de vous a atteint la limite d'amis ou de demandes en attente.",
+    )
+    val inviteTooMany get() = t(
+        "Too many tries with links that don't work. Wait a while and try again.",
+        "Demasiados intentos con enlaces que no valen. Espera un rato y vuelve a probar.",
+        "Tentativas demais com links que não funcionam. Espere um pouco e tente de novo.",
+        "Zu viele Versuche mit ungültigen Links. Warte eine Weile und versuch es noch einmal.",
+        "Trop d'essais avec des liens qui ne marchent pas. Attends un peu et réessaie.",
+    )
     val feedToday get() = t("Today", "Hoy", "Hoje", "Heute", "Aujourd'hui")
     val feedYesterday get() = t("Yesterday", "Ayer", "Ontem", "Gestern", "Hier")
     val caughtUp get() = t("You're all caught up.", "Ya estás al día.", "Você está em dia.", "Du bist auf dem Laufenden.", "Tu es à jour.")
@@ -619,6 +633,15 @@ object S {
     val report get() = t("Report", "Reportar", "Denunciar", "Melden", "Signaler")
     val block get() = t("Block", "Bloquear", "Bloquear", "Blockieren", "Bloquer")
     val removeFriend get() = t("Remove friend", "Quitar de amigos", "Remover amigo", "Freund entfernen", "Retirer des amis")
+    val blockedRow get() = t("Blocked", "Bloqueados", "Bloqueados", "Blockiert", "Bloqués")
+    val blockedEmpty get() = t(
+        "You haven't blocked anyone.",
+        "No has bloqueado a nadie.",
+        "Você não bloqueou ninguém.",
+        "Du hast niemanden blockiert.",
+        "Tu n'as bloqué personne.",
+    )
+    val unblock get() = t("Unblock", "Desbloquear", "Desbloquear", "Entsperren", "Débloquer")
     val reportText get() = t(
         "The card is hidden for you now, and the report reaches Chroma, which acts within 24 hours. Nobody is told who reported it.",
         "La tarjeta se te oculta ya, y el reporte llega a Chroma, que actúa en menos de 24 horas. Nadie sabrá quién lo hizo.",
@@ -739,6 +762,14 @@ object S {
         "$name deixa de te ver e não poderá te convidar de novo. Ninguém é avisado.",
         "$name sieht dich nicht mehr und kann dich nicht wieder einladen. Niemand wird benachrichtigt.",
         "$name ne te verra plus et ne pourra plus t'inviter. Personne n'est prévenu.",
+    )
+
+    fun unblockText(name: String) = t(
+        "$name will be able to send you a request again. Nobody is told.",
+        "$name podrá volver a enviarte una solicitud. Nadie recibe ningún aviso.",
+        "$name poderá te enviar um pedido de novo. Ninguém é avisado.",
+        "$name kann dir wieder eine Anfrage schicken. Niemand wird benachrichtigt.",
+        "$name pourra de nouveau t'envoyer une demande. Personne n'est prévenu.",
     )
 
     fun weekHint(name: String) = t(

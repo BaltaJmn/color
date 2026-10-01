@@ -156,7 +156,8 @@ cuenta como compartir. Se añade a la tabla de 1:
 | ¿Se pueden borrar los datos sin borrar la cuenta? | Sí: cualquier día se hace privado y su fila y su foto se borran |
 
 Hechos del código que lo sostienen: el esquema de `supabase/migrations`, la subida de `Outbox.kt`
-(foto a 720, recodificada), el borrado de fotos a los 7 días (`purge-photos`) y el de la cuenta
+(foto a 720, recodificada), el borrado de fotos (`purge-photos`: a los 7 días y, además, el barrido de
+los ficheros que ninguna tarjeta señala, para que ninguna se quede atrás) y el de la cuenta
 (`delete-account`).
 
 ## 5. App Store: privacidad de la app
@@ -184,6 +185,11 @@ rastreo:
 | Contenido del usuario > Fotos o vídeos | Las fotos compartidas, 7 días |
 | Contenido del usuario > Otro contenido del usuario | Colores, nombres de color, palabras, amistades y reportes |
 | Identificadores > ID de usuario | Pasa a **vinculado**: el de la cuenta de Amigos |
+
+El servidor guarda además, de uno a dos días, el ID de usuario y la hora de cada enlace de invitación
+que no valía (`invite_attempts`), solo para frenar a quien prueba códigos al azar. Cae en lo ya
+declarado: ID de usuario, para la funcionalidad de la app (Apple incluye ahí la seguridad y evitar el
+fraude), y no añade ningún tipo.
 
 `PrivacyInfo.xcprivacy` ya declara esto. Si se publica una versión sin servidor (`SupabaseConfig`
 vacío), el formulario correcto es el de 5 y el manifiesto declara de más, cosa que Apple no rechaza; lo
@@ -228,13 +234,14 @@ Lo que cambia al publicar la v1.1 (los datos que salen, en #38):
 | Play, política de contenido generado por usuarios | Términos con tolerancia cero, reportar dentro de la app, bloquear, y actuación en 24 horas |
 | App Store, edad | Contenido generado por usuarios: **sí**, y mensajería o chat: no. El resultado sube, previsiblemente a 12+ |
 | Play, público objetivo y acceso | 16 y más, y cuenta de prueba (tabla de 3) |
-| App Store, notas al revisor | Una cuenta de prueba con un amigo ya aceptado y días compartidos, y dónde están reportar (mantener pulsada una tarjeta), bloquear y los términos |
+| App Store, notas al revisor | Una cuenta de prueba con un amigo ya aceptado y días compartidos, y dónde están reportar (mantener pulsada una tarjeta), bloquear (también en cada solicitud), desbloquear (Ajustes > Amigos > Bloqueados) y los términos |
 | Play, seguridad de los datos | "¿Los usuarios pueden pedir que se borren sus datos?": **sí**. URL de borrado de la cuenta: `https://color.baltajmn.dev/delete` (`web/delete.html`) |
 | App Store | Borrar la cuenta desde la app (5.1.1(v)): Ajustes > Amigos > Borrar cuenta |
 | Términos | `https://color.baltajmn.dev/terms.html` (`web/terms.html`). Se aceptan al crear el nombre, antes de ver nada de nadie, y están en Ajustes > Privacidad |
 
 Apple 1.2 pide los cuatro a la vez: términos aceptados, filtro o reporte de contenido, bloquear, y
-actuar en 24 horas. Los reportes llegan por correo (`report-notify`, `store/servidor.md` 3).
+actuar en 24 horas. Los reportes llegan por correo (`report-notify`, `store/servidor.md` 3), lanzado desde
+la base y reintentado cada hora hasta que sale, y cómo actuar sobre uno está en `store/servidor.md` 7.
 
 ## 7. La política: dónde se publica
 

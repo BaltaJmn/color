@@ -74,6 +74,11 @@ data class JournalFile(
      */
     val outbox: List<String> = emptyList(),
     /**
+     * The account the queue and the shared marks belong to. Another account signing in on this phone
+     * never inherits them: what was queued for one is not the other's to send.
+     */
+    val outboxOwner: String? = null,
+    /**
      * Friends' colors on the day of the last feed load, for the today widget (#42). Colors only, in
      * order of the hour; never exported, and forgotten on signing out.
      */
@@ -92,6 +97,17 @@ fun sharedChanges(before: Journal, after: Journal): List<String> =
     }.sorted()
 
 private fun ChromaEntry?.isShared() = this != null && share != Share.Private
+
+/**
+ * The journal as an account with none of its days would see it: every day private, nothing queued.
+ * For a deleted account, whose server has nothing left, and for another one signing in, which has no
+ * share of these days to catch up with (the earlier account's rows stay on the server, untouched).
+ */
+fun JournalFile.withNothingShared(owner: String?): JournalFile = copy(
+    entries = entries.mapValues { (_, e) -> if (e.share == Share.Private) e else e.copy(share = Share.Private) },
+    outbox = emptyList(),
+    outboxOwner = owner,
+)
 
 /** What goes into a backup: the days without the settings of this phone. */
 @OptIn(ExperimentalSerializationApi::class)

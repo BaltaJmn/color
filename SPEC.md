@@ -89,7 +89,7 @@ métricas.
 - [ ] Paleta del círculo: la tira con los colores de hoy de tus amigos.
 - [ ] Mosaico de cada amigo con los días que compartió.
 - [ ] Sintonía: marca sutil cuando tu color y el de un amigo casi coinciden.
-- [ ] Quitar amigo en silencio, bloquear y reportar.
+- [ ] Quitar amigo en silencio, bloquear (y poder desbloquear) y reportar.
 - [ ] Borrar la cuenta desde la app y desde la web.
 
 ### v1.2: extras
@@ -192,7 +192,8 @@ El principio que decide cada duda: **ver a tus amigos, nunca que te midan.**
 - Si quien abre el enlace no tiene la app, la página web le lleva a su tienda y, tras instalar, el
   enlace se puede volver a abrir.
 - El código es fijo y se puede regenerar. Un enlace filtrado no da nada: toda amistad pasa por
-  aceptar.
+  aceptar. Quien prueba muchos enlaces que no valen se queda sin intentos un rato, y nadie acumula
+  más de 100 solicitudes en espera.
 - Tope de 50. Al llegar, un mensaje tranquilo, sin sugerencias de a quién quitar.
 
 ### Qué ves
@@ -218,9 +219,10 @@ que ya trae el feed.
 
 ### Seguridad
 
-Bloquear (deja de verte y no puede volver a invitarte) y reportar una tarjeta (se te oculta al
-momento y el autor de la app recibe un correo para actuar en menos de 24 horas). Están en un menú
-discreto. No son reacciones: Apple y Google los exigen y protegen a quien lo necesita.
+Bloquear (deja de verte y no puede volver a invitarte, hasta que lo desbloquees en Ajustes, Amigos,
+Bloqueados) y reportar una tarjeta (se te oculta al momento y el autor de la app recibe un correo para
+actuar en menos de 24 horas). Están en un menú discreto, y bloquear también en cada solicitud recibida.
+No son reacciones: Apple y Google los exigen y protegen a quien lo necesita.
 
 ---
 
@@ -417,16 +419,24 @@ profiles        (id, display_name, invite_code, created_at)
 friendships     (a, b, status, requested_by, created_at)   a < b, status pending | accepted
 shared_entries  (author, day, color, name, word, photo_path, updated_at)   clave (author, day)
 blocks          (blocker, blocked)
-reports         (id, reporter, author, day, created_at)
+reports         (id, reporter, author, day, created_at, notified_at)   único (reporter, author, day)
 ```
+
+El esquema vigente, con sus restricciones, está en `supabase/migrations/` y en `docs/tecnico.md` 8.1.
 
 - Una fila de `shared_entries` la leen su autor y sus amigos aceptados, salvo que haya un bloqueo en
   cualquier sentido.
 - Un trigger aplica el tope de 50 al aceptar.
-- El bucket de fotos es privado y usa la misma regla. Las fotos se sirven con URL firmadas de vida
-  corta.
-- Una Edge Function diaria borra las fotos con más de 7 días y pone `photo_path` a null.
-- Otra Edge Function avisa por correo (Resend) de cada reporte.
+- El bucket de fotos es privado y usa la misma regla. Las fotos se descargan con la sesión de quien
+  mira, y las políticas del bucket deciden; la única URL firmada es la de 24 h del correo de reporte.
+- Un fichero del bucket solo se lee con una tarjeta que lo señale, o si es de uno. Y solo se escribe
+  con un nombre fijo por día (`<uid>/<día>.jpg`), de modo que nadie puede llenarlo.
+- Una Edge Function diaria borra las fotos con más de 7 días y pone `photo_path` a null, y barre los
+  ficheros que ninguna tarjeta señala.
+- Otra Edge Function avisa por correo (Resend) de cada reporte. Sale de la base, no de un ajuste del
+  panel, y se reintenta cada hora hasta que el correo ha salido.
+- Nadie puede preguntar al servidor si lo han bloqueado, ni recorrer códigos de invitación sin freno,
+  ni acumular más de 100 solicitudes en espera, ni mandar más de 20 reportes al día.
 - Borrar la cuenta borra perfil, amistades, entradas compartidas y fotos. El diario local no se toca.
 - Las migraciones viven en el repositorio.
 
@@ -445,7 +455,8 @@ La foto se recodifica antes de subir, y con eso se van el GPS y el resto de meta
 - Tarjeta: contraste AA en una barrida del espacio de color.
 - Almacén: escritura atómica, cuarentena, fusión al importar.
 - Palabra: tope de 24 con emoji.
-- Servidor: sin amistad no se lee nada; un bloqueo corta la lectura al momento; el tope de 50.
+- Servidor: sin amistad no se lee nada; un bloqueo corta la lectura al momento; el tope de 50;
+  qué puede ejecutar cada rol; las fotos con nombre fuera de patrón.
 - Sintonía: umbral en el borde.
 
 ---
