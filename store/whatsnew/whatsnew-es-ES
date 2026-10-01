@@ -1,4 +1,7 @@
-- Un pago pendiente ya no parece un error: Pro se activa solo cuando se completa, incluso con la app abierta.
-- Si se corta la conexión al comprar, la app dice que Pro llegará solo, y restaurar sin conexión ya no dice "no hay compras".
-- El panel de Pro se desplaza con letra grande y el botón de compra siempre se ve.
-- La petición de valoración llega en un momento tranquilo, no justo al elegir el color.
+- Los nombres de color largos ya no se parten a mitad de palabra en la tarjeta.
+- Toca el nombre o el código de tu tarjeta para copiar el código.
+- Amplía la foto con dos dedos o con doble toque.
+- Los días casi blancos o casi negros se distinguen en Mi año, el póster y el widget.
+- Los colores salen solo de la parte de la foto que se ve.
+- Las estadísticas de Pro ya no toman ruido por diferencia y comparan años hasta el mismo día.
+- Mejor con letra grande y con lector de pantalla.

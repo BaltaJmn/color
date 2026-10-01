@@ -1,4 +1,7 @@
-- A pending payment no longer looks like an error: Pro turns on by itself once it goes through, even with the app open.
-- If the connection drops while buying, the app says Pro will arrive on its own, and restoring offline no longer says "no purchases".
-- The Pro panel scrolls with large text, so the buy button is always reachable.
-- The rating request comes at a calm moment, not right as you pick your color.
+- Long color names no longer break mid-word on the card.
+- Tap the name or the code on your card to copy the code.
+- Zoom the photo with two fingers or a double tap.
+- Near white and near black days stand out in My year, on the poster and in the widget.
+- Colors come only from the part of the photo you see.
+- Pro stats no longer read noise as a difference, and compare years up to the same day.
+- Better with large text and with a screen reader.

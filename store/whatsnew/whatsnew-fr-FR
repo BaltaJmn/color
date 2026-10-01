@@ -1,4 +1,7 @@
-- Un paiement en attente ne ressemble plus à une erreur : Pro s'active tout seul une fois passé, même app ouverte.
-- Si la connexion coupe pendant l'achat, l'app dit que Pro arrivera tout seul, et restaurer hors ligne ne dit plus "aucun achat".
-- Le panneau Pro défile avec un grand texte, le bouton d'achat reste accessible.
-- La demande de note arrive à un moment calme, pas au moment de choisir ta couleur.
+- Les noms de couleur longs ne sont plus coupés au milieu du mot sur la carte.
+- Touche le nom ou le code de ta carte pour copier le code.
+- Zoome sur la photo à deux doigts ou d'un double toucher.
+- Les jours presque blancs ou noirs ressortent dans Mon année, l'affiche et le widget.
+- Les couleurs viennent seulement de la partie visible de la photo.
+- Les stats Pro ne prennent plus le bruit pour un écart et comparent les années au même jour.
+- Mieux avec un grand texte et un lecteur d'écran.

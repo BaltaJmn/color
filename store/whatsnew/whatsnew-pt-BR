@@ -1,4 +1,7 @@
-- Um pagamento pendente não parece mais um erro: o Pro é ativado sozinho quando for concluído, mesmo com o app aberto.
-- Se a conexão cair na compra, o app diz que o Pro chega sozinho, e restaurar sem conexão não diz mais "nenhuma compra".
-- O painel do Pro rola com letra grande, e o botão de compra sempre aparece.
-- O pedido de avaliação chega num momento tranquilo, não bem na hora de escolher a cor.
+- Nomes de cor longos não se quebram mais no meio da palavra no cartão.
+- Toque no nome ou no código do seu cartão para copiar o código.
+- Amplie a foto com dois dedos ou com toque duplo.
+- Dias quase brancos ou quase pretos se destacam em Meu ano, no pôster e no widget.
+- As cores saem só da parte da foto que você vê.
+- As estatísticas do Pro não confundem mais ruído com diferença e comparam anos até o mesmo dia.
+- Melhor com letra grande e com leitor de tela.

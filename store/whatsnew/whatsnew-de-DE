@@ -1,4 +1,7 @@
-- Eine ausstehende Zahlung sieht nicht mehr wie ein Fehler aus: Pro wird von selbst aktiv, sobald sie durch ist, auch bei offener App.
-- Bricht beim Kauf die Verbindung ab, sagt die App, dass Pro von selbst kommt. Offline wiederherstellen meldet nicht mehr "keine Käufe".
-- Das Pro-Fenster scrollt bei großer Schrift, der Kaufknopf bleibt erreichbar.
-- Die Bitte um eine Bewertung kommt in einem ruhigen Moment, nicht direkt beim Farbwählen.
+- Lange Farbnamen werden auf der Karte nicht mehr mitten im Wort getrennt.
+- Tippe auf Namen oder Code deiner Karte, um den Code zu kopieren.
+- Zoome das Foto mit zwei Fingern oder Doppeltippen.
+- Fast weiße und fast schwarze Tage heben sich in Mein Jahr, auf dem Poster und im Widget ab.
+- Farben kommen nur aus dem sichtbaren Teil des Fotos.
+- Die Pro-Statistik hält Rauschen nicht mehr für Unterschiede und vergleicht Jahre bis zum selben Tag.
+- Besser mit großer Schrift und Screenreader.
