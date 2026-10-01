@@ -1,6 +1,4 @@
-- Uma queda de energia ou o celular cheio ao salvar não levam mais a sua última mudança.
-- Sem espaço, a cor do dia é salva mesmo que a foto não caiba, e o Chroma avisa.
-- Importar uma cópia em um celular novo traz as fotos também.
-- Se o Android fechar o Chroma enquanto você tira a foto, ela te espera na volta.
-- Com o app aberto às 3h, o dia vira sozinho e nada vai parar no dia errado.
-- Se suas cores não puderam ser lidas, você sempre fica sabendo.
+- Se as notificações do Chroma estiverem desativadas, os Ajustes avisam e levam você até elas.
+- O lembrete do dia some assim que você escolhe sua cor.
+- Tocar no lembrete abre Hoje.
+- Os widgets passam para o novo dia às 3h sem abrir o app e seguem o modo escuro.

@@ -1,6 +1,4 @@
-- A power cut or a full phone while saving no longer takes your latest change.
-- Out of space, the day's color is saved even if the photo doesn't fit, and Chroma tells you.
-- Importing a backup on a new phone brings the photos back too.
-- If Android closes Chroma while you take the photo, it waits for you when you return.
-- With the app open at 3 am, the day turns on its own and nothing lands on the wrong day.
-- If your colors couldn't be read, you are always told.
+- If Chroma's notifications are off, Settings tells you and takes you to turn them on.
+- The daily nudge goes away as soon as you pick your color.
+- Tapping the nudge opens Today.
+- Widgets turn to the new day at 3 am without opening the app, and follow dark mode.

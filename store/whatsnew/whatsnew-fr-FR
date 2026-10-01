@@ -1,6 +1,4 @@
-- Une coupure ou un téléphone plein à l'enregistrement ne fait plus perdre ton dernier changement.
-- Sans espace, la couleur du jour est gardée même sans la photo, et Chroma te le dit.
-- Une copie importée sur un nouveau téléphone ramène aussi les photos.
-- Si Android ferme Chroma pendant la photo, elle t'attend au retour.
-- Avec l'app ouverte à 3 h, le jour change tout seul et rien n'atterrit sur le mauvais jour.
-- Si tes couleurs n'ont pas pu être lues, tu es toujours prévenu.
+- Si les notifications de Chroma sont désactivées, les Réglages te le disent et t'y emmènent.
+- Le rappel du jour disparaît dès que tu choisis ta couleur.
+- Toucher le rappel ouvre Aujourd'hui.
+- Les widgets passent au nouveau jour à 3 h sans ouvrir l'app, et suivent le mode sombre.
