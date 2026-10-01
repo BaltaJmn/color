@@ -1,4 +1,4 @@
-- Se as notificações do Chroma estiverem desativadas, os Ajustes avisam e levam você até elas.
-- O lembrete do dia some assim que você escolhe sua cor.
-- Tocar no lembrete abre Hoje.
-- Os widgets passam para o novo dia às 3h sem abrir o app e seguem o modo escuro.
+- Um pagamento pendente não parece mais um erro: o Pro é ativado sozinho quando for concluído, mesmo com o app aberto.
+- Se a conexão cair na compra, o app diz que o Pro chega sozinho, e restaurar sem conexão não diz mais "nenhuma compra".
+- O painel do Pro rola com letra grande, e o botão de compra sempre aparece.
+- O pedido de avaliação chega num momento tranquilo, não bem na hora de escolher a cor.

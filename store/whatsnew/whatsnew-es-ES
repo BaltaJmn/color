@@ -1,4 +1,4 @@
-- Si las notificaciones de Chroma están desactivadas, Ajustes te lo dice y te lleva a activarlas.
-- El aviso del día desaparece en cuanto eliges tu color.
-- Tocar el aviso abre Hoy.
-- Los widgets pasan al día nuevo a las 03:00 sin abrir la app, y siguen el modo oscuro.
+- Un pago pendiente ya no parece un error: Pro se activa solo cuando se completa, incluso con la app abierta.
+- Si se corta la conexión al comprar, la app dice que Pro llegará solo, y restaurar sin conexión ya no dice "no hay compras".
+- El panel de Pro se desplaza con letra grande y el botón de compra siempre se ve.
+- La petición de valoración llega en un momento tranquilo, no justo al elegir el color.

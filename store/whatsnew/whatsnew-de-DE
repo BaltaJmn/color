@@ -1,4 +1,4 @@
-- Sind Mitteilungen für Chroma aus, sagen es dir die Einstellungen und bringen dich hin.
-- Die tägliche Erinnerung verschwindet, sobald du deine Farbe wählst.
-- Ein Tipp auf die Erinnerung öffnet Heute.
-- Widgets wechseln um 3 Uhr ohne App-Start zum neuen Tag und folgen dem Dunkelmodus.
+- Eine ausstehende Zahlung sieht nicht mehr wie ein Fehler aus: Pro wird von selbst aktiv, sobald sie durch ist, auch bei offener App.
+- Bricht beim Kauf die Verbindung ab, sagt die App, dass Pro von selbst kommt. Offline wiederherstellen meldet nicht mehr "keine Käufe".
+- Das Pro-Fenster scrollt bei großer Schrift, der Kaufknopf bleibt erreichbar.
+- Die Bitte um eine Bewertung kommt in einem ruhigen Moment, nicht direkt beim Farbwählen.

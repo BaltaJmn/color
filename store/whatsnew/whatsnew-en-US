@@ -1,4 +1,4 @@
-- If Chroma's notifications are off, Settings tells you and takes you to turn them on.
-- The daily nudge goes away as soon as you pick your color.
-- Tapping the nudge opens Today.
-- Widgets turn to the new day at 3 am without opening the app, and follow dark mode.
+- A pending payment no longer looks like an error: Pro turns on by itself once it goes through, even with the app open.
+- If the connection drops while buying, the app says Pro will arrive on its own, and restoring offline no longer says "no purchases".
+- The Pro panel scrolls with large text, so the buy button is always reachable.
+- The rating request comes at a calm moment, not right as you pick your color.

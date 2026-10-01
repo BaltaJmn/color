@@ -1,4 +1,4 @@
-- Si les notifications de Chroma sont désactivées, les Réglages te le disent et t'y emmènent.
-- Le rappel du jour disparaît dès que tu choisis ta couleur.
-- Toucher le rappel ouvre Aujourd'hui.
-- Les widgets passent au nouveau jour à 3 h sans ouvrir l'app, et suivent le mode sombre.
+- Un paiement en attente ne ressemble plus à une erreur : Pro s'active tout seul une fois passé, même app ouverte.
+- Si la connexion coupe pendant l'achat, l'app dit que Pro arrivera tout seul, et restaurer hors ligne ne dit plus "aucun achat".
+- Le panneau Pro défile avec un grand texte, le bouton d'achat reste accessible.
+- La demande de note arrive à un moment calme, pas au moment de choisir ta couleur.
