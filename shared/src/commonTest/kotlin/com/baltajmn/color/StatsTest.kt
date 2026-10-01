@@ -62,4 +62,23 @@ class StatsTest {
         assertEquals(Versus.Cooler, yearStats(2025, before + now + (1..7).map { month(2024, it, "#EC6E0E") }.reduce { a, b -> a + b }).versus)
         assertEquals(Versus.Alike, yearStats(2026, now + (1..7).map { month(2025, it, "#EC6E0E") }.reduce { a, b -> a + b }).versus)
     }
+
+    @Test
+    fun aGreyYearNamesNoMonthAndNoSeason() {
+        // The same grey every month: no month is warmer, no season greyer.
+        val journal = (1..12).map { month(2026, it, "#96968F") }.reduce { a, b -> a + b }
+        val stats = yearStats(2026, journal)
+        assertNull(stats.warmest)
+        assertNull(stats.coldest)
+        assertNull(stats.greyest)
+    }
+
+    @Test
+    fun aYearSoFarIsComparedWithTheSameStretchOfTheLastOne() {
+        // Last year: a blue winter and an orange summer. This year so far: the same blue winter.
+        val before = (1..3).map { month(2025, it, "#1F47B8", n = 7) }.reduce { a, b -> a + b } +
+            (6..8).map { month(2025, it, "#EC6E0E", n = 7) }.reduce { a, b -> a + b }
+        val now = (1..3).map { month(2026, it, "#1F47B8", n = 7) }.reduce { a, b -> a + b }
+        assertEquals(Versus.Alike, yearStats(2026, before + now).versus)
+    }
 }

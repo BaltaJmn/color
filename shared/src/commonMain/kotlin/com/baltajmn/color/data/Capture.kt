@@ -1,10 +1,7 @@
 package com.baltajmn.color.data
 
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
+import com.baltajmn.color.color.sampleOf
 import com.baltajmn.color.model.logicalDate
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -68,26 +65,11 @@ fun parseExifDate(s: String?): LocalDateTime? {
 }
 
 /**
- * The photo squeezed into [SAMPLE_SIDE] x [SAMPLE_SIDE] ARGB pixels for the extraction. Squeezing
- * changes the shape but not how much of the picture each color covers, which is all that counts.
+ * The [SAMPLE_SIDE] x [SAMPLE_SIDE] ARGB pixels the colors come from: the visible 4:5 of the photo,
+ * averaged in common code ([sampleOf]) so both platforms count the same pixels the same way.
  */
-fun samplePixels(jpeg: ByteArray): IntArray? {
-    val image = decodeImage(jpeg) ?: return null
-    return samplePixels(image)
-}
-
 fun samplePixels(image: ImageBitmap): IntArray {
-    val target = ImageBitmap(SAMPLE_SIDE, SAMPLE_SIDE)
-    Canvas(target).drawImageRect(
-        image,
-        IntOffset.Zero,
-        IntSize(image.width, image.height),
-        IntOffset.Zero,
-        IntSize(SAMPLE_SIDE, SAMPLE_SIDE),
-        Paint().apply { filterQuality = androidx.compose.ui.graphics.FilterQuality.Low },
-    )
-    val pixels = IntArray(SAMPLE_SIDE * SAMPLE_SIDE)
-    target.readPixels(pixels)
-    return pixels
+    val pixels = IntArray(image.width * image.height)
+    image.readPixels(pixels)
+    return sampleOf(pixels, image.width, image.height, SAMPLE_SIDE)
 }
-

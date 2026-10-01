@@ -131,3 +131,41 @@ private fun kmeans(points: List<Lab>): MutableList<Group> {
     }
     return groups.filter { it.n > 0 }.toMutableList()
 }
+
+/**
+ * The pixels the colors are taken from: the centre 4:5 of the photo, the part Today shows while the
+ * color is picked, averaged down to [side] x [side] by whole blocks. Integer sums over the decoded
+ * pixels, the same on both platforms, instead of each platform's own scaler sampling a point here and
+ * there: every pixel counts, so a thin line is a thin share and not a coin toss. [pixels] is ARGB,
+ * [width] x [height], row by row.
+ */
+fun sampleOf(pixels: IntArray, width: Int, height: Int, side: Int): IntArray {
+    // Width over height against 4 over 5, in integers: crop whichever side is too long.
+    val cropW = if (width * 5 > height * 4) height * 4 / 5 else width
+    val cropH = if (width * 5 > height * 4) height else width * 5 / 4
+    val left = (width - cropW) / 2
+    val top = (height - cropH) / 2
+    val out = IntArray(side * side)
+    for (oy in 0 until side) {
+        val y0 = top + oy * cropH / side
+        val y1 = maxOf(top + (oy + 1) * cropH / side, y0 + 1)
+        for (ox in 0 until side) {
+            val x0 = left + ox * cropW / side
+            val x1 = maxOf(left + (ox + 1) * cropW / side, x0 + 1)
+            var r = 0L
+            var g = 0L
+            var b = 0L
+            for (y in y0 until y1) {
+                for (x in x0 until x1) {
+                    val p = pixels[y * width + x]
+                    r += (p shr 16) and 0xFF
+                    g += (p shr 8) and 0xFF
+                    b += p and 0xFF
+                }
+            }
+            val n = (y1 - y0).toLong() * (x1 - x0)
+            out[oy * side + ox] = (0xFF shl 24) or ((r / n).toInt() shl 16) or ((g / n).toInt() shl 8) or (b / n).toInt()
+        }
+    }
+    return out
+}

@@ -11,8 +11,14 @@ const val STATS_MIN_DAYS = 3
 /** Days each of two years needs before they are compared. */
 const val STATS_MIN_YEAR_DAYS = 20
 
-/** A difference in mean warmth smaller than this reads as "about the same year". */
+/**
+ * A difference in mean warmth smaller than this reads as "about the same": two years, or the warmest
+ * and the coldest month, which then are not named at all.
+ */
 const val STATS_ALIKE = 3.0
+
+/** Seasons whose mean chroma spreads less than this are equally grey, and none is named. */
+const val STATS_GREY_SPREAD = 3.0
 
 /** The Lab hue that counts as warmest, between red and orange; its opposite, a blue, is coldest. */
 private const val WARM_HUE = 50.0 * PI / 180.0
@@ -50,10 +56,11 @@ fun yearStats(year: Int, journal: Map<String, ChromaEntry>): YearStats {
     fun meanWarmth(days: List<Map.Entry<String, ChromaEntry>>) = days.map { warmth(labOf(it.value.color)) }.average()
     val days = daysOf(year)
 
+    // A grey year has a warmest and a coldest month only by noise; two equal months would be both.
     val months = days.groupBy { it.key.substring(5, 7).toInt() }
         .filterValues { it.size >= STATS_MIN_DAYS }
         .mapValues { meanWarmth(it.value) }
-        .takeIf { it.size >= 2 }
+        .takeIf { it.size >= 2 && it.values.max() - it.values.min() >= STATS_ALIKE }
 
     val repeated = days.groupingBy { it.value.name }.eachCount()
         .filterValues { it >= 2 }
@@ -62,10 +69,12 @@ fun yearStats(year: Int, journal: Map<String, ChromaEntry>): YearStats {
     val greyest = days.groupBy { day -> Season.entries.first { day.key.substring(5, 7).toInt() in it.months } }
         .filterValues { it.size >= STATS_MIN_DAYS }
         .mapValues { season -> season.value.map { labOf(it.value.color).chroma }.average() }
-        .takeIf { it.size >= 2 }
+        .takeIf { it.size >= 2 && it.values.max() - it.values.min() >= STATS_GREY_SPREAD }
         ?.minByOrNull { it.value }?.key
 
-    val before = daysOf(year - 1)
+    // The same stretch of both years: a January against a whole year is winter against the year.
+    val reached = days.lastOrNull()?.key?.substring(5)
+    val before = daysOf(year - 1).filter { reached != null && it.key.substring(5) <= reached }
     val versus = if (days.size >= STATS_MIN_YEAR_DAYS && before.size >= STATS_MIN_YEAR_DAYS) {
         val difference = meanWarmth(days) - meanWarmth(before)
         when {

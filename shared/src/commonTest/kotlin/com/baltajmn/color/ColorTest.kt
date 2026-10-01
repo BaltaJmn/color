@@ -5,6 +5,7 @@ import com.baltajmn.color.color.extractSwatches
 import com.baltajmn.color.color.hexOf
 import com.baltajmn.color.color.labOf
 import com.baltajmn.color.color.rgbOf
+import com.baltajmn.color.color.sampleOf
 import com.baltajmn.color.color.toRgb
 import kotlin.math.abs
 import kotlin.random.Random
@@ -50,6 +51,18 @@ class ColorTest {
         val random = Random(3)
         val pixels = IntArray(64 * 64) { (0xFF shl 24) or random.nextInt(0x1000000) }
         assertEquals(extractSwatches(pixels), extractSwatches(pixels.copyOf()))
+    }
+
+    // Test 4b: the same colors on every platform. Hard-coded, so a JVM and a Kotlin/Native run that
+    // drift apart in some floating-point corner fail here instead of on two phones.
+    @Test
+    fun sameOnEveryPlatform() {
+        val random = Random(3)
+        val pixels = IntArray(64 * 64) { i ->
+            val band = listOf(0xD32F2F, 0x1976D2, 0xFBC02D, 0x388E3C)[(i % 64) / 16]
+            (0xFF shl 24) or (band xor random.nextInt(0x202020))
+        }
+        assertEquals(listOf("#319E81", "#E150C2", "#E44F43", "#30557A", "#2ACD47"), extractSwatches(pixels).map { it.color })
     }
 
     // Test 5: three bands give those three colors.
@@ -105,5 +118,17 @@ class ContrastTest {
             if (c < worst) worst = c
         }
         assertTrue(worst >= 4.5, "worst contrast $worst")
+    }
+
+    @Test
+    fun theSampleIsTheVisibleCropAveragedByBlocks() {
+        val red = 0xFFFF0000.toInt()
+        val blue = 0xFF0000FF.toInt()
+        // 20 x 10, wider than 4:5: the visible part is the centre 8 x 10. Red outside it, blue inside.
+        val wide = IntArray(20 * 10) { i -> if (i % 20 in 6 until 14) blue else red }
+        assertTrue(sampleOf(wide, 20, 10, 2).all { it == blue })
+        // A one pixel line in a 4 x 5 block weighs a twentieth of the cell, every time.
+        val line = IntArray(4 * 5) { i -> if (i % 4 == 0 && i / 4 == 0) 0xFFFFFFFF.toInt() else 0xFF000000.toInt() }
+        assertEquals(0xFF0C0C0C.toInt(), sampleOf(line, 4, 5, 1).single())
     }
 }

@@ -424,14 +424,17 @@ decirlo con honradez:
 - **Calidez** de un color: su croma proyectada sobre el tono cálido de Lab (50 grados, entre rojo y
   naranja): `C * cos(h - 50)`. Un gris da casi cero, sea claro u oscuro; un azul, negativo.
 - **Mes más cálido y más frío**: media de calidez de los meses con `STATS_MIN_DAYS` (3) días o más,
-  y al menos dos meses así.
+  al menos dos meses así, y entre el más cálido y el más frío `STATS_ALIKE` (3) o más: en un año
+  gris los dos salen por ruido, y dos meses iguales serían a la vez el cálido y el frío.
 - **Color que más volvió**: la clave de nombre más repetida, con dos días como mínimo. Empates, al
   primero del año.
-- **Estación más gris**: la de menor croma media entre las de 3 días o más (al menos dos). Estaciones
+- **Estación más gris**: la de menor croma media entre las de 3 días o más (al menos dos, y con
+  `STATS_GREY_SPREAD` (3) de croma o más entre la más gris y la más viva). Estaciones
   meteorológicas por meses (diciembre a febrero, etc.), nombradas por sus meses y no por verano o
   invierno, que dependen del hemisferio.
 - **Comparación**: con `STATS_MIN_YEAR_DAYS` (20) días en los dos años, la diferencia de calidez
-  media; por debajo de `STATS_ALIKE` (3) es "se pareció mucho".
+  media; por debajo de `STATS_ALIKE` (3) es "se pareció mucho". El año anterior se corta en el mismo
+  día del año que el actual ha alcanzado: un enero contra un año entero es invierno contra el año.
 
 Se enseña en frases (`StatsScreen`), sin números ni gráficas.
 
@@ -455,8 +458,11 @@ class Picked(val jpeg: ByteArray, val takenOn: LocalDateTime?)
 - iOS: `UIImagePickerController` con fuente cámara, y `PHPickerViewController` sin acceso a la
   fototeca. La fecha sale de `CGImageSourceCopyPropertiesAtIndex` (`{Exif}.DateTimeOriginal`).
 - Las dos: se aplica la orientación EXIF, se reduce a `PHOTO_SIDE` y se recodifica a JPEG 85 (así
-  se van los metadatos también en local). La miniatura de `SAMPLE_SIDE` en ARGB sale en común del
-  JPEG ya decodificado (`samplePixels`), así las dos plataformas analizan los mismos píxeles.
+  se van los metadatos también en local). La miniatura de `SAMPLE_SIDE` en ARGB sale en común de la
+  foto ya decodificada (`samplePixels`, que llama a `sampleOf`): el recorte 4:5 central, lo que Hoy
+  enseña mientras se elige, promediado por bloques enteros con sumas de enteros. Antes se escalaba la
+  foto entera con el escalador de cada plataforma, que muestrea puntos sueltos: un color que no se
+  veía en el recorte podía salir de candidato, y una línea fina salía o no según dónde cayera.
 - Regla de fecha: si `takenOn` existe y su `logicalDate` no es hoy, se rechaza con el aviso
   `galleryNotToday`. Sin fecha, se acepta.
 - Sin nadie que conteste (1.0.6): en Android `cameraAvailable` exige además que alguien resuelva
