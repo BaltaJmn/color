@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.baltajmn.color.billing.Billing
 import com.baltajmn.color.billing.PurchaseOutcome
+import com.baltajmn.color.billing.RestoreOutcome
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.today
 import com.baltajmn.color.i18n.S
@@ -47,6 +50,10 @@ fun ProDialog(onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
     var pack by remember { mutableStateOf<Package?>(null) }
     var busy by remember { mutableStateOf(false) }
+    var pending by remember { mutableStateOf(false) }
+    // Pro arriving while this is open (a pending payment approved, a restore elsewhere) closes it.
+    val pro = ChromaRepository.settings.pro
+    LaunchedEffect(pro) { if (pro) onDismiss() }
     var note by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
@@ -65,6 +72,9 @@ fun ProDialog(onDismiss: () -> Unit) {
             Modifier.fillMaxWidth()
                 .clip(RoundedCornerShape(28.dp))
                 .background(colors.surface)
+                // With large text, in another language or sideways, the buy button would fall off
+                // the window, and this is the only way to pay.
+                .verticalScroll(rememberScrollState())
                 .padding(24.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -98,20 +108,26 @@ fun ProDialog(onDismiss: () -> Unit) {
             if (target != null && price != null) {
                 PrimaryAction(
                     label = if (busy) S.working else S.buy(price),
-                    enabled = !busy,
+                    // A payment on its way is not bought twice: the store would only say it is owned.
+                    enabled = !busy && !pending,
                     modifier = Modifier.fillMaxWidth(),
                     onClick = {
                         busy = true
                         note = null
                         scope.launch {
-                            when (Billing.purchase(target)) {
+                            val outcome = Billing.purchase(target)
+                            busy = false
+                            when (outcome) {
                                 PurchaseOutcome.Success -> onDismiss()
                                 // Changing your mind says nothing and shows nothing.
-                                PurchaseOutcome.Cancelled -> busy = false
-                                PurchaseOutcome.Failed -> {
-                                    busy = false
-                                    note = S.buyFailed
+                                PurchaseOutcome.Cancelled -> Unit
+                                PurchaseOutcome.Pending -> {
+                                    note = S.buyPending
+                                    pending = true
                                 }
+                                PurchaseOutcome.Offline -> note = S.buyOffline
+                                PurchaseOutcome.Unreachable -> note = S.storeUnavailable
+                                PurchaseOutcome.Failed -> note = S.buyFailed
                             }
                         }
                     },
@@ -126,9 +142,13 @@ fun ProDialog(onDismiss: () -> Unit) {
                     onClick = {
                         busy = true
                         scope.launch {
-                            val found = Billing.restore()
+                            val outcome = Billing.restore()
                             busy = false
-                            if (found) onDismiss() else note = S.restoreNothing
+                            when (outcome) {
+                                RestoreOutcome.Found -> onDismiss()
+                                RestoreOutcome.Nothing -> note = S.restoreNothing
+                                RestoreOutcome.Unreachable -> note = S.storeUnavailable
+                            }
                         }
                     },
                 )

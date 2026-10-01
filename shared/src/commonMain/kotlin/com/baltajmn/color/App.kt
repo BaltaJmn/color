@@ -126,6 +126,7 @@ fun App() {
     // elapsedMillis and not a monotonic mark: Android's stops while the phone sleeps in a pocket.
     var leftAt by remember { mutableStateOf<Long?>(null) }
     var leftOnTrip by remember { mutableStateOf(false) }
+    var reviewDue by remember { mutableStateOf(false) }
     var proCheck by remember { mutableStateOf(0) }
     var barHeight by remember { mutableStateOf(0.dp) }
 
@@ -139,6 +140,20 @@ fun App() {
         proCheck++
         // A minute away locks it again, ten after a trip of our own. A clock that went back locks too.
         if (ChromaRepository.settings.lockOn && relocks(leftAt?.let { elapsedMillis() - it }, leftOnTrip)) locked = true
+        // Not back from a camera, a share sheet or system settings of our own (a pick may be under
+        // way), nor locked.
+        reviewDue = !locked && !leftOnTrip
+    }
+    // Decided on a real return (ON_START), asked once the window is in front (ON_RESUME): iOS drops a
+    // request from a scene that is not active yet. A permission dialog pauses and resumes without a
+    // return, so it never brings one. Not over a layer, the paywall, or a screen a widget asked for.
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        if (!reviewDue) return@LifecycleEventEffect
+        reviewDue = false
+        val clear = openDay == null && sharing == null && poster == null && stats == null && photo == null
+        if (!locked && clear && !Paywall.open && Route.pending == null && screen == Screen.Today) {
+            ChromaRepository.maybeRequestReview()
+        }
     }
     LaunchedEffect(proCheck) { Billing.refresh() }
     // The screen can stay on across 03:00, and the new day must not keep showing the old one. A poll

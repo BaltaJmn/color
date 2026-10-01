@@ -413,6 +413,20 @@ object S {
         "Der Store ist gerade nicht verfügbar.",
         "La boutique n'est pas disponible pour le moment.",
     )
+    val buyPending get() = t(
+        "The payment is pending. Pro turns on by itself once it goes through.",
+        "El pago está pendiente. Pro se activa solo cuando se complete.",
+        "O pagamento está pendente. O Pro é ativado sozinho quando for concluído.",
+        "Die Zahlung steht noch aus. Pro wird von selbst aktiviert, sobald sie durch ist.",
+        "Le paiement est en attente. Pro s'active tout seul une fois qu'il est passé.",
+    )
+    val buyOffline get() = t(
+        "No connection. If you were charged, Pro turns on by itself once you're back online. You can also tap Restore.",
+        "Sin conexión. Si ya se ha cobrado, Pro se activa solo al volver la conexión. También puedes tocar Restaurar.",
+        "Sem conexão. Se a cobrança já foi feita, o Pro é ativado sozinho quando a conexão voltar. Você também pode tocar em Restaurar.",
+        "Keine Verbindung. Falls schon abgebucht wurde, wird Pro von selbst aktiv, sobald du wieder online bist. Du kannst auch auf Wiederherstellen tippen.",
+        "Pas de connexion. Si le paiement est passé, Pro s'active tout seul au retour de la connexion. Tu peux aussi toucher Restaurer.",
+    )
     val buyFailed get() = t(
         "The purchase could not be completed.",
         "No se ha podido completar la compra.",

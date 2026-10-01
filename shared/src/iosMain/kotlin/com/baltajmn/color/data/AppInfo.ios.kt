@@ -14,7 +14,11 @@ actual object AppInfo {
         NSURL.URLWithString(url)?.let { UIApplication.sharedApplication.openURL(it) }
     }
 
-    actual fun openSettings() = open(UIApplicationOpenSettingsURLString)
+    // A trip of our own: coming back does not ask for the lock after one minute, nor for a rating.
+    actual fun openSettings() {
+        Trip.start()
+        open(UIApplicationOpenSettingsURLString)
+    }
 }
 
 actual val Sibling.storeUrl: String? get() = iosUrl

@@ -319,7 +319,6 @@ object ChromaRepository {
             // A new color today moves the next nudge to tomorrow; iOS has to be told.
             Reminder.sync(askPermission = false)
             afterSave.forEach { runCatching { it(snapshot) } }
-            maybeRequestReview(snapshot)
             val gone = photosOf(previous) - photosOf(snapshot)
             if (gone.isNotEmpty()) withContext(Dispatchers.IO) { gone.forEach(Storage::deletePhoto) }
         } else {
@@ -328,14 +327,13 @@ object ChromaRepository {
     }
 
     /**
-     * Once ever, the moment the journal reaches a week of entries. Only runs from a real save, so it
-     * never fires on first launch (nothing saved yet) and never mid purchase (that flow does not
-     * touch the journal).
+     * Once ever, a week of colors in, called on coming back to the app with today's already picked: a
+     * calm moment, never on top of a pick, an import or a save that runs with the app stopped. Marked
+     * only once the store was asked, so an attempt with nothing to show it in is not spent.
      */
-    private fun maybeRequestReview(f: JournalFile) {
-        if (!reachedReviewDayCount(f.entries.size, f.settings.reviewRequested)) return
-        updateSettings { it.copy(reviewRequested = true) }
-        Review.request()
+    fun maybeRequestReview() {
+        if (!reachedReviewDayCount(journal.size, settings.reviewRequested) || today().isoKey() !in journal) return
+        Review.request { updateSettings { it.copy(reviewRequested = true) } }
     }
 
     /**

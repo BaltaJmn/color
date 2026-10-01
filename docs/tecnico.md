@@ -342,6 +342,33 @@ Purl 6.15: RevenueCat KMP, `pro_lifetime`, derecho `pro`. Sin clave, la app func
 fallo de red no quita el Pro guardado. Paywall al chocar: exportar el póster, tocar el widget del año
 bloqueado, o la fila de Ajustes.
 
+Desde 1.0.9 la compra distingue más que bien o mal, porque cada respuesta pide algo distinto al
+usuario:
+
+- `Success` solo si el derecho queda activo: una compra que la tienda acepta sin activar `pro` es un
+  error de configuración, no un éxito.
+- `Pending`, pago diferido (operadora, un padre que aprueba): `buyPending` y el botón de compra se
+  desactiva, porque reintentar solo diría que ya es suyo.
+- `Offline`, `NetworkError`: en Android llega cuando Play ya ha cobrado y el recibo no ha llegado a
+  RevenueCat, que lo reenvía solo. `buyOffline` lo dice así, con Restaurar como salida.
+- `Unreachable`, `StoreProblemError`: la tienda no responde antes de cobrar, `storeUnavailable`.
+- `ProductAlreadyPurchasedError` restaura y, si aparece, es un `Success`.
+- `Cancelled`, nada; el resto, `Failed`.
+
+Un `PurchasesDelegate` escucha cada `CustomerInfo` nueva: un pago diferido aprobado o un reembolso
+cambian Pro sin esperar a que nadie pregunte, y el paywall abierto se cierra solo si llega Pro.
+Restaurar sin llegar a la tienda dice `storeUnavailable`, no `restoreNothing`: esa respuesta asusta a
+quien sí pagó.
+
+Valoración en la tienda: una vez, con 7 días o más, al volver a la app con el color de hoy ya
+elegido. Se decide en `ON_START` (sin bloqueo y sin volver de un viaje propio: cámara, galería,
+compartir, ajustes del sistema) y se pide en el `ON_RESUME` siguiente, en Hoy, sin capas, sin
+paywall y sin una ruta de widget pendiente: iOS descarta la petición de una escena que aún no está
+activa, y un diálogo de permiso pausa sin volver. No desde el guardado: gastaba la única petición al
+importar una copia o con la app parada. `reviewRequested` se marca solo cuando la tienda ha recibido
+la petición (Android, al terminar `launchReviewFlow` con la Activity delante; iOS, con una escena
+activa), y no hay dos peticiones en vuelo.
+
 ### 6.9 Tarjeta y póster a imagen
 
 - Tarjeta: 1080x1350 (`share/ShareCard.kt`). Fondo del color; márgenes de 72 px; nombre a 96 px con

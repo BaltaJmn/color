@@ -375,7 +375,9 @@ Un diálogo propio en `surface`, radio 28: `proTitle` con su icono; con dos día
 tira de 56 de alto con los colores del usuario; lo que incluye, una fila por cosa con su icono
 (`proPoster`, `proYearWidget`, y en v1.2 `proStats`); `proOnce` en `caption` (con `proFriendsFree`
 solo cuando Amigos existe, v1.1); el botón principal a lo ancho con el precio leído de la tienda
-(`buy`), y debajo `restore` y `notNow` como botones de texto en gris.
+(`buy`), y debajo `restore` y `notNow` como botones de texto en gris. Si la compra o la restauración
+no llegan a la tienda, `storeUnavailable`; un pago pendiente, `buyPending`. Con letra grande el panel
+se desplaza: el botón de compra nunca se queda fuera.
 
 ---
 

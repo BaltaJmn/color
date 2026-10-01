@@ -67,6 +67,7 @@ actual object Reminder {
     }
 
     actual fun unblock() {
+        Trip.start()
         val context = AndroidContext.value
         val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
             .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)

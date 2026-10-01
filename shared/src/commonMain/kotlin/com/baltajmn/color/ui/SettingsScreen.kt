@@ -48,6 +48,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.billing.Billing
+import com.baltajmn.color.billing.RestoreOutcome
 import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.color.weekColor
 import com.baltajmn.color.data.AppInfo
@@ -245,9 +246,13 @@ fun SettingsScreen(onBack: () -> Unit) {
                     onClick = {
                         restoring = true
                         scope.launch {
-                            val found = Billing.restore()
+                            val outcome = Billing.restore()
                             restoring = false
-                            restored = if (found) S.restoreDone else S.restoreNothing
+                            restored = when (outcome) {
+                                RestoreOutcome.Found -> S.restoreDone
+                                RestoreOutcome.Nothing -> S.restoreNothing
+                                RestoreOutcome.Unreachable -> S.storeUnavailable
+                            }
                         }
                     },
                 )

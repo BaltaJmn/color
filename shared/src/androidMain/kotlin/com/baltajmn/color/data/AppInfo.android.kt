@@ -19,6 +19,8 @@ actual object AppInfo {
     }
 
     actual fun openSettings() {
+        // A trip of our own: coming back does not ask for the lock after one minute, nor for a rating.
+        Trip.start()
         val context = AndroidContext.value
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
