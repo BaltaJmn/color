@@ -46,7 +46,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="com.baltajmn.color" android:host="login" />
             </intent-filter>
-            <!-- Las invitaciones. autoVerify contra web/.well-known/assetlinks.json: sin verificar, Android
+            <!-- Las invitaciones. autoVerify contra .well-known/assetlinks.json (repo chroma-privacy): sin verificar, Android
                  abre el navegador y la pagina lleva a la tienda. -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />

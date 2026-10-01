@@ -2,7 +2,7 @@
 
 Todo lo que las consolas preguntan y no tiene API, con la respuesta cerrada y el hecho del código que
 la sostiene. Se pegan a mano. Si el código cambia algo de lo que aquí se afirma (un permiso, un SDK,
-un dato que sale del teléfono), se cambian en el mismo commit este fichero, `web/index.html` y
+un dato que sale del teléfono), se cambian en el mismo cambio este fichero, el `index.html` de `BaltaJmn/chroma-privacy` y
 `iosApp/iosApp/PrivacyInfo.xcprivacy`.
 
 Las secciones 1 a 6 son v1.0, sin cuentas. Lo que cambia con Amigos (v1.1) está en 1b, 5b y 6b, y
@@ -235,9 +235,9 @@ Lo que cambia al publicar la v1.1 (los datos que salen, en #38):
 | App Store, edad | Contenido generado por usuarios: **sí**, y mensajería o chat: no. El resultado sube, previsiblemente a 12+ |
 | Play, público objetivo y acceso | 16 y más, y cuenta de prueba (tabla de 3) |
 | App Store, notas al revisor | Una cuenta de prueba con un amigo ya aceptado y días compartidos, y dónde están reportar (mantener pulsada una tarjeta), bloquear (también en cada solicitud), desbloquear (Ajustes > Amigos > Bloqueados) y los términos |
-| Play, seguridad de los datos | "¿Los usuarios pueden pedir que se borren sus datos?": **sí**. URL de borrado de la cuenta: `https://color.baltajmn.dev/delete` (`web/delete.html`) |
+| Play, seguridad de los datos | "¿Los usuarios pueden pedir que se borren sus datos?": **sí**. URL de borrado de la cuenta: `https://color.baltajmn.dev/delete` (`delete.html` de `chroma-privacy`) |
 | App Store | Borrar la cuenta desde la app (5.1.1(v)): Ajustes > Amigos > Borrar cuenta |
-| Términos | `https://color.baltajmn.dev/terms.html` (`web/terms.html`). Se aceptan al crear el nombre, antes de ver nada de nadie, y están en Ajustes > Privacidad |
+| Términos | `https://color.baltajmn.dev/terms.html` (`terms.html` de `chroma-privacy`). Se aceptan al crear el nombre, antes de ver nada de nadie, y están en Ajustes > Privacidad |
 
 Apple 1.2 pide los cuatro a la vez: términos aceptados, filtro o reporte de contenido, bloquear, y
 actuar en 24 horas. Los reportes llegan por correo (`report-notify`, `store/servidor.md` 3), lanzado desde
@@ -245,11 +245,15 @@ la base y reintentado cada hora hasta que sale, y cómo actuar sobre uno está e
 
 ## 7. La política: dónde se publica
 
-`web/index.html` se publica en **https://color.baltajmn.dev/** con GitHub Pages desde este mismo
-repositorio (`.github/workflows/pages.yml` sube la carpeta `web/`). La misma URL va en la Play Console,
-en App Store Connect (política y soporte), en la ficha de Play (sitio web) y en la app (`PRIVACY_URL`).
+La política es el `index.html` del repositorio público `BaltaJmn/chroma-privacy`, y se publica en
+**https://color.baltajmn.dev/** con GitHub Pages desde su rama `main`, sin flujo de Actions. La misma
+URL va en la Play Console, en App Store Connect (política y soporte), en la ficha de Play (sitio web)
+y en la app (`PRIVACY_URL`).
 
-Montado el 24-09-2026, como Quilt: Pages con fuente *GitHub Actions* y dominio propio, y en
+Hasta el 01-10-2026 se publicaba desde la carpeta `web/` de este repositorio; al pasar a privado,
+Pages dejó de servirla (el plan gratuito no publica desde repositorios privados) y la web se fue a su
+repositorio, como las de Quilt y MoodTraker. Pages en modo rama, con `.nojekyll` para que Jekyll no se
+coma `.well-known`, dominio propio, y en
 Cloudflare (que es quien sirve el DNS de `baltajmn.dev`; Porkbun solo es el registrador) un `CNAME
 color` a `baltajmn.github.io` **con proxy**. El HTTPS lo pone Cloudflare; *Enforce HTTPS* de GitHub
 se queda sin marcar porque detrás del proxy GitHub no puede emitir certificado. Los pasos para otra

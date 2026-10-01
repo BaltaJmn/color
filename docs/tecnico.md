@@ -109,7 +109,8 @@ Los `actual` de `Storage`, `Photos`, `Capture`, `Reminder`, `Widgets`, `Lock`, `
 ### Resto
 
 `androidApp`, `iosApp` (con `ChromaWidget/`), `supabase/` (v1.1: `migrations/` y `functions/`),
-`web/` (política, invitación y borrado de cuenta), `store/`, `tools/`, `.github/workflows/`.
+`store/`, `tools/`, `.github/workflows/`. La web (política, invitación y borrado de cuenta) está en el
+repositorio público `BaltaJmn/chroma-privacy`.
 
 ---
 
@@ -820,8 +821,8 @@ con cuenta; el valor para los días nuevos, en Ajustes > Amigos.
 ### 9.4 Invitación
 
 Enlace `https://color.baltajmn.dev/i/<code>`. Android: `intent-filter` con `autoVerify` y
-`web/.well-known/assetlinks.json`. iOS: `applinks:color.baltajmn.dev` y
-`web/.well-known/apple-app-site-association`. La web (`web/404.html`, que GitHub Pages sirve para
+`.well-known/assetlinks.json` de `chroma-privacy`. iOS: `applinks:color.baltajmn.dev` y su
+`.well-known/apple-app-site-association`. La web (su `404.html`, que GitHub Pages sirve para
 cualquier ruta) lee el código y enseña los botones de las tiendas.
 
 - El código son 10 caracteres hexadecimales; `inviteCodeOf` solo acepta ese host y esa forma.

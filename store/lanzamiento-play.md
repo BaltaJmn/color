@@ -65,8 +65,10 @@ ni siquiera si la versión anterior no llegó a publicarse.
 
 ## 2. La web de privacidad en color.baltajmn.dev
 
-**Hecho el 24-09-2026.** La política (`web/index.html`, más `terms.html` y `delete.html`) se publica en
-`https://color.baltajmn.dev/`, que es la URL a la que ya apunta la app (`AppInfo.kt`).
+**Hecho el 24-09-2026; movida el 01-10-2026.** La política (`index.html`, más `terms.html` y
+`delete.html`) vive en el repositorio público `BaltaJmn/chroma-privacy` y se publica en
+`https://color.baltajmn.dev/`, que es la URL a la que ya apunta la app (`AppInfo.kt`). Antes estaba en
+`web/` de este repositorio, que al pasar a privado dejó de poder publicarse con Pages gratis.
 
 Cómo está montado, igual que Quilt:
 
@@ -75,7 +77,7 @@ Cómo está montado, igual que Quilt:
 | Registrador | Porkbun. No se toca: los servidores de nombres de `baltajmn.dev` son los de Cloudflare |
 | DNS | Cloudflare, zona `baltajmn.dev`: `CNAME color` a `baltajmn.github.io`, **con proxy** (nube naranja) |
 | HTTPS | Lo pone Cloudflare en su borde y redirige `http` a `https`. GitHub no puede emitir certificado detrás del proxy, así que su casilla *Enforce HTTPS* se queda sin marcar, y está bien |
-| GitHub Pages | Fuente *GitHub Actions*; dominio propio `color.baltajmn.dev`. `.github/workflows/pages.yml` publica `web/` en cada cambio |
+| GitHub Pages | Repositorio `chroma-privacy`, fuente rama `main` en la raíz, con `.nojekyll` (si no, Jekyll se salta `.well-known`); dominio propio `color.baltajmn.dev` (fichero `CNAME`). Publica solo en cada push |
 
 Si Cloudflare pasara algún día a SSL "Full (strict)", estas webs darían error 526: el certificado de
 GitHub no cubre el subdominio. Con el modo actual funcionan.
@@ -83,20 +85,19 @@ GitHub no cubre el subdominio. Con el modo actual funcionan.
 Para la web de otra app, lo mismo cambiando el nombre:
 
 ```bash
-gh api -X POST repos/BaltaJmn/<repo>/pages -f build_type=workflow
-gh workflow run pages.yml --repo BaltaJmn/<repo>
+gh api -X POST repos/BaltaJmn/<app>-privacy/pages -f "source[branch]=main" -f "source[path]=/"
 # CNAME <app> a baltajmn.github.io, con proxy, en Cloudflare
-gh api -X PUT repos/BaltaJmn/<repo>/pages -f cname=<app>.baltajmn.dev
+gh api -X PUT repos/BaltaJmn/<app>-privacy/pages -f cname=<app>.baltajmn.dev
 ```
 
 Si antes de poner el dominio alguien pidió la URL, algunos nodos del CDN de GitHub se quedan con su
 404 ("Site not found") y `/` alterna 404 y 200 durante mucho más de los 10 minutos de caché. Un
-despliegue nuevo lo purga: `gh workflow run pages.yml --repo BaltaJmn/<repo>`.
+despliegue nuevo lo purga: `gh api -X POST repos/BaltaJmn/<app>-privacy/pages/builds`.
 
 Comprobación:
 
 ```bash
-for p in "" terms.html delete.html .well-known/assetlinks.json; do curl -s -o /dev/null -w "%{http_code} /$p\n" https://color.baltajmn.dev/$p; done
+for p in "" terms.html delete.html .well-known/assetlinks.json .well-known/apple-app-site-association; do curl -s -o /dev/null -w "%{http_code} /$p\n" https://color.baltajmn.dev/$p; done
 ```
 
 `/.well-known/assetlinks.json` lleva todavía un marcador: solo lo usarán los enlaces de invitación de
@@ -176,7 +177,7 @@ y programas > Contenido de la aplicación*). Las respuestas completas, con su po
 4. Vista previa y *Guardar*.
 
 Los dos datos son los de RevenueCat al comprar Pro. Si algún día cambia lo que sale del teléfono, se
-cambia en el mismo commit `web/index.html`, `formularios.md` y `PrivacyInfo.xcprivacy`.
+cambia a la vez el `index.html` de `chroma-privacy`, `formularios.md` y `PrivacyInfo.xcprivacy`.
 
 Si la consola pregunta por servicios en primer plano, el permiso lo trae WorkManager (a través de los
 widgets), no la app. Pásame el texto exacto de la pregunta y lo resolvemos.
@@ -467,12 +468,10 @@ directo al 8 cuando termines las secciones 4 y 5 (la consola te lo dirá en el *
 
 ## 9. Después del lanzamiento
 
-- **Amigos (v1.1)**: los enlaces de invitación abren la app gracias a
-  `web/.well-known/assetlinks.json`. Necesita la huella SHA-256 de la **clave de firma de la app** (no
-  la de subida), que está en *Prueba y publicación > Integridad de la app > Firma de apps*. Se pone en
-  lugar de `PLAY_APP_SIGNING_SHA256` cuando llegue v1.1, junto con los formularios 1b de
-  `formularios.md`.
+- **Amigos (v1.1)**: los enlaces de invitación abren la app gracias al `.well-known/assetlinks.json`
+  de `chroma-privacy`, que ya lleva la huella SHA-256 de la **clave de firma de la app** (no la de
+  subida) desde el 01-10-2026. Al encender Amigos, los formularios 1b de `formularios.md`.
 - **iOS**: App Store Connect, la misma idea con `appl_` en `Billing.ios.kt`, el producto `pro_lifetime`
-  como *No consumible* y `TEAM_ID` y `APP_STORE_ID` en `web/`.
+  como *No consumible* y `TEAM_ID` y `APP_STORE_ID` en `chroma-privacy`.
 - Cada versión nueva: `versionCode` + 1, `whatsnew` actualizado, `bundleRelease`, comprobar la huella,
   subir.

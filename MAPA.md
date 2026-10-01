@@ -23,11 +23,7 @@ Qué hay en cada sitio. Se actualiza en el mismo commit que añade o mueve algo.
 
 | Ruta | Qué es |
 |---|---|
-| `web/index.html` | Política de privacidad, en color.baltajmn.dev por GitHub Pages |
-| `web/terms.html` | Términos de uso de Amigos: tolerancia cero, reportar, bloquear |
-| `web/delete.html` | Cómo borrar la cuenta desde la app o sin ella, para el formulario de Play |
-| `web/404.html` | Cualquier ruta desconocida; para `/i/<code>`, la invitación sin la app, con las tiendas |
-| `web/.well-known/` | `assetlinks.json` y `apple-app-site-association`: los enlaces abren la app |
+| `BaltaJmn/chroma-privacy` | La web, en color.baltajmn.dev por GitHub Pages: política (`index.html`), términos de Amigos (`terms.html`), borrado de cuenta (`delete.html`), invitación sin la app (`404.html`) y `.well-known` para que los enlaces abran la app. Repositorio público aparte, porque este es privado |
 | `store/formularios.md` | Respuestas de los formularios de las dos consolas y cómo se publica la web |
 | `store/listings/<idioma>/` | Ficha de Play: título, corta y larga, un párrafo por línea |
 | `store/app-store/<idioma>/` | Ficha de App Store: nombre, subtítulo, palabras clave, promo y descripción |
@@ -50,7 +46,6 @@ Qué hay en cada sitio. Se actualiza en el mismo commit que añade o mueve algo.
 | `supabase/functions` | Edge Functions: `purge-photos`, `report-notify`, `delete-account` |
 | `supabase/tests` | Tests pgTAP de las reglas de acceso (test 17) |
 | `.github/workflows/tests.yml` | Tests comunes en cada push, en JVM y en Kotlin/Native |
-| `.github/workflows/pages.yml` | Publica `web/` en GitHub Pages cuando cambia |
 | `tools/icon.py` | Genera todos los iconos desde una geometría |
 | `tools/demo/generar.py` | El año de demostración de las capturas |
 | `tools/store/capturas.py`, `tools/store/fichas.py` | Marco de las capturas; topes y subida de las fichas |

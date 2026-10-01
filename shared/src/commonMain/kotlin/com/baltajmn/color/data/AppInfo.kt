@@ -4,7 +4,8 @@ import com.baltajmn.color.i18n.S
 
 /**
  * The published privacy policy. Play, the App Store and the About section all point at the same
- * URL, so it lives here and not in three places. Source of the page: web/index.html.
+ * URL, so it lives here and not in three places. Source of the page: index.html in
+ * the public repository BaltaJmn/chroma-privacy.
  */
 const val PRIVACY_URL = "https://color.baltajmn.dev/"
 const val TERMS_URL = "https://color.baltajmn.dev/terms.html"

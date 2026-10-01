@@ -81,17 +81,18 @@ sobre `reports`, con `pg_net`, y lo reintenta `report-retry`. Si de una versión
 ## 5. Los enlaces de invitación
 
 `https://color.baltajmn.dev/i/<code>` abre la app si está instalada; si no, GitHub Pages sirve
-`web/404.html`, que lleva a las tiendas. Para que el sistema confíe en el dominio hay que rellenar tres
-huecos de `web/`, que están con marcadores hasta que existan las cuentas:
+el `404.html` de la web (repositorio público `BaltaJmn/chroma-privacy`), que lleva a las tiendas. Para
+que el sistema confíe en el dominio, la web lleva tres datos de las cuentas:
 
-- `web/.well-known/assetlinks.json`: `PLAY_APP_SIGNING_SHA256` por el SHA-256 de la clave de firma
-  de apps de Play (*Play Console > Prueba y publicación > Integridad de la app*). Si se quiere probar
-  una build firmada con la clave de subida, se añade también la suya a la lista.
-- `web/.well-known/apple-app-site-association`: `TEAM_ID` por el Team ID de `Config.xcconfig`. El
+- `.well-known/assetlinks.json`: el SHA-256 de la clave de firma de apps de Play, **ya puesto** el
+  01-10-2026 (leído de la API, `generatedApks`; también en *Play Console > Prueba y publicación >
+  Integridad de la app*). Si se quiere probar una build firmada con la clave de subida, se añade
+  también la suya a la lista.
+- `.well-known/apple-app-site-association`: `TEAM_ID` por el Team ID de `Config.xcconfig`. El
   App ID necesita la capacidad *Associated Domains*. En v1.0 se quitaron de `iosApp.entitlements`
   `associated-domains` (`applinks:color.baltajmn.dev`) y `applesignin` (`Default`): un equipo
   personal de Xcode no firma con ellas. Volver a ponerlas al activar Amigos.
-- `web/404.html`: `APP_STORE_ID` por el identificador numérico de la app en App Store Connect. Vacío,
+- `404.html`: `APP_STORE_ID` por el identificador numérico de la app en App Store Connect. Vacío,
   la página solo enseña Google Play.
 
 Comprobación: `adb shell pm verify-app-links --re-verify com.baltajmn.color` y después

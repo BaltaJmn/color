@@ -3,7 +3,8 @@
 Una foto al día, un color que eliges, y un año pintado en una rejilla. Amigos opcionales, sin
 métricas. Android + iOS, Compose Multiplatform sobre Kotlin Multiplatform. Nombre bajo el icono
 **Chroma**; ficha **Chroma: diario de color**. Identificador en las dos tiendas: `com.baltajmn.color`.
-Repositorio `BaltaJmn/color`, **público**.
+Repositorio `BaltaJmn/color`, **privado**. La web (política, términos, borrado, `.well-known`) vive
+aparte, en el repositorio público `BaltaJmn/chroma-privacy` (clon en `../chroma-privacy`).
 
 Este fichero lo carga Claude Code solo en cualquier sesión abierta sobre este repositorio. Es el
 contexto permanente del proyecto: si algo hay que saber siempre, va aquí, no en el chat.
@@ -30,7 +31,7 @@ toca en el mismo commit, y se sigue**.
 
 - **Lo que no compartes no sale del teléfono.** Sin analítica ni informes de fallos. Sale lo de
   RevenueCat y, con cuenta, lo que el usuario comparte. Cualquier cambio a eso toca en el mismo
-  commit la política (`web/index.html`), `store/formularios.md` y `PrivacyInfo.xcprivacy`.
+  cambio la política (`index.html` de `chroma-privacy`), `store/formularios.md` y `PrivacyInfo.xcprivacy`.
 - **Social sin métricas.** Ni likes, ni comentarios, ni contadores, ni "visto por", ni avisos de
   publicación, ni rachas. Una función que meta cualquiera de esas cosas no entra.
 - **Las fotos compartidas viven 7 días en el servidor.** Los colores, mientras exista la cuenta.
@@ -52,7 +53,8 @@ toca en el mismo commit, y se sigue**.
 
 ## Seguridad, sin excepciones
 
-El repositorio es público: todo lo que entra en su historia se queda.
+El repositorio fue público hasta octubre de 2026: lo que entró en su historia se da por publicado, y
+estas reglas siguen igual por si vuelve a serlo. `chroma-privacy` es público y no lleva nada privado.
 
 - El `.jks`, `keystore.properties` y `local.properties` nunca se suben.
 - Los secretos viven en GitHub repository secrets o en los secretos de Supabase.

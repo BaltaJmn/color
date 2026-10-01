@@ -10,7 +10,28 @@ permissions:
   contents: read
 
 jobs:
+  # Until the Apple account exists this repository has no iOS secrets, and a job that fails on every
+  # tag trains you to ignore the red mark next to the Android one that matters. Checked on Linux:
+  # the repository is private, and a macOS minute costs ten of the free allowance just to say no.
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      # Through env and not interpolated into the script, like every other secret here.
+      - id: check
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+        run: |
+          if [ -n "$KEY_ID" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice::No App Store Connect secrets yet, skipping the iOS release."
+          fi
+
   testflight:
+    needs: gate
+    if: needs.gate.outputs.ready == 'true'
     # macos-26 and not macos-15: Compose links against UIKit classes that only exist from the
     # iOS 26 SDK on, so an older image fails the archive with undefined symbols.
     runs-on: macos-26
@@ -26,21 +47,7 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      # Until the Apple account exists this repository has no iOS secrets, and a job that fails on
-      # every tag trains you to ignore the red mark next to the Android one that matters.
-      # Through env and not interpolated into the script, like every other secret here.
-      - id: gate
-        env:
-          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
-        run: |
-          if [ -n "$KEY_ID" ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::No App Store Connect secrets yet, skipping the iOS release."
-          fi
-
       - name: Archive and upload
-        if: steps.gate.outputs.ready == 'true'
         env:
           KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
           ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
