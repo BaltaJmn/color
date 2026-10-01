@@ -1,5 +1,6 @@
-- Photos from some front cameras are no longer saved sideways or mirrored.
-- Changing the app language takes effect right away.
-- Dark mode, a new text size or a keyboard no longer send you back to Today or lose the photo you just took.
-- If the phone has no camera app to open, Chroma says so instead of doing nothing.
-- A file that can't be read no longer closes the app.
+- A power cut or a full phone while saving no longer takes your latest change.
+- Out of space, the day's color is saved even if the photo doesn't fit, and Chroma tells you.
+- Importing a backup on a new phone brings the photos back too.
+- If Android closes Chroma while you take the photo, it waits for you when you return.
+- With the app open at 3 am, the day turns on its own and nothing lands on the wrong day.
+- If your colors couldn't be read, you are always told.

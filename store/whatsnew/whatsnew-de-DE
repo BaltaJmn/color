@@ -1,5 +1,6 @@
-- Fotos mancher Frontkameras werden nicht mehr seitlich oder gespiegelt gespeichert.
-- Eine andere App-Sprache gilt sofort.
-- Dunkelmodus, eine andere Schriftgröße oder eine Tastatur bringen dich nicht mehr zu Heute zurück, und das gerade gemachte Foto bleibt.
-- Hat das Handy keine Kamera-App zum Öffnen, sagt Chroma es, statt nichts zu tun.
-- Eine Datei, die sich nicht lesen lässt, schließt die App nicht mehr.
+- Ein Stromausfall oder ein volles Handy beim Sichern nimmt dir nicht mehr die letzte Änderung.
+- Ohne Speicherplatz wird die Farbe des Tages gesichert, auch wenn das Foto nicht passt, und Chroma sagt es dir.
+- Eine Kopie auf einem neuen Handy importieren bringt auch die Fotos zurück.
+- Schließt Android Chroma, während du fotografierst, wartet das Foto auf dich.
+- Ist die App um 3 Uhr offen, wechselt der Tag von selbst und nichts landet am falschen Tag.
+- Konnten deine Farben nicht gelesen werden, erfährst du es immer.

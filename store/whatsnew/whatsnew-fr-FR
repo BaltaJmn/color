@@ -1,5 +1,6 @@
-- Les photos de certaines caméras frontales ne sont plus enregistrées de côté ou en miroir.
-- Changer la langue de l'app s'applique tout de suite.
-- Le mode sombre, une autre taille de texte ou un clavier ne te ramènent plus à Aujourd'hui et ne font plus perdre la photo que tu viens de prendre.
-- Si le téléphone n'a pas d'app photo à ouvrir, Chroma le dit au lieu de ne rien faire.
-- Un fichier illisible ne ferme plus l'app.
+- Une coupure ou un téléphone plein pendant l'enregistrement ne fait plus perdre ta dernière modification.
+- Sans espace, la couleur du jour est enregistrée même si la photo ne rentre pas, et Chroma te le dit.
+- Importer une copie sur un nouveau téléphone ramène aussi les photos.
+- Si Android ferme Chroma pendant que tu prends la photo, elle t'attend au retour.
+- Avec l'app ouverte à 3 h, le jour change tout seul et rien n'atterrit sur le mauvais jour.
+- Si tes couleurs n'ont pas pu être lues, tu es toujours prévenu.

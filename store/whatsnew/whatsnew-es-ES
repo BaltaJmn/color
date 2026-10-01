@@ -1,5 +1,6 @@
-- Las fotos de algunas cámaras frontales ya no se guardan de lado ni en espejo.
-- Cambiar el idioma de la app se nota al momento.
-- El modo oscuro, otro tamaño de letra o un teclado ya no te devuelven a Hoy ni pierden la foto recién hecha.
-- Si el móvil no tiene app de cámara que abrir, Chroma lo dice en vez de no hacer nada.
-- Un fichero que no se puede leer ya no cierra la app.
+- Un corte o el móvil lleno al guardar ya no se llevan tu último cambio.
+- Sin espacio, el color del día se guarda aunque la foto no quepa, y te lo dice.
+- Importar una copia en un móvil nuevo devuelve también las fotos.
+- Si Android cierra Chroma mientras haces la foto, te espera al volver.
+- Con la app abierta a las 03:00, el día cambia solo y nada se escribe en el día equivocado.
+- Si tus colores no se pudieron leer, siempre te avisa.
