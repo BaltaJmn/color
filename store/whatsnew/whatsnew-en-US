@@ -1,3 +1,4 @@
-- Photos taken with the phone sideways are no longer lost.
-- Turning the phone no longer sends you back to Today or asks you to unlock again.
-- The Today's color widget no longer shows an error after a while without opening the app.
+- With the lock on, nothing underneath responds to touches or gets read aloud any more.
+- On Android 8 to 10, turning the lock on no longer closes the app.
+- The lock comes back even after the phone has been asleep.
+- Tapping a photo shown full screen no longer changes the day's color.

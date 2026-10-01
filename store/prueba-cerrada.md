@@ -25,6 +25,7 @@ Cada versión que sube a la prueba añade su fila aquí en el mismo commit que s
 | 5 | 1.0.2 | 28-09-2026 | Los círculos de color se aplastaban en móviles estrechos. La foto de la cámara se perdía con el móvil justo de espacio (se escribía en la caché). El paywall prometía Amigos, que no llega hasta la v1.1. Compartir no enseñaba la vista previa de la tarjeta. | Probando la versión de la prueba el primer día |
 | 6 | 1.0.3 | 28-09-2026 | Lavado de cara: fecha en grande, barra de navegación flotante, ajustes por grupos y widgets nuevos. La vista previa del widget del año no cargaba en el selector. | Decisión propia: la app se sentía sosa, y los testers tenían que valorar la de verdad |
 | 7 | 1.0.4 | 29-09-2026 | La foto hecha con el móvil en horizontal se perdía al volver de la cámara. Girar el móvil devolvía a Hoy y volvía a pedir el desbloqueo. El widget de Hoy enseñaba "Can't show content" cuando Android arrancaba la app solo para refrescarlo. Un recordatorio o un cambio de hora con la app abierta podía llevarse el último cambio sin guardar y la foto recién hecha. | Revisión del código antes de subir versión; los tres primeros reproducidos en el emulador |
+| 8 | 1.0.5 | 01-10-2026 | Bloqueo: la capa dejaba pasar los toques a lo de debajo (se podía borrar el día o apagar el bloqueo sin autenticar), TalkBack la atravesaba y los diálogos quedaban encima. En Android 8 a 10 encenderlo cerraba la app. El minuto del rebloqueo no contaba el tiempo con el móvil dormido. Sin bloqueo de pantalla en el teléfono, la capa no tenía salida. El visor de fotos dejaba pasar los toques. | Revisión del código del 30-09-2026 (#45); el visor, comprobado en el emulador |
 
 ## Comentarios de los testers
 
@@ -32,7 +33,15 @@ Llegan por los comentarios privados de Play (*Valoraciones y reseñas > Comentar
 `baltajmn@gmail.com` y por los hilos del intercambio de pruebas. Una línea por comentario: fecha, qué
 dijo (sin nombre) y qué se hizo.
 
-Ninguno a 29-09-2026.
+- 28-09-2026, hilo del intercambio: "se ve muy limpia". Nada que cambiar.
+- 28-09-2026, hilo del intercambio: un tester con iPhone se inscribió y Play no le dejaba instalar.
+  Chroma es solo Android; se le explicó. Nada en la app.
+- 29-09-2026, hilo del intercambio: tras inscribirse, Chroma no le salía en Play ("Is India country
+  enabled?"); a los 20 minutos ya estaba. Retraso de Play tras unirse al grupo, el canal está en todos
+  los países. Nada en la app.
+- 30-09-2026, hilo del intercambio (HMD Pulse): la tarjeta de hoy con el hex vacío `#------` "te dice
+  para qué es el día sin ningún onboarding". Nada que cambiar; confirma que la pantalla de hoy se
+  entiende sin tutorial.
 
 ## Para la solicitud de acceso a producción
 

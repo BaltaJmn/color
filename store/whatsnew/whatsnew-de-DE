@@ -1,3 +1,4 @@
-- Fotos, die du im Querformat aufnimmst, gehen nicht mehr verloren.
-- Wenn du das Handy drehst, landest du nicht mehr bei Heute und musst nicht erneut entsperren.
-- Das Widget Die Farbe von heute zeigt keinen Fehler mehr, wenn du die App eine Weile nicht geöffnet hast.
+- Bei aktivierter Sperre reagiert nichts darunter mehr auf Berührungen oder wird vorgelesen.
+- Unter Android 8 bis 10 schließt sich die App beim Einschalten der Sperre nicht mehr.
+- Die Sperre greift wieder, auch wenn das Handy im Ruhezustand war.
+- Ein Foto im Vollbild zu tippen ändert die Farbe des Tages nicht mehr.

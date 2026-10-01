@@ -1,3 +1,4 @@
-- Les photos prises avec le téléphone à l'horizontale ne se perdent plus.
-- Tourner le téléphone ne te renvoie plus à Aujourd'hui et ne te demande plus de déverrouiller à nouveau.
-- Le widget La couleur du jour n'affiche plus d'erreur quand tu n'as pas ouvert l'app depuis un moment.
+- Avec le verrouillage activé, rien en dessous ne réagit plus au toucher ni n'est lu à voix haute.
+- Sur Android 8 à 10, activer le verrouillage ne ferme plus l'appli.
+- Le verrouillage revient même après une mise en veille du téléphone.
+- Toucher une photo en plein écran ne change plus la couleur du jour.

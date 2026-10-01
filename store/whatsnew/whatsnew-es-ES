@@ -1,3 +1,4 @@
-- Las fotos hechas con el móvil en horizontal ya no se pierden.
-- Girar el móvil ya no te devuelve a Hoy ni te pide desbloquear otra vez.
-- El widget El color de hoy ya no muestra un error cuando llevas un rato sin abrir la app.
+- Con el bloqueo puesto, lo que hay debajo ya no responde a toques ni se lee en voz alta.
+- En Android 8 a 10, encender el bloqueo ya no cierra la app.
+- El bloqueo vuelve a pedirse aunque el móvil haya estado dormido.
+- Tocar una foto a pantalla completa ya no cambia el color del día.

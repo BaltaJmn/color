@@ -1,3 +1,4 @@
-- As fotos tiradas com o celular na horizontal não se perdem mais.
-- Girar o celular não te leva mais de volta para Hoje nem pede para desbloquear de novo.
-- O widget A cor de hoje não mostra mais um erro depois de um tempo sem abrir o app.
+- Com o bloqueio ativado, o que está por baixo não responde mais a toques nem é lido em voz alta.
+- No Android 8 a 10, ativar o bloqueio não fecha mais o app.
+- O bloqueio volta a ser pedido mesmo depois de o celular ficar em repouso.
+- Tocar numa foto em tela cheia não muda mais a cor do dia.
