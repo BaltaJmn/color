@@ -1,6 +1,6 @@
-- Une coupure ou un téléphone plein pendant l'enregistrement ne fait plus perdre ta dernière modification.
-- Sans espace, la couleur du jour est enregistrée même si la photo ne rentre pas, et Chroma te le dit.
-- Importer une copie sur un nouveau téléphone ramène aussi les photos.
-- Si Android ferme Chroma pendant que tu prends la photo, elle t'attend au retour.
+- Une coupure ou un téléphone plein à l'enregistrement ne fait plus perdre ton dernier changement.
+- Sans espace, la couleur du jour est gardée même sans la photo, et Chroma te le dit.
+- Une copie importée sur un nouveau téléphone ramène aussi les photos.
+- Si Android ferme Chroma pendant la photo, elle t'attend au retour.
 - Avec l'app ouverte à 3 h, le jour change tout seul et rien n'atterrit sur le mauvais jour.
 - Si tes couleurs n'ont pas pu être lues, tu es toujours prévenu.
