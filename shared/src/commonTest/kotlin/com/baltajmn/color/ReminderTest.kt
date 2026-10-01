@@ -1,6 +1,7 @@
 package com.baltajmn.color
 
 import com.baltajmn.color.data.REMINDER_WINDOW
+import com.baltajmn.color.data.nextDayStart
 import com.baltajmn.color.data.nextFire
 import com.baltajmn.color.data.reminderPlan
 import com.baltajmn.color.model.ChromaEntry
@@ -22,6 +23,14 @@ class ReminderTest {
         assertEquals(LocalDateTime.parse("2027-01-16T20:00"), fire("2027-01-16T19:59"))
         assertEquals(LocalDateTime.parse("2027-01-18T20:00"), fire("2027-01-17T19:59"))
         assertEquals(LocalDateTime.parse("2027-01-18T20:00"), fire("2027-01-16T20:00"))
+    }
+
+    @Test
+    fun theWidgetsTurnThePageAtThreeInTheMorning() {
+        fun next(at: String) = nextDayStart(LocalDateTime.parse(at))
+        assertEquals(LocalDateTime.parse("2027-01-17T03:00"), next("2027-01-17T02:59"))
+        assertEquals(LocalDateTime.parse("2027-01-18T03:00"), next("2027-01-17T03:00"))
+        assertEquals(LocalDateTime.parse("2028-01-01T03:00"), next("2027-12-31T23:30"))
     }
 
     @Test

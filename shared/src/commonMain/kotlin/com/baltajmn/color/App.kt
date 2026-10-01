@@ -166,6 +166,8 @@ fun App() {
             else -> Unit
         }
         if (Route.pending != null) {
+            if (Route.pending != "pro") Paywall.open = false
+            photo = null
             openDay = null
             sharing = null
             poster = null

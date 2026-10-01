@@ -79,8 +79,9 @@ pasan una vez; un tic ligero al cambiar el color después. Nada más vibra.
 - **Un botón relleno por pantalla**, como mucho: la acción que la pantalla existe para hacer. Si hay
   dos opciones iguales (Apple y Google), las dos van con borde.
 - **Un aviso a la vez.** Si coinciden varios, se ve el más urgente: fallo al guardar, fichero
-  ilegible, aviso pasajero, cámara sin permiso (`cameraDenied`, con `openSystemSettings`), y solo
-  después las ofertas (recordatorio, copia).
+  ilegible, aviso pasajero, cámara sin permiso (`cameraDenied`, con `openSystemSettings`), recordatorio
+  aceptado en la oferta y bloqueado por el sistema (`reminderBlocked`, una vez), y solo después las
+  ofertas (recordatorio, copia).
 - **Lo que no se deshace se marca en rojo** (`error`): el botón que confirma borrar un día, borrar la
   cuenta, eliminar o bloquear a un amigo y cambiar el enlace de invitación. Y la entrada del menú que
   lleva a borrar. Nada más usa rojo.
@@ -253,7 +254,9 @@ Cada fila, de 60 como mínimo, lleva delante una tesela con su icono (campana, c
 sello, rombo, exportar, importar, restaurar, apps) y al final su interruptor o, si lleva a otro sitio,
 una flecha. Una lista de opciones se lee como unas pocas cosas que decidir, no como un párrafo:
 
-1. **Recordatorio**: interruptor y hora (`reminderRow`).
+1. **Recordatorio**: interruptor y hora (`reminderRow`). Encendido y sin poder llegar (notificaciones
+   de Chroma apagadas en el sistema), debajo sale `reminderBlocked` con `openSystemSettings`, que abre
+   los ajustes de notificaciones de la app (en un iPhone donde nunca se preguntó, la pregunta).
 2. **Amigos** (v1.1): cuenta y nombre visible, `defaultShareRow`, `friendsRow`, `inviteFriend` (el
    mismo nombre que la pantalla que abre), `signOut`,
    `deleteAccount` (confirmación `deleteAccountText`; mientras borra, `working`; sin conexión, el aviso

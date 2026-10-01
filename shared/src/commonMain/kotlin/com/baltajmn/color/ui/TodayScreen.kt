@@ -101,6 +101,8 @@ fun TodayScreen(
     var working by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
     var cameraDenied by remember { mutableStateOf(false) }
+    // Said yes to the reminder here: if the system says no, it is told here too, not only in Settings.
+    var reminderAsked by remember { mutableStateOf(false) }
     // Only the card that follows a pick is revealed; coming back to Today later just shows it.
     var justPicked by remember(today) { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -181,6 +183,14 @@ fun TodayScreen(
                         AppInfo.openSettings()
                     },
                 )
+                reminderAsked && Reminder.blocked -> Notice(
+                    S.reminderBlocked,
+                    S.notNow to { reminderAsked = false },
+                    S.openSystemSettings to {
+                        reminderAsked = false
+                        Reminder.unblock()
+                    },
+                )
                 entry == null || pending != null -> Unit
                 // One offer at a time, and each only once: waving it away counts as an answer.
                 !settings.reminderOffered -> Notice(
@@ -189,6 +199,7 @@ fun TodayScreen(
                     S.yes to {
                         ChromaRepository.updateSettings { it.copy(reminderOffered = true, reminderOn = true) }
                         Reminder.sync(askPermission = true)
+                        reminderAsked = true
                     },
                     glyph = Glyph.BELL,
                 )

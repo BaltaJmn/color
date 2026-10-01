@@ -305,12 +305,36 @@ tinta al 24 %, porque no es texto.
 ### 6.6 Recordatorio
 
 Purl 6.10 tal cual: Android programa el siguiente disparo y se calla si hoy ya hay entrada; iOS
-programa una ventana de 60 avisos sueltos que se rehace al guardar.
+programa una ventana de 60 avisos sueltos que se rehace al guardar. Desde 1.0.8, además:
+
+- `sync` quita el aviso que siga en la bandeja si hoy ya tiene color o si se entregó antes de las
+  03:00 de hoy (`dayStart`): pedía algo ya hecho, o hablaba de un día que acabó (Android `cancel`,
+  iOS `removeDeliveredNotificationsWithIdentifiers` de los `reminder-*`).
+- Tocar el aviso abre Hoy, se hubiera dejado la app donde fuera (extra `screen` en Android, el
+  delegado de `UNUserNotificationCenter` en iOS).
+- `Reminder.blocked`: el sistema no va a entregar el aviso. En Android, notificaciones de la app
+  apagadas o el canal `color-daily` desactivado (se puede hacer desde el propio aviso). En iOS,
+  denegado, o nunca preguntado con el recordatorio encendido (un diario restaurado en un iPhone
+  nuevo trae el recordatorio y no el permiso). Se lee en cada `sync`, también al volver a primer
+  plano y en cuanto se contesta la pregunta. Ajustes lo enseña bajo la fila (`reminderBlocked`), y
+  Hoy también, una vez, si el sí venía de su oferta. `Reminder.unblock` lleva a los ajustes de
+  notificaciones de la app o, en iOS sin preguntar, hace la pregunta. El recordatorio sigue
+  encendido: es lo que el usuario pidió.
+- `BootReceiver` está exportado, porque los avisos del sistema lo piden, y solo atiende a esas
+  cuatro acciones.
 
 ### 6.7 Widgets
 
 `syncWidgets` escribe `widget.json` en el App Group (iOS) o en `filesDir` (Android) y pide repintar,
 como Purl 6.11. Se llama al cargar, al guardar y al volver a primer plano.
+
+En Android nada más repinta a las 03:00 (el `updatePeriodMillis` mínimo es media hora y no cae en
+la hora), así que `Reminder.sync` reserva siempre, haya recordatorio o no, una alarma inexacta al
+próximo 03:00 (`nextDayStart`) cuyo `DayReceiver` sincroniza los widgets y vuelve a reservarla.
+`BootReceiver` hace lo mismo tras un reinicio, una actualización o un cambio de hora o de zona. Los
+widgets de Android siguen el tema del sistema con `ColorProvider(día, noche)` (desde Android 12 sin
+repintar; en 8 a 11 el color se elige al dibujar y se pone al día en el siguiente repintado), y los días vacíos de
+la rejilla del año son un gris translúcido que vale sobre los dos fondos.
 
 ### 6.8 Compras
 

@@ -10,4 +10,13 @@ expect object Reminder {
      * the reminder on: asking at start-up is rude, and on Android it cannot be done from composition.
      */
     fun sync(askPermission: Boolean)
+
+    /** The system has notifications off for the app: the reminder is on and can never arrive. */
+    val blocked: Boolean
+
+    /**
+     * Takes the user to where [blocked] is undone: the app's notification settings or, on an iPhone
+     * that was never asked (a journal restored from another phone), the question itself.
+     */
+    fun unblock()
 }

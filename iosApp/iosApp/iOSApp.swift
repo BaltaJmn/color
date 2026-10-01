@@ -1,9 +1,34 @@
 import SwiftUI
+import UserNotifications
 import WidgetKit
 import Shared
 
+/** Only for the notification centre, whose delegate has to be set before launch finishes. */
+final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
+        UNUserNotificationCenter.current().delegate = self
+        return true
+    }
+
+    // The daily nudge asks about today's color: tapping it opens Today, wherever the app was left.
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        if response.notification.request.identifier.hasPrefix("reminder-") {
+            ChromaBridge.shared.open(url: "com.baltajmn.color://today")
+        }
+        completionHandler()
+    }
+}
+
 @main
 struct iOSApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme
 

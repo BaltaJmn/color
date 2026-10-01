@@ -6,6 +6,7 @@ import com.baltajmn.color.widget.YearWidget
 import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 /** filesDir, next to the journal but readable by the widget process, which the journal never is. */
@@ -23,9 +24,12 @@ fun readWidgetState(): WidgetState? {
     return runCatching { WidgetJson.decodeFromString(WidgetState.serializer(), text) }.getOrNull()
 }
 
+/** The redraw in flight, for a receiver that has to wait for it before it lets the process go. */
+internal var lastRefresh: Job? = null
+
 actual fun refreshWidgets() {
     val context = AndroidContext.value
-    CoroutineScope(Dispatchers.Default).launch {
+    lastRefresh = CoroutineScope(Dispatchers.Default).launch {
         TodayWidget().updateAll(context)
         YearWidget().updateAll(context)
     }

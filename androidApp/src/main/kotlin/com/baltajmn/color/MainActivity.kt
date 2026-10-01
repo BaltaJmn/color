@@ -35,8 +35,9 @@ class MainActivity : FragmentActivity() {
     private val openBackup =
         registerForActivityResult(ActivityResultContracts.OpenDocument(), FilePicker::onPicked)
 
+    // Whatever the answer, Settings has to know whether the reminder can still arrive.
     private val askNotifications =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { Reminder.sync(askPermission = false) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()

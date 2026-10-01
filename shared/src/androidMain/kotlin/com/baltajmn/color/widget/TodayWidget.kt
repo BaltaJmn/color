@@ -3,7 +3,6 @@ package com.baltajmn.color.widget
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -18,6 +17,7 @@ import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.color.ColorProvider as DayNight
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -88,19 +88,14 @@ private fun Today(state: WidgetState?) {
             FriendsStrip(state.friends)
         }
     } else {
-        // Glance 1.1.1 has no day/night ColorProvider, so the scheme is read from the host.
-        val night = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
-            Configuration.UI_MODE_NIGHT_YES
-        val scheme = if (night) Dark else Light
-        Column(frame.background(scheme.surfaceVariant).padding(14.dp)) {
-            Text(day.day.toString(), style = TextStyle(color = ColorProvider(scheme.onBackground), fontSize = 30.sp, fontWeight = FontWeight.Normal))
+        // Day and night both: from Android 12 the launcher switches them with the dark mode without a
+        // redraw; before, they are picked when drawn, and the next redraw catches up.
+        val ink = DayNight(Light.onBackground, Dark.onBackground)
+        Column(frame.background(DayNight(Light.surfaceVariant, Dark.surfaceVariant)).padding(14.dp)) {
+            Text(day.day.toString(), style = TextStyle(color = ink, fontSize = 30.sp, fontWeight = FontWeight.Normal))
             Spacer(GlanceModifier.defaultWeight())
-            Text(
-                S.widgetEmpty,
-                maxLines = 2,
-                style = TextStyle(color = ColorProvider(scheme.onBackground), fontSize = 14.sp, fontWeight = FontWeight.Medium),
-            )
-            Text("#------", style = TextStyle(color = ColorProvider(scheme.onSurfaceVariant), fontSize = 12.sp))
+            Text(S.widgetEmpty, maxLines = 2, style = TextStyle(color = ink, fontSize = 14.sp, fontWeight = FontWeight.Medium))
+            Text("#------", style = TextStyle(color = DayNight(Light.onSurfaceVariant, Dark.onSurfaceVariant), fontSize = 12.sp))
             state?.let { FriendsStrip(it.friends) }
         }
     }

@@ -130,6 +130,10 @@ fun SettingsScreen(onBack: () -> Unit) {
                 ) {
                     SoftSwitch(settings.reminderOn, onChange = setReminder)
                 }
+                // On, and never going to arrive: said here, where the user looks for it.
+                if (settings.reminderOn && Reminder.blocked) {
+                    SettingRow(S.reminderBlocked, S.openSystemSettings, onClick = Reminder::unblock)
+                }
             }
 
             val me = Social.me

@@ -223,6 +223,13 @@ object S {
     val sectionAbout get() = t("About", "Acerca de", "Sobre", "Über", "À propos")
     val reminderRow get() = t("Daily reminder", "Recordatorio diario", "Lembrete diário", "Tägliche Erinnerung", "Rappel quotidien")
     val reminderOff get() = t("Off", "Apagado", "Desativado", "Aus", "Désactivé")
+    val reminderBlocked get() = t(
+        "Notifications are off for Chroma",
+        "Las notificaciones de Chroma están desactivadas",
+        "As notificações do Chroma estão desativadas",
+        "Mitteilungen für Chroma sind aus",
+        "Les notifications de Chroma sont désactivées",
+    )
     val openSystemSettings get() = t("Open settings", "Abrir ajustes", "Abrir ajustes", "Einstellungen öffnen", "Ouvrir les réglages")
     val weekColorRow get() = t("Color of the week", "Color de la semana", "Cor da semana", "Farbe der Woche", "Couleur de la semaine")
     val watermarkRow get() = t(

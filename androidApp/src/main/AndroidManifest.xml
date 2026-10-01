@@ -58,6 +58,9 @@
 
         <receiver android:name="com.baltajmn.color.data.ReminderReceiver" android:exported="false" />
 
+        <!-- A las 03:00 los widgets pasan de dia aunque nadie abra la app. -->
+        <receiver android:name="com.baltajmn.color.data.DayReceiver" android:exported="false" />
+
         <!-- Las alarmas no sobreviven a un reinicio, una reinstalacion ni un cambio de hora. -->
         <receiver android:name="com.baltajmn.color.data.BootReceiver" android:exported="true">
             <intent-filter>

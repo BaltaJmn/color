@@ -1,6 +1,7 @@
 package com.baltajmn.color.data
 
 import com.baltajmn.color.i18n.S
+import com.baltajmn.color.model.DAY_CUTOFF_HOUR
 import com.baltajmn.color.model.Journal
 import com.baltajmn.color.model.Settings
 import com.baltajmn.color.model.logicalDate
@@ -22,6 +23,15 @@ fun nextFire(now: LocalDateTime, hour: Int, minute: Int, done: (LocalDate) -> Bo
     if (c <= now) c = c.plusDays(1)
     while (done(logicalDate(c))) c = c.plusDays(1)
     return c
+}
+
+/** When the logical day [day] began, its 03:00: a nudge delivered before then asked about another day. */
+fun dayStart(day: LocalDate): LocalDateTime = LocalDateTime(day, LocalTime(DAY_CUTOFF_HOUR, 0))
+
+/** When the next logical day begins, the next 03:00: the moment the widgets have to turn the page. */
+fun nextDayStart(now: LocalDateTime): LocalDateTime {
+    val cut = LocalDateTime(now.date, LocalTime(DAY_CUTOFF_HOUR, 0))
+    return if (now < cut) cut else cut.plusDays(1)
 }
 
 data class Planned(val id: String, val at: LocalDateTime, val title: String, val body: String)
