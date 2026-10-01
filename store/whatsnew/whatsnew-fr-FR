@@ -1,4 +1,5 @@
-- Avec le verrouillage activé, rien en dessous ne réagit plus au toucher ni n'est lu à voix haute.
-- Sur Android 8 à 10, activer le verrouillage ne ferme plus l'appli.
-- Le verrouillage revient même après une mise en veille du téléphone.
-- Toucher une photo en plein écran ne change plus la couleur du jour.
+- Les photos de certaines caméras frontales ne sont plus enregistrées de côté ou en miroir.
+- Changer la langue de l'app s'applique tout de suite.
+- Le mode sombre, une autre taille de texte ou un clavier ne te ramènent plus à Aujourd'hui et ne font plus perdre la photo que tu viens de prendre.
+- Si le téléphone n'a pas d'app photo à ouvrir, Chroma le dit au lieu de ne rien faire.
+- Un fichier illisible ne ferme plus l'app.

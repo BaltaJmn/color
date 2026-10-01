@@ -1,4 +1,5 @@
-- Com o bloqueio ativado, o que está por baixo não responde mais a toques nem é lido em voz alta.
-- No Android 8 a 10, ativar o bloqueio não fecha mais o app.
-- O bloqueio volta a ser pedido mesmo depois de o celular ficar em repouso.
-- Tocar numa foto em tela cheia não muda mais a cor do dia.
+- Fotos de algumas câmeras frontais não são mais salvas de lado nem espelhadas.
+- Mudar o idioma do app vale na hora.
+- O modo escuro, outro tamanho de letra ou um teclado não te levam mais de volta para Hoje nem perdem a foto que você acabou de tirar.
+- Se o celular não tiver app de câmera para abrir, o Chroma avisa em vez de não fazer nada.
+- Um arquivo que não pode ser lido não fecha mais o app.

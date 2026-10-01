@@ -1,4 +1,5 @@
-- With the lock on, nothing underneath responds to touches or gets read aloud any more.
-- On Android 8 to 10, turning the lock on no longer closes the app.
-- The lock comes back even after the phone has been asleep.
-- Tapping a photo shown full screen no longer changes the day's color.
+- Photos from some front cameras are no longer saved sideways or mirrored.
+- Changing the app language takes effect right away.
+- Dark mode, a new text size or a keyboard no longer send you back to Today or lose the photo you just took.
+- If the phone has no camera app to open, Chroma says so instead of doing nothing.
+- A file that can't be read no longer closes the app.

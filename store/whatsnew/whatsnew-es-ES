@@ -1,4 +1,5 @@
-- Con el bloqueo puesto, lo que hay debajo ya no responde a toques ni se lee en voz alta.
-- En Android 8 a 10, encender el bloqueo ya no cierra la app.
-- El bloqueo vuelve a pedirse aunque el móvil haya estado dormido.
-- Tocar una foto a pantalla completa ya no cambia el color del día.
+- Las fotos de algunas cámaras frontales ya no se guardan de lado ni en espejo.
+- Cambiar el idioma de la app se nota al momento.
+- El modo oscuro, otro tamaño de letra o un teclado ya no te devuelven a Hoy ni pierden la foto recién hecha.
+- Si el móvil no tiene app de cámara que abrir, Chroma lo dice en vez de no hacer nada.
+- Un fichero que no se puede leer ya no cierra la app.
