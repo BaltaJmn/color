@@ -61,6 +61,7 @@ import com.baltajmn.color.data.FilePicker
 import com.baltajmn.color.data.PickResult
 import com.baltajmn.color.data.Picked
 import com.baltajmn.color.data.Reminder
+import com.baltajmn.color.data.Trip
 import com.baltajmn.color.data.decodeImage
 import com.baltajmn.color.data.isFromToday
 import com.baltajmn.color.data.samplePixels
@@ -104,6 +105,7 @@ fun TodayScreen(
 
     fun capture(from: suspend () -> Picked?) {
         if (working) return
+        Trip.start()
         scope.launch {
             working = true
             val picked = from()
@@ -339,7 +341,7 @@ private fun CardMenu(onRetake: () -> Unit, onShare: () -> Unit, onDelete: () -> 
     var open by remember { mutableStateOf(false) }
     Box {
         GlyphButton(Glyph.MORE, S.a11yMore, { open = true })
-        DropdownMenu(open, onDismissRequest = { open = false }, containerColor = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(18.dp)) {
+        DropdownMenu(open && !LocalLocked.current, onDismissRequest = { open = false }, containerColor = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(18.dp)) {
             DropdownMenuItem(text = { Text(S.retakePhoto, style = Styles.body) }, onClick = { open = false; onRetake() })
             DropdownMenuItem(text = { Text(S.share, style = Styles.body) }, onClick = { open = false; onShare() })
             DropdownMenuItem(

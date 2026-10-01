@@ -19,9 +19,11 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -29,6 +31,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.ui.theme.Styles
+
+/**
+ * True while the lock covers the app. Dialogs and menus are windows of their own and would float
+ * above it, so they wait for the unlock instead, keeping their state.
+ */
+val LocalLocked = compositionLocalOf { false }
+
+/**
+ * Stops touches from reaching anything under a full-screen layer. Being hit is enough: Compose stops
+ * at the first sibling with a pointer node. Consuming the events as well would cancel the taps of the
+ * buttons on the layer itself whenever the finger moves a little.
+ */
+fun Modifier.blockTouches(): Modifier = pointerInput(Unit) {}
 
 /** The one filled button of a screen: ink on paper, a pill 52 high (docs/pantallas.md 1). */
 @Composable
@@ -191,6 +206,7 @@ fun Ask(
     onDismiss: (() -> Unit)? = null,
     destructive: Boolean = false,
 ) {
+    if (LocalLocked.current) return
     AlertDialog(
         onDismissRequest = onDismiss ?: onConfirm,
         title = title?.let { { Text(it, style = Styles.title) } },

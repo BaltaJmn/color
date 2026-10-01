@@ -164,6 +164,7 @@ fun FriendActions(acting: Acting, onDone: () -> Unit) {
         Friends.resyncWidgetStrip()
     }
 
+    if (LocalLocked.current) return
     when (step) {
         Step.Menu -> AlertDialog(
             onDismissRequest = onDone,

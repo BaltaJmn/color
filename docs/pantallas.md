@@ -263,6 +263,24 @@ una flecha. Una lista de opciones se lee como unas pocas cosas que decidir, no c
      "Chroma" en `display` y `unlock`, por encima de todo, diálogos incluidos. Atrás no hace nada. El
      diálogo del sistema sale solo. La multitarea queda tapada (Android 13+ sin captura de recientes;
      iOS con una capa del color del papel pintada desde `iOSApp.swift`).
+   - Lo de debajo sigue vivo (una foto a medio elegir no se pierde), pero la capa se traga los toques,
+     el lector de pantalla no lo lee y los diálogos y menús, que son ventanas propias, esperan al
+     desbloqueo (`LocalLocked`).
+   - El tiempo fuera se mide con `elapsedMillis` (en Android `elapsedRealtime`, que cuenta el sueño y
+     no se puede cambiar; en iOS el reloj de pared). Un reloj que va hacia atrás bloquea. Volver de un
+     viaje propio (cámara, galería, selector de ficheros, hoja de compartir) espera `TRIP_GRACE`
+     (10 min) en vez de un minuto. El viaje se marca con la hora y solo cuenta si la app sale de
+     pantalla en los 10 s siguientes: una hoja que no la saca (iOS) o un lanzamiento que falla no
+     regalan los 10 min a la siguiente salida.
+   - En iOS las hojas del sistema (compartir, galería, ficheros) se presentan sobre Compose y quedan
+     por encima de la capa si se dejan abiertas al salir. Se acepta: lo que enseñan es lo que el dueño
+     acababa de elegir compartir o abrir.
+   - Si el teléfono se queda sin bloqueo de pantalla (o la copia llega a uno sin él), el de Chroma se
+     apaga solo en cuanto la capa lo intenta, al abrir o con `unlock`: nadie podría contestar al
+     diálogo, y quien tiene un móvil sin bloqueo ya puede abrir todo lo que hay en él. En Android se
+     pregunta a `KeyguardManager.isDeviceSecure`, no a `canAuthenticate`, que en algunos móviles dice
+     que no con un código puesto. El interruptor sigue activo con el bloqueo encendido aunque falte el
+     del sistema, para poder apagarlo.
    - Los widgets siguen enseñando colores: están en la pantalla de inicio porque el usuario los puso,
      y nunca llevan fotos ni palabras.
 4. **Tarjeta**: `watermarkRow`, `weekColorRow` (v1.2, interruptor con el nombre del color de esta

@@ -23,6 +23,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.baltajmn.color.data.Trip
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.share.Sharing
 import com.baltajmn.color.social.Friends
@@ -58,7 +59,10 @@ fun InviteScreen(onClose: () -> Unit) {
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { Text(link, style = Styles.caption) }
             Spacer(Modifier.height(24.dp))
             if (failed) Notice(S.friendsOffline, S.ok to { failed = false })
-            OutlinedAction(S.shareLink, { Sharing.shareText(S.inviteMessage(link)) })
+            OutlinedAction(S.shareLink, {
+                Trip.start()
+                Sharing.shareText(S.inviteMessage(link))
+            })
             Spacer(Modifier.height(8.dp))
             TextAction(if (busy) S.working else S.regenerateLink, { confirming = true }, enabled = !busy)
         }

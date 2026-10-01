@@ -30,6 +30,7 @@ fun exportName(today: LocalDate) = "$EXPORT_PREFIX-$today.zip"
 fun startExport(today: LocalDate, onResult: (PickResult) -> Unit) {
     ChromaRepository.saveNow()
     val snapshot = ChromaRepository.file
+    Trip.start()
     FilePicker.exportZip(exportName(today), { sink -> exportZip(snapshot, sink) }) { result ->
         if (result == PickResult.Done) {
             ChromaRepository.updateSettings { it.copy(lastBackup = today.toString(), backupNoticeDone = true) }

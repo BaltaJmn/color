@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +43,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -49,6 +52,8 @@ import com.baltajmn.color.billing.Billing
 import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Lock
+import com.baltajmn.color.data.Trip
+import com.baltajmn.color.data.elapsedMillis
 import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.Route
 import com.baltajmn.color.data.today
@@ -65,6 +70,7 @@ import com.baltajmn.color.ui.FriendsScreen
 import com.baltajmn.color.ui.Glyph
 import com.baltajmn.color.ui.GlyphIcon
 import com.baltajmn.color.ui.InviteScreen
+import com.baltajmn.color.ui.LocalLocked
 import com.baltajmn.color.ui.LockScreen
 import com.baltajmn.color.ui.Paywall
 import com.baltajmn.color.ui.PhotoViewer
@@ -77,8 +83,8 @@ import com.baltajmn.color.ui.TodayScreen
 import com.baltajmn.color.ui.YearScreen
 import com.baltajmn.color.ui.theme.ChromaTheme
 import com.baltajmn.color.ui.theme.Styles
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.TimeSource
 import kotlinx.datetime.LocalDate
 
 /** Four screens do not justify a navigation library. Friends stays hidden until v1.1. */
@@ -86,6 +92,13 @@ enum class Screen { Today, Year, Friends, Settings }
 
 /** A minute in the background. Short enough to protect, long enough to answer the door. */
 val RELOCK_AFTER = 60.seconds
+
+/** Away at the camera or a share sheet: a long take is still the same visit. */
+val TRIP_GRACE = 10.minutes
+
+/** Whether coming back after [away] milliseconds out locks again. A clock that went back counts as long. */
+internal fun relocks(away: Long?, trip: Boolean): Boolean =
+    away != null && (away < 0 || away >= (if (trip) TRIP_GRACE else RELOCK_AFTER).inWholeMilliseconds)
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -105,7 +118,9 @@ fun App() {
     var poster by remember { mutableStateOf<Int?>(null) }
     var stats by remember { mutableStateOf<Int?>(null) }
     var locked by remember { mutableStateOf(ChromaRepository.settings.lockOn) }
-    var leftAt by remember { mutableStateOf<TimeSource.Monotonic.ValueTimeMark?>(null) }
+    // elapsedMillis and not a monotonic mark: Android's stops while the phone sleeps in a pocket.
+    var leftAt by remember { mutableStateOf<Long?>(null) }
+    var leftOnTrip by remember { mutableStateOf(false) }
     var proCheck by remember { mutableStateOf(0) }
     var barHeight by remember { mutableStateOf(0.dp) }
 
@@ -117,9 +132,8 @@ fun App() {
         Outbox.kick()
         // A purchase or a refund may have happened on another device.
         proCheck++
-        // A minute away locks it again; stepping out to the camera or a share sheet does not.
-        val away = leftAt?.elapsedNow()
-        if (ChromaRepository.settings.lockOn && away != null && away >= RELOCK_AFTER) locked = true
+        // A minute away locks it again, ten after a trip of our own. A clock that went back locks too.
+        if (ChromaRepository.settings.lockOn && relocks(leftAt?.let { elapsedMillis() - it }, leftOnTrip)) locked = true
     }
     LaunchedEffect(proCheck) { Billing.refresh() }
     // A widget asked for a screen, maybe before the app existed.
@@ -149,53 +163,62 @@ fun App() {
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) {
         // The debounce may still be waiting when the app leaves the screen: write now.
         ChromaRepository.saveNow()
-        leftAt = TimeSource.Monotonic.markNow()
+        val now = elapsedMillis()
+        leftAt = now
+        leftOnTrip = Trip.consume(now)
     }
     // The task switcher takes its picture without asking, so the window is told in advance.
     LaunchedEffect(ChromaRepository.settings.lockOn) { Lock.setHidesPreview(ChromaRepository.settings.lockOn) }
 
     ChromaTheme {
         Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-            Column(Modifier.fillMaxSize()) {
-                // The keyboard rises over the bottom bar as well; the screens pad for it with
-                // imePadding, so what the bar already takes is consumed here, not padded twice.
-                val bar = if (screen != Screen.Settings) barHeight else 0.dp
-                Box(Modifier.weight(1f).fillMaxWidth().consumeWindowInsets(PaddingValues(bottom = bar))) {
-                    when (screen) {
-                        Screen.Today -> TodayScreen(
-                            today = day,
-                            onSettings = { screen = Screen.Settings },
-                            onPhoto = { photo = it },
-                            onShare = { sharing = it },
-                        )
-                        Screen.Year -> YearScreen(day, onOpenDay = { openDay = it }, onPoster = { poster = it }, onStats = { stats = it })
-                        Screen.Settings -> SettingsScreen(onBack = { screen = Screen.Today })
-                        Screen.Friends -> FriendsScreen(day, onPhoto = { photo = it })
+            // Locked, everything stays composed underneath (a photo halfway to its color is not lost),
+            // but none of it is touched, read aloud, or opened as a window over the lock.
+            CompositionLocalProvider(LocalLocked provides locked) {
+                // Keys too: a hardware keyboard could still Tab to a button underneath and press it.
+                Box(Modifier.fillMaxSize().then(if (locked) Modifier.clearAndSetSemantics {}.onPreviewKeyEvent { true } else Modifier)) {
+                    Column(Modifier.fillMaxSize()) {
+                        // The keyboard rises over the bottom bar as well; the screens pad for it with
+                        // imePadding, so what the bar already takes is consumed here, not padded twice.
+                        val bar = if (screen != Screen.Settings) barHeight else 0.dp
+                        Box(Modifier.weight(1f).fillMaxWidth().consumeWindowInsets(PaddingValues(bottom = bar))) {
+                            when (screen) {
+                                Screen.Today -> TodayScreen(
+                                    today = day,
+                                    onSettings = { screen = Screen.Settings },
+                                    onPhoto = { photo = it },
+                                    onShare = { sharing = it },
+                                )
+                                Screen.Year -> YearScreen(day, onOpenDay = { openDay = it }, onPoster = { poster = it }, onStats = { stats = it })
+                                Screen.Settings -> SettingsScreen(onBack = { screen = Screen.Today })
+                                Screen.Friends -> FriendsScreen(day, onPhoto = { photo = it })
+                            }
+                        }
+                        if (screen != Screen.Settings) {
+                            val density = LocalDensity.current
+                            BottomBar(
+                                screen,
+                                ChromaRepository.entryOn(day)?.color,
+                                Modifier.onSizeChanged { barHeight = with(density) { it.height.toDp() } },
+                            ) { screen = it }
+                        }
                     }
-                }
-                if (screen != Screen.Settings) {
-                    val density = LocalDensity.current
-                    BottomBar(
-                        screen,
-                        ChromaRepository.entryOn(day)?.color,
-                        Modifier.onSizeChanged { barHeight = with(density) { it.height.toDp() } },
-                    ) { screen = it }
+                    openDay?.let { DaySheet(it, onClose = { openDay = null }, onPhoto = { photo = it }, onShare = { sharing = it }) }
+                    sharing?.let { ShareScreen(it, onClose = { sharing = null }) }
+                    poster?.let { PosterScreen(it, onClose = { poster = null }) }
+                    stats?.let { StatsScreen(it, onClose = { stats = null }) }
+                    if (Friends.inviteOpen) InviteScreen { Friends.inviteOpen = false }
+                    if (Friends.listOpen) FriendList { Friends.listOpen = false }
+                    Friends.viewing?.let { FriendYear(it, day, onClose = { Friends.viewing = null }) }
+                    Friends.viewingDay?.let { row ->
+                        Friends.viewing?.let { FriendDay(row, it, onClose = { Friends.viewingDay = null }, onPhoto = { photo = it }) }
+                    }
+                    Friends.acting?.let { FriendActions(it) { Friends.acting = null } }
+                    photo?.let { PhotoViewer(it) { photo = null } }
+                    if (Paywall.open) ProDialog { Paywall.open = false }
                 }
             }
-            openDay?.let { DaySheet(it, onClose = { openDay = null }, onPhoto = { photo = it }, onShare = { sharing = it }) }
-            sharing?.let { ShareScreen(it, onClose = { sharing = null }) }
-            poster?.let { PosterScreen(it, onClose = { poster = null }) }
-            stats?.let { StatsScreen(it, onClose = { stats = null }) }
-            if (Friends.inviteOpen) InviteScreen { Friends.inviteOpen = false }
-            if (Friends.listOpen) FriendList { Friends.listOpen = false }
-            Friends.viewing?.let { FriendYear(it, day, onClose = { Friends.viewing = null }) }
-            Friends.viewingDay?.let { row ->
-                Friends.viewing?.let { FriendDay(row, it, onClose = { Friends.viewingDay = null }, onPhoto = { photo = it }) }
-            }
-            Friends.acting?.let { FriendActions(it) { Friends.acting = null } }
-            photo?.let { PhotoViewer(it) { photo = null } }
-            if (Paywall.open) ProDialog { Paywall.open = false }
-            // Last, so it covers every other layer, dialogs included.
+            // Last, so it covers every other layer; the windows above wait on LocalLocked.
             if (locked) LockScreen { locked = false }
 
             // Locked, back does nothing: the layers under the lock are not the user's to close yet.

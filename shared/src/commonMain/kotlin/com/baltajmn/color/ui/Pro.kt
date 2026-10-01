@@ -59,6 +59,7 @@ fun ProDialog(onDismiss: () -> Unit) {
     val colors = MaterialTheme.colorScheme
     val year = today().year
     val mine = ChromaRepository.journal.filterKeys { it.startsWith("$year-") }.mapValues { it.value.color }
+    if (LocalLocked.current) return
     Dialog(onDismissRequest = { if (!busy) onDismiss() }) {
         Column(
             Modifier.fillMaxWidth()

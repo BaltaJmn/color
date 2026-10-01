@@ -63,6 +63,7 @@ import com.baltajmn.color.data.PickResult
 import com.baltajmn.color.data.Reminder
 import com.baltajmn.color.data.SIBLINGS
 import com.baltajmn.color.data.TERMS_URL
+import com.baltajmn.color.data.Trip
 import com.baltajmn.color.data.abandonImport
 import com.baltajmn.color.data.merge
 import com.baltajmn.color.data.readBackup
@@ -154,7 +155,8 @@ fun SettingsScreen(onBack: () -> Unit) {
                     title = S.lockRow,
                     subtitle = if (canLock) S.lockSubtitle else S.lockUnavailable,
                     checked = settings.lockOn,
-                    enabled = canLock,
+                    // On without a screen lock to answer it: it can still be switched off.
+                    enabled = canLock || settings.lockOn,
                     glyph = Glyph.LOCK,
                 ) { on ->
                     // Turning it on proves who is asking: otherwise whoever has the phone in their
@@ -199,6 +201,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                     onClick = {
                         busy = true
                         var read: Result<Backup>? = null
+                        Trip.start()
                         FilePicker.importFile({ source -> read = runCatching { readBackup(source) } }) { result ->
                             busy = false
                             val answer = read
@@ -353,6 +356,7 @@ private fun RenameDialog(current: String, onDone: () -> Unit) {
     var name by remember { mutableStateOf(current) }
     var busy by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    if (LocalLocked.current) return
     AlertDialog(
         onDismissRequest = { if (!busy) onDone() },
         title = { Text(S.nameRow, style = Styles.title) },
@@ -387,6 +391,7 @@ private fun importText(e: Throwable): String = when ((e as? ImportFailed)?.probl
 @Composable
 private fun TimeDialog(hour: Int, minute: Int, onDismiss: () -> Unit, onPick: (Int, Int) -> Unit) {
     val state = rememberTimePickerState(initialHour = hour, initialMinute = minute, is24Hour = true)
+    if (LocalLocked.current) return
     AlertDialog(
         onDismissRequest = onDismiss,
         text = { TimePicker(state) },

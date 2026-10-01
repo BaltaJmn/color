@@ -2,7 +2,7 @@ package com.baltajmn.color.data
 
 import android.app.KeyguardManager
 import android.os.Build
-import androidx.biometric.BiometricManager
+import android.os.SystemClock
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
@@ -16,16 +16,10 @@ actual object Lock {
     /** Set by MainActivity: BiometricPrompt needs a live fragment host, and holding it would leak it. */
     var host: WeakReference<FragmentActivity>? = null
 
-    actual fun isAvailable(): Boolean {
-        val context = AndroidContext.value
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            BiometricManager.from(context).canAuthenticate(BIOMETRIC_WEAK or DEVICE_CREDENTIAL) ==
-                BiometricManager.BIOMETRIC_SUCCESS
-        } else {
-            // Before API 30 the combined query lies, so the screen lock is asked about directly.
-            context.getSystemService(KeyguardManager::class.java)?.isDeviceSecure == true
-        }
-    }
+    // The screen lock itself, on every version. canAuthenticate can answer HW_UNAVAILABLE or
+    // STATUS_UNKNOWN on some builds even with a code set, and a false no here switches the lock off.
+    actual fun isAvailable(): Boolean =
+        AndroidContext.value.getSystemService(KeyguardManager::class.java)?.isDeviceSecure == true
 
     actual fun authenticate(onResult: (Boolean) -> Unit) {
         val activity = host?.get()
@@ -44,20 +38,18 @@ actual object Lock {
                 override fun onAuthenticationError(code: Int, message: CharSequence) = onResult(false)
             },
         )
+        // The one combination valid on every API level. Mixing it with setDeviceCredentialAllowed
+        // made build() throw before Android 11, which closed the app.
         val info = BiometricPrompt.PromptInfo.Builder()
             .setTitle(S.lockPromptTitle)
             .setSubtitle(S.lockPromptSubtitle)
-            .apply {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    setAllowedAuthenticators(BIOMETRIC_WEAK or DEVICE_CREDENTIAL)
-                } else {
-                    setAllowedAuthenticators(BIOMETRIC_WEAK)
-                    @Suppress("DEPRECATION")
-                    setDeviceCredentialAllowed(true)
-                }
-            }
+            .setAllowedAuthenticators(BIOMETRIC_WEAK or DEVICE_CREDENTIAL)
             .build()
-        prompt.authenticate(info)
+        try {
+            prompt.authenticate(info)
+        } catch (e: Exception) {
+            onResult(false)
+        }
     }
 
     actual fun setHidesPreview(on: Boolean) {
@@ -67,3 +59,5 @@ actual object Lock {
         }
     }
 }
+
+actual fun elapsedMillis(): Long = SystemClock.elapsedRealtime()

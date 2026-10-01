@@ -37,6 +37,7 @@ fun ShareSwitch(current: Share, hasPhoto: Boolean, onChange: (Share) -> Unit) {
 /** The default for new days: asked once when the first friend arrives, and kept in Settings. */
 @Composable
 fun ShareChoiceDialog(title: String, text: String?, current: Share, onPick: (Share) -> Unit, onDismiss: () -> Unit) {
+    if (LocalLocked.current) return
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(title, style = Styles.title) },

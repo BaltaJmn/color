@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Photos
+import com.baltajmn.color.data.Trip
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.share.Sharing
 import com.baltajmn.color.share.encodeToPng
@@ -130,7 +131,14 @@ fun PictureScreen(
                 )
             }
             options()
-            val share = { if (locked) onLocked() else Sharing.sharePng(picture.encodeToPng()) }
+            val share = {
+                if (locked) {
+                    onLocked()
+                } else {
+                    Trip.start()
+                    Sharing.sharePng(picture.encodeToPng())
+                }
+            }
             val save = {
                 if (locked) {
                     onLocked()

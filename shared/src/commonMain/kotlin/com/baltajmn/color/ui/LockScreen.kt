@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Lock
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.ui.theme.Styles
@@ -28,18 +29,32 @@ fun LockScreen(onUnlocked: () -> Unit) {
     // A field underneath keeps its focus while the app is away, and the keyboard would come back up
     // over the lock with it. Clearing the focus sends it down and keeps it down.
     val focus = LocalFocusManager.current
+    // Asked again on every try: the screen lock of the phone can go while this layer is up. Without
+    // one nothing could ever answer the prompt, and whoever holds a phone with no lock can already
+    // open everything on it, so the lock of Chroma goes too.
+    val attempt = {
+        if (Lock.isAvailable()) {
+            Lock.authenticate { if (it) onUnlocked() }
+        } else {
+            ChromaRepository.updateSettings { it.copy(lockOn = false) }
+            onUnlocked()
+        }
+    }
     LaunchedEffect(Unit) {
         focus.clearFocus(force = true)
-        Lock.authenticate { if (it) onUnlocked() }
+        attempt()
     }
 
-    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background), contentAlignment = Alignment.Center) {
+    Box(
+        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).blockTouches(),
+        contentAlignment = Alignment.Center,
+    ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             GlyphTile(Glyph.LOCK)
             Spacer(Modifier.height(16.dp))
             Text("Chroma", style = Styles.display)
             Spacer(Modifier.height(32.dp))
-            PrimaryAction(S.unlock, { Lock.authenticate { if (it) onUnlocked() } })
+            PrimaryAction(S.unlock, attempt)
         }
     }
 }

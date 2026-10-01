@@ -25,3 +25,6 @@ actual object Lock {
     /** iOS hides the app from the switcher from Swift: Compose does not repaint before the snapshot. */
     actual fun setHidesPreview(on: Boolean) = Unit
 }
+
+/** iOS has no setting-proof clock that counts sleep within reach; the wall clock it is. */
+actual fun elapsedMillis(): Long = nowMillis()

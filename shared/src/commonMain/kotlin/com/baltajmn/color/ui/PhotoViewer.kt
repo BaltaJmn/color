@@ -21,7 +21,7 @@ import com.baltajmn.color.i18n.S
 /** The photo behind a card, whole, on black. */
 @Composable
 fun PhotoViewer(image: ImageBitmap, onClose: () -> Unit) {
-    Box(Modifier.fillMaxSize().background(Color.Black)) {
+    Box(Modifier.fillMaxSize().background(Color.Black).blockTouches()) {
         Image(image, null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize().safeDrawingPadding())
         // A scrim behind the glyph: plain white vanishes over a light photo.
         Box(
