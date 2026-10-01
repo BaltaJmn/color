@@ -33,16 +33,25 @@ actual object Storage {
         if (!temp.renameTo(file)) error("could not restore the main file")
     }
 
+    private val corrupt get() = File(dir, "corrupt").apply { mkdirs() }
+
     @OptIn(ExperimentalTime::class)
-    actual fun quarantine() {
+    private fun stamp(): String {
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-        val stamp = "%04d%02d%02d-%02d%02d%02d".format(
-            now.year, now.month.ordinal + 1, now.day, now.hour, now.minute, now.second,
-        )
-        val corrupt = File(dir, "corrupt").apply { mkdirs() }
+        return "%04d%02d%02d-%02d%02d%02d".format(now.year, now.month.ordinal + 1, now.day, now.hour, now.minute, now.second)
+    }
+
+    actual fun quarantine() {
+        val stamp = stamp()
         file.takeIf { it.exists() }?.renameTo(File(corrupt, "entries-$stamp.json"))
         backup.takeIf { it.exists() }?.renameTo(File(corrupt, "entries-$stamp.bak.json"))
     }
+
+    actual fun quarantineMain() {
+        if (file.exists() && !file.renameTo(File(corrupt, "entries-${stamp()}.json"))) error("could not move the main file aside")
+    }
+
+    actual fun quarantinedCount(): Int = corrupt.list()?.count { it.endsWith(".json") } ?: 0
 
     actual fun writePhoto(name: String, bytes: ByteArray) {
         File(photos, name).writeBytes(bytes)
@@ -93,5 +102,6 @@ actual object Storage {
         }
     }
 
-    private fun File.textOrNull(): String? = takeIf { it.exists() }?.readText()
+    /** Like iOS: a file that exists but cannot be read is quarantined, not a crash on every start. */
+    private fun File.textOrNull(): String? = if (exists()) runCatching { readText() }.getOrDefault("") else null
 }

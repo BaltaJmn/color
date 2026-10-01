@@ -22,8 +22,12 @@ private const val NOTIFICATION_ID = 1
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         ChromaRepository.ensureLoaded()
-        if (ChromaRepository.entryOn(today()) == null) notify(context)
-        Reminder.sync(askPermission = false)
+        // The next one is booked whatever happens to this one, or the reminders stop for good.
+        try {
+            if (ChromaRepository.entryOn(today()) == null) notify(context)
+        } finally {
+            Reminder.sync(askPermission = false)
+        }
     }
 
     private fun notify(context: Context) {

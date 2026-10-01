@@ -33,6 +33,12 @@ expect object Capture {
     /** False on a device without a camera, like the iOS simulator. */
     val cameraAvailable: Boolean
 
+    /** True when the user said no to the camera (iOS): the camera would only open black. */
+    val cameraDenied: Boolean
+
+    /** The last [camera] or [gallery] found nothing on the phone to open (Android). */
+    val launchFailed: Boolean
+
     /** Null when the user cancels or the photo cannot be read. */
     suspend fun camera(): Picked?
 

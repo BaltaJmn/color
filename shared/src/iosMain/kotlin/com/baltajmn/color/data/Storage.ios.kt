@@ -65,16 +65,29 @@ actual object Storage {
 
     actual fun restoreMain(text: String) = writeAtomically(path, text.encodeToByteArray())
 
+    private val corruptDir get() = "$root/corrupt".also { fm.createDirectoryAtPath(it, true, protection, null) }
+
     @OptIn(ExperimentalTime::class)
-    actual fun quarantine() {
+    private fun stamp(): String {
         val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
         fun two(n: Int) = n.toString().padStart(2, '0')
-        val stamp = "${now.year}${two(now.month.ordinal + 1)}${two(now.day)}-" +
-            "${two(now.hour)}${two(now.minute)}${two(now.second)}"
-        val corrupt = "$root/corrupt".also { fm.createDirectoryAtPath(it, true, protection, null) }
-        if (fm.fileExistsAtPath(path)) fm.moveItemAtPath(path, "$corrupt/entries-$stamp.json", null)
-        if (fm.fileExistsAtPath(backupPath)) fm.moveItemAtPath(backupPath, "$corrupt/entries-$stamp.bak.json", null)
+        return "${now.year}${two(now.month.ordinal + 1)}${two(now.day)}-${two(now.hour)}${two(now.minute)}${two(now.second)}"
     }
+
+    actual fun quarantine() {
+        val stamp = stamp()
+        if (fm.fileExistsAtPath(path)) fm.moveItemAtPath(path, "$corruptDir/entries-$stamp.json", null)
+        if (fm.fileExistsAtPath(backupPath)) fm.moveItemAtPath(backupPath, "$corruptDir/entries-$stamp.bak.json", null)
+    }
+
+    actual fun quarantineMain() {
+        if (fm.fileExistsAtPath(path) && !fm.moveItemAtPath(path, "$corruptDir/entries-${stamp()}.json", null)) {
+            error("could not move the main file aside")
+        }
+    }
+
+    actual fun quarantinedCount(): Int =
+        fm.contentsOfDirectoryAtPath(corruptDir, null)?.filterIsInstance<String>()?.count { it.endsWith(".json") } ?: 0
 
     actual fun writePhoto(name: String, bytes: ByteArray) = writeAtomically("$photosDir/$name", bytes)
 

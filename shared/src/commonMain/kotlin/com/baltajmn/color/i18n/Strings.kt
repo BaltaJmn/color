@@ -18,13 +18,19 @@ internal fun normalizeLanguage(code: String): String =
  * Not Compose Resources on purpose: part of these strings are drawn outside a `@Composable` (a
  * BroadcastReceiver, a Glance widget, the Canvas of the share card, a notification builder).
  *
- * ponytail: the language is read once at first access. Both systems restart the app when the
- * language changes, so this only matters if live switching is ever needed. The functions read
- * [lang] on every call, which lets the tests go through the five.
+ * The language is read on every call: Android changes it (per app since 13) by recreating the
+ * Activity, not the process, so a value kept from the first access would stay in the old one. The
+ * tests set [lang] to go through the five.
  */
 object S {
 
-    internal var lang = normalizeLanguage(systemLanguage())
+    private var forced: String? = null
+
+    internal var lang: String
+        get() = forced ?: normalizeLanguage(systemLanguage())
+        set(value) {
+            forced = value
+        }
 
     private fun t(en: String, es: String, pt: String, de: String, fr: String): String = when (lang) {
         "es" -> es
@@ -123,6 +129,20 @@ object S {
         "Não foi possível ler essa foto.",
         "Dieses Foto konnte nicht gelesen werden.",
         "Impossible de lire cette photo.",
+    )
+    val cameraDenied get() = t(
+        "Chroma isn't allowed to use the camera. You can allow it in Settings, or choose from today's photos.",
+        "Chroma no tiene permiso para usar la cámara. Puedes darlo en Ajustes, o elegir de las fotos de hoy.",
+        "O Chroma não tem permissão para usar a câmera. Você pode permitir em Ajustes, ou escolher das fotos de hoje.",
+        "Chroma darf die Kamera nicht nutzen. Du kannst es in den Einstellungen erlauben oder aus den Fotos von heute wählen.",
+        "Chroma n'a pas accès à l'appareil photo. Tu peux l'autoriser dans Réglages, ou choisir parmi les photos du jour.",
+    )
+    val captureFailed get() = t(
+        "Couldn't open that on this phone.",
+        "No se ha podido abrir en este móvil.",
+        "Não foi possível abrir neste celular.",
+        "Das ließ sich auf diesem Handy nicht öffnen.",
+        "Impossible de l'ouvrir sur ce téléphone.",
     )
     val addWord get() = t("Add a word", "Añadir una palabra", "Adicionar uma palavra", "Ein Wort hinzufügen", "Ajouter un mot")
     val wordPlaceholder get() = t("One word for today", "Una palabra para hoy", "Uma palavra para hoje", "Ein Wort für heute", "Un mot pour aujourd'hui")

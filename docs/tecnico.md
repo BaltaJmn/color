@@ -37,9 +37,14 @@ La plantilla es **Purl** (`../line`): casi todo lo que no es color ni amigos sal
 
 ## 2. Versiones y dependencias
 
-Las de Purl sin tocar (`../line/gradle/libs.versions.toml`): AGP 9.0.1, SDK 36, minSdk 24, Kotlin
-2.4.10, Compose Multiplatform 1.11.1, material3 1.11.0-alpha07, kotlinx-datetime 0.8.0,
-kotlinx-serialization 1.11.0, Glance 1.1.1, purchases-kmp 3.2.1, biometric 1.1.0.
+Las de Purl (`../line/gradle/libs.versions.toml`): AGP 9.0.1, SDK 36, Kotlin 2.4.10, Compose
+Multiplatform 1.11.1, material3 1.11.0-alpha07, kotlinx-datetime 0.8.0, kotlinx-serialization
+1.11.0, Glance 1.1.1, purchases-kmp 3.2.1, biometric 1.1.0.
+
+**minSdk 26, no 24 como Purl** (1.0.6): kotlinx-datetime envuelve `java.time`, que no existe antes de
+Android 8.0, y sin desugaring la app no abría en Android 7. Subirlo quita también `NotificationChannel`
+sin guarda y una plataforma que nadie ha probado; Android 7 es una fracción mínima de los móviles
+activos. Purl y las hermanas tienen el mismo fallo.
 
 En v1.1 se añaden:
 
@@ -151,7 +156,13 @@ data class ChromaEntry(
   `hiddenCards: List<String>` (`<author>/<day>` de cada día reportado: oculto para siempre, porque
   los reportes no se pueden leer desde la app).
 - `JournalJson`: `ignoreUnknownKeys`, sin valores por defecto ni nulos explícitos. Igual que Purl.
-- `entries.bak.json`, cuarentena en `corrupt/` y un único escritor con rebote de 800 ms: Purl 6.12.
+- `entries.bak.json`, cuarentena en `corrupt/` y un único escritor con rebote de 800 ms: Purl 6.12,
+  con dos diferencias (1.0.6):
+  - Si `entries.json` no se lee y la `.bak` sí, el ilegible va a `corrupt/` antes de restaurar la
+    `.bak` en su sitio; Purl lo pisaba. Si no se puede apartar, tampoco se restaura.
+  - El barrido de fotos huérfanas solo corre con el diario leído del principal y nada en `corrupt/`:
+    si no, esas fotos pueden ser de los días del fichero que no se leyó. Los borrados normales los
+    hace la escritura, no el barrido.
 
 ### 4.2 `widget.json`
 
@@ -367,6 +378,17 @@ class Picked(val jpeg: ByteArray, val takenOn: LocalDateTime?)
   JPEG ya decodificado (`samplePixels`), así las dos plataformas analizan los mismos píxeles.
 - Regla de fecha: si `takenOn` existe y su `logicalDate` no es hoy, se rechaza con el aviso
   `galleryNotToday`. Sin fecha, se acepta.
+- Sin nadie que conteste (1.0.6): en Android `cameraAvailable` exige además que alguien resuelva
+  `ACTION_IMAGE_CAPTURE` (de ahí el `<queries>` del manifiesto), mirado una vez por proceso. Si el
+  lanzamiento falla igualmente, `launchFailed`, aviso `captureFailed` y el botón de cámara se va.
+- Permiso de cámara en iOS (1.0.6): la primera vez lo pide `camera()` con
+  `AVCaptureDevice.requestAccessForMediaType`, no el selector, que tras un no se queda en negro.
+  Denegado da `cameraDenied` y el aviso lleva a Ajustes (`AppInfo.openSettings`); restringido
+  (Tiempo de uso, móvil gestionado) cuenta como sin cámara, porque en Ajustes no hay nada que tocar.
+- La Activity no se rehace al girar ni con el modo oscuro, el tamaño de letra, la negrita, la
+  densidad o un teclado físico (`configChanges`): una foto que vuelve de la cámara se perdería. Solo
+  el idioma la rehace. Como nada más redibuja los widgets con el tema o el idioma nuevos,
+  `ChromaApp.onConfigurationChanged` los sincroniza cuando cambia cualquiera de los dos.
 
 ---
 

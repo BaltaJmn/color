@@ -2,6 +2,13 @@ package com.baltajmn.color.data
 
 import kotlin.coroutines.resume
 import kotlinx.cinterop.ExperimentalForeignApi
+import platform.AVFoundation.AVAuthorizationStatusDenied
+import platform.AVFoundation.AVAuthorizationStatusNotDetermined
+import platform.AVFoundation.AVAuthorizationStatusRestricted
+import platform.AVFoundation.AVCaptureDevice
+import platform.AVFoundation.AVMediaTypeVideo
+import platform.AVFoundation.authorizationStatusForMediaType
+import platform.AVFoundation.requestAccessForMediaType
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.useContents
@@ -40,10 +47,18 @@ private const val JPEG_QUALITY = 0.85
 
 actual object Capture {
 
+    // Restricted (Screen Time, a managed phone) has no switch the user can turn in Settings: to them
+    // there is no camera, and the photos are the way in.
     actual val cameraAvailable: Boolean
         get() = UIImagePickerController.isSourceTypeAvailable(
             UIImagePickerControllerSourceType.UIImagePickerControllerSourceTypeCamera,
-        )
+        ) && cameraStatus != AVAuthorizationStatusRestricted
+
+    actual val cameraDenied: Boolean get() = cameraStatus == AVAuthorizationStatusDenied
+
+    actual val launchFailed = false
+
+    private val cameraStatus get() = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
 
     // The pickers hold their delegates weakly, so the one in flight is kept alive here.
     private var held: NSObject? = null
@@ -53,8 +68,22 @@ actual object Capture {
 
     private fun top(vc: UIViewController): UIViewController = vc.presentedViewController?.let(::top) ?: vc
 
-    /** A photo just taken is today's by definition, so it carries no date to check. */
-    actual suspend fun camera(): Picked? = suspendCancellableCoroutine { cont ->
+    /**
+     * A photo just taken is today's by definition, so it carries no date to check. The first time,
+     * the permission is asked here and not by the picker: a no in its prompt leaves it open on black.
+     */
+    actual suspend fun camera(): Picked? {
+        if (cameraStatus == AVAuthorizationStatusNotDetermined && !askCamera()) return null
+        return presentCamera()
+    }
+
+    private suspend fun askCamera(): Boolean = suspendCancellableCoroutine { cont ->
+        AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo) { granted ->
+            dispatch_async(dispatch_get_main_queue()) { cont.resume(granted) }
+        }
+    }
+
+    private suspend fun presentCamera(): Picked? = suspendCancellableCoroutine { cont ->
         val presenter = root
         if (presenter == null || !cameraAvailable) {
             cont.resume(null)

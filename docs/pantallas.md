@@ -79,7 +79,8 @@ pasan una vez; un tic ligero al cambiar el color después. Nada más vibra.
 - **Un botón relleno por pantalla**, como mucho: la acción que la pantalla existe para hacer. Si hay
   dos opciones iguales (Apple y Google), las dos van con borde.
 - **Un aviso a la vez.** Si coinciden varios, se ve el más urgente: fallo al guardar, fichero
-  ilegible, aviso pasajero, y solo después las ofertas (recordatorio, copia).
+  ilegible, aviso pasajero, cámara sin permiso (`cameraDenied`, con `openSystemSettings`), y solo
+  después las ofertas (recordatorio, copia).
 - **Lo que no se deshace se marca en rojo** (`error`): el botón que confirma borrar un día, borrar la
   cuenta, eliminar o bloquear a un amigo y cambiar el enlace de invitación. Y la entrada del menú que
   lleva a borrar. Nada más usa rojo.
@@ -143,6 +144,8 @@ Tras la foto, en la misma pantalla:
 - Sobre los círculos, `pickColor` en `eyebrow`: la primera vez no es obvio que hay que tocar uno.
 - Mientras se analiza la foto (menos de 100 ms), los botones se desactivan y sale `working`.
 - Si la foto de galería no es de hoy: aviso `galleryNotToday` y se vuelve al estado sin entrada.
+- Si el teléfono no tiene nada que abra la cámara o el selector: aviso `captureFailed`, y la cámara
+  deja de ofrecerse hasta la próxima vez que se abra la app.
 
 ### Con entrada
 

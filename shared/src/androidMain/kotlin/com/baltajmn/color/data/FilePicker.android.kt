@@ -61,7 +61,7 @@ actual object FilePicker {
                 }
             }
         }
-        launch(suggestedName)
+        launchOrFail(onDone) { launch(suggestedName) }
     }
 
     actual fun importFile(read: (source: (Int) -> ByteArray?) -> Unit, onDone: (PickResult) -> Unit) {
@@ -87,6 +87,14 @@ actual object FilePicker {
                 }
             }
         }
-        launch()
+        launchOrFail(onDone) { launch() }
+    }
+
+    // A phone without a documents app throws instead of opening the picker.
+    private fun launchOrFail(onDone: (PickResult) -> Unit, launch: () -> Unit) {
+        runCatching(launch).onFailure {
+            waiting = null
+            onDone(PickResult.Failed)
+        }
     }
 }

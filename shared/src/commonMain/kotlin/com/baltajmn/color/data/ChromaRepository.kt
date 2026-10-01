@@ -97,13 +97,19 @@ object ChromaRepository {
         if (loaded == null) {
             previous = Storage.readPrevious()
             loaded = decode(previous)
-            if (loaded != null) runCatching { Storage.restoreMain(previous!!) }
+            if (loaded != null) {
+                runCatching {
+                    // The unreadable one goes aside first, never under the copy restored in its place.
+                    if (main != null) Storage.quarantineMain()
+                    Storage.restoreMain(previous!!)
+                }
+            }
         }
         corrupt = false
         when {
             loaded != null -> {
                 file = loaded
-                sweep(loaded)
+                sweep(loaded, photos = previous == null)
             }
             main == null && previous == null -> file = JournalFile()
             else -> {
@@ -297,10 +303,19 @@ object ChromaRepository {
         Review.request()
     }
 
-    /** Photos nobody references any more, and whatever an import left half done. */
-    private fun sweep(f: JournalFile) {
-        val referenced = photosOf(f)
-        Storage.listPhotos().filter { it !in referenced }.forEach(Storage::deletePhoto)
+    /**
+     * Photos nobody references any more, and whatever an import left half done. Photos only when the
+     * journal came from the main file and nothing ever went to corrupt/: otherwise they may belong to
+     * days in a file that could not be read, and a lost day's photo is worth more than the space.
+     * Ordinary deletes happen in persist and do not need this.
+     */
+    // ponytail: after a first quarantine orphans are never swept again; scan corrupt/ for the photo
+    // names it cites if that space ever matters.
+    private fun sweep(f: JournalFile, photos: Boolean) {
+        if (photos && Storage.quarantinedCount() == 0) {
+            val referenced = photosOf(f)
+            Storage.listPhotos().filter { it !in referenced }.forEach(Storage::deletePhoto)
+        }
         Storage.importDir()
     }
 

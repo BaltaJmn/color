@@ -15,6 +15,9 @@ expect object AppInfo {
     val version: String
 
     fun open(url: String)
+
+    /** This app's page in the system settings, where a permission said no can be given back. */
+    fun openSettings()
 }
 
 data class Sibling(val name: String, val tagline: String, val androidUrl: String?, val iosUrl: String?)

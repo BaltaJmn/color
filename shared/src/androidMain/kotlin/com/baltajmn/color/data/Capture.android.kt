@@ -1,11 +1,13 @@
 package com.baltajmn.color.data
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -32,8 +34,24 @@ actual object Capture {
     // next Today would save it, if that ever shows up in the wild.
     private var waiting: ((Uri?) -> Unit)? = null
 
-    actual val cameraAvailable: Boolean
-        get() = AndroidContext.value.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+    // A camera is not enough: a work profile or a disabled camera app leaves nobody to answer the
+    // intent. Seeing that answer needs the <queries> entry in the manifest. Asked once per process,
+    // and a launch that fails anyway turns the button off.
+    private val cameraAnswers by lazy {
+        AndroidContext.value.packageManager.let {
+            it.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY) &&
+                Intent(MediaStore.ACTION_IMAGE_CAPTURE).resolveActivity(it) != null
+        }
+    }
+    private var cameraFailed = false
+
+    actual val cameraAvailable: Boolean get() = cameraAnswers && !cameraFailed
+
+    private var failed = false
+    actual val launchFailed: Boolean get() = failed
+
+    // The system camera app takes the photo, so Chroma itself never holds the permission.
+    actual val cameraDenied: Boolean = false
 
     // Not cacheDir: low on space, the system empties it while the camera is open and the photo is lost.
     private val shot: File
@@ -43,7 +61,9 @@ actual object Capture {
         val launch = launchCamera ?: return null
         val file = shot.apply { delete() }
         val uri = FileProvider.getUriForFile(AndroidContext.value, "${AndroidContext.value.packageName}.fileprovider", file)
-        val answer = await { launch(uri) } ?: return null
+        val answer = await { launch(uri) }
+        if (launchFailed) cameraFailed = true
+        if (answer == null) return null
         return withContext(Dispatchers.IO) {
             runCatching { process { AndroidContext.value.contentResolver.openInputStream(answer) } }.getOrNull()
                 .also { file.delete() }
@@ -81,7 +101,13 @@ actual object Capture {
         }
         waiting = { cont.resume(it) }
         cont.invokeOnCancellation { waiting = null }
-        launch()
+        failed = false
+        // Nobody to answer the intent throws here, and the throw would close the app.
+        runCatching(launch).onFailure {
+            failed = true
+            waiting = null
+            cont.resume(null)
+        }
     }
 }
 
@@ -93,12 +119,18 @@ internal fun process(open: () -> InputStream?): Picked? {
     val exif = open()?.use { ExifInterface(it) }
     val takenOn = parseExifDate(exif?.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL))
         ?: parseExifDate(exif?.getAttribute(ExifInterface.TAG_DATETIME))
-    val degrees = when (exif?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
-        ExifInterface.ORIENTATION_ROTATE_90 -> 90f
-        ExifInterface.ORIENTATION_ROTATE_180 -> 180f
-        ExifInterface.ORIENTATION_ROTATE_270 -> 270f
-        // ponytail: mirrored orientations (front cameras on a few phones) are drawn unmirrored.
-        else -> 0f
+    // The whole EXIF table: the mirrored ones (front cameras on some phones) also turn.
+    val orient = Matrix().apply {
+        when (exif?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+            ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> setScale(-1f, 1f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> setRotate(180f)
+            ExifInterface.ORIENTATION_FLIP_VERTICAL -> setScale(1f, -1f)
+            ExifInterface.ORIENTATION_TRANSPOSE -> { setRotate(90f); postScale(-1f, 1f) }
+            ExifInterface.ORIENTATION_ROTATE_90 -> setRotate(90f)
+            ExifInterface.ORIENTATION_TRANSVERSE -> { setRotate(-90f); postScale(-1f, 1f) }
+            ExifInterface.ORIENTATION_ROTATE_270 -> setRotate(-90f)
+            else -> Unit
+        }
     }
 
     val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
@@ -114,7 +146,7 @@ internal fun process(open: () -> InputStream?): Picked? {
     val scale = (PHOTO_SIDE.toFloat() / max(decoded.width, decoded.height)).coerceAtMost(1f)
     val matrix = Matrix().apply {
         postScale(scale, scale)
-        postRotate(degrees)
+        postConcat(orient)
     }
     val bitmap = Bitmap.createBitmap(decoded, 0, 0, decoded.width, decoded.height, matrix, true)
     val jpeg = ByteArrayOutputStream().use { out ->

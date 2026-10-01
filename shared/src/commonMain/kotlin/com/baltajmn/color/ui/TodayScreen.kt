@@ -55,6 +55,7 @@ import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.color.extractSwatches
 import com.baltajmn.color.color.nearestName
 import com.baltajmn.color.color.weekColor
+import com.baltajmn.color.data.AppInfo
 import com.baltajmn.color.data.Capture
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.FilePicker
@@ -99,6 +100,7 @@ fun TodayScreen(
     var notice by remember { mutableStateOf<String?>(null) }
     var working by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
+    var cameraDenied by remember { mutableStateOf(false) }
     // Only the card that follows a pick is revealed; coming back to Today later just shows it.
     var justPicked by remember(today) { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -118,7 +120,7 @@ fun TodayScreen(
             }
             working = false
             when {
-                picked == null -> Unit
+                picked == null -> if (Capture.launchFailed) notice = S.captureFailed
                 !isFromToday(picked.takenOn, today) -> notice = S.galleryNotToday
                 result == null || result.swatches.isEmpty() -> notice = S.photoUnreadable
                 else -> pending = result
@@ -126,7 +128,14 @@ fun TodayScreen(
         }
     }
 
-    val camera = { capture { Capture.camera() } }
+    // A no given in the system prompt just now shows the same way as one given long ago.
+    val camera = {
+        if (Capture.cameraDenied) {
+            cameraDenied = true
+        } else {
+            capture { Capture.camera().also { if (it == null && Capture.cameraDenied) cameraDenied = true } }
+        }
+    }
     val gallery = { capture { Capture.gallery() } }
 
     Column(
@@ -152,6 +161,14 @@ fun TodayScreen(
                 ChromaRepository.saveFailed -> Notice(S.noticeSaveFailed)
                 ChromaRepository.corrupt -> Notice(S.noticeCorrupt, S.ok to ChromaRepository::dismissCorrupt)
                 activeNotice != null -> Notice(activeNotice, S.ok to { notice = null })
+                cameraDenied -> Notice(
+                    S.cameraDenied,
+                    S.notNow to { cameraDenied = false },
+                    S.openSystemSettings to {
+                        cameraDenied = false
+                        AppInfo.openSettings()
+                    },
+                )
                 entry == null || pending != null -> Unit
                 // One offer at a time, and each only once: waving it away counts as an answer.
                 !settings.reminderOffered -> Notice(

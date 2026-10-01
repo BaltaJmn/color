@@ -1,6 +1,8 @@
 package com.baltajmn.color.data
 
 import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.core.net.toUri
 
 actual object AppInfo {
@@ -14,6 +16,13 @@ actual object AppInfo {
     actual fun open(url: String) {
         val intent = Intent(Intent.ACTION_VIEW, url.toUri()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         runCatching { AndroidContext.value.startActivity(intent) }
+    }
+
+    actual fun openSettings() {
+        val context = AndroidContext.value
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        runCatching { context.startActivity(intent) }
     }
 }
 

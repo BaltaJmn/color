@@ -14,7 +14,9 @@ object Photos {
         // containsKey, not getOrPut: a photo whose file went missing has to be remembered as
         // missing, or every frame goes back to the disk looking for it.
         if (cache.containsKey(name)) return cache[name]
-        val decoded = Storage.readPhoto(name)?.let(::decodeImage)
+        // A read that fails is drawn as no photo and tried again next time, never a crash mid-frame.
+        val bytes = runCatching { Storage.readPhoto(name) }.getOrElse { return null }
+        val decoded = bytes?.let(::decodeImage)
         cache[name] = decoded
         return decoded
     }

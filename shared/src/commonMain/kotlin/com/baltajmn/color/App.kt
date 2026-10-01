@@ -51,6 +51,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import com.baltajmn.color.billing.Billing
 import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.data.ChromaRepository
+import com.baltajmn.color.model.JournalFile
 import com.baltajmn.color.data.Lock
 import com.baltajmn.color.data.Trip
 import com.baltajmn.color.data.elapsedMillis
@@ -96,6 +97,8 @@ val RELOCK_AFTER = 60.seconds
 /** Away at the camera or a share sheet: a long take is still the same visit. */
 val TRIP_GRACE = 10.minutes
 
+private val kickOutbox: suspend (JournalFile) -> Unit = { Outbox.kick() }
+
 /** Whether coming back after [away] milliseconds out locks again. A clock that went back counts as long. */
 internal fun relocks(away: Long?, trip: Boolean): Boolean =
     away != null && (away < 0 || away >= (if (trip) TRIP_GRACE else RELOCK_AFTER).inWholeMilliseconds)
@@ -106,8 +109,9 @@ fun App() {
     remember {
         ChromaRepository.ensureLoaded()
         Billing.configure()
-        // Whatever was saved and shared goes out after the save, never before it.
-        ChromaRepository.afterSave += { Outbox.kick() }
+        // Whatever was saved and shared goes out after the save, never before it. Once per process:
+        // a recreated Activity composes App again.
+        if (kickOutbox !in ChromaRepository.afterSave) ChromaRepository.afterSave += kickOutbox
     }
     var day by remember { mutableStateOf(today()) }
     var screen by remember { mutableStateOf(Screen.Today) }

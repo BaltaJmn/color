@@ -23,6 +23,12 @@ expect object Storage {
     /** Moves both files to corrupt/entries-<yyyyMMdd-HHmmss>.json and .bak.json. */
     fun quarantine()
 
+    /** Moves only entries.json aside, before a good .bak is restored in its place. Throws if it cannot. */
+    fun quarantineMain()
+
+    /** Journal files waiting in corrupt/. They are the user's and nothing ever deletes them. */
+    fun quarantinedCount(): Int
+
     fun writePhoto(name: String, bytes: ByteArray)
     fun readPhoto(name: String): ByteArray?
     fun deletePhoto(name: String)

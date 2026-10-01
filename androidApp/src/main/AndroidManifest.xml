@@ -4,6 +4,14 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <!-- Desde Android 11 una app solo ve las actividades que declara buscar: sin esto, ninguna camara
+         contestaria a Capture.cameraAvailable. -->
+    <queries>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+    </queries>
+
     <application
         android:name=".ChromaApp"
         android:allowBackup="true"
@@ -16,12 +24,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Chroma">
 
-        <!-- Girar el movil no recrea la Activity: Compose se repinta solo, y recrearla perdia la foto
-             hecha en horizontal, devolvia a Hoy y volvia a pedir el bloqueo. El idioma y el modo oscuro
-             si la recrean, porque los textos y la barra de estado se leen al crearla. -->
+        <!-- Girar el movil, el modo oscuro, el tamano de letra o el de pantalla no recrean la Activity:
+             Compose se repinta solo, y recrearla perdia la foto hecha o a medio elegir, devolvia a Hoy y
+             volvia a pedir el bloqueo. La barra de estado se vuelve a pintar en onConfigurationChanged.
+             El idioma si la recrea: lo cambia el usuario en los ajustes del sistema, y asi se recargan
+             los recursos (los textos de S se leen en cada llamada). -->
         <activity
             android:name=".MainActivity"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|uiMode|fontScale|fontWeightAdjustment|density|colorMode"
             android:exported="true"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize">

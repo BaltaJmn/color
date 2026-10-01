@@ -36,6 +36,7 @@ class StorageTest {
         File(dir, "entries.tmp.json").writeText("{\"version\":1,\"entr")
         File(dir, "entries.json").writeText("not json")
         File(dir, "entries.bak.json").writeText(good)
+        Storage.writePhoto("p-newest.jpg", byteArrayOf(1))
 
         ChromaRepository.load()
 
@@ -43,6 +44,9 @@ class StorageTest {
         assertFalse(ChromaRepository.corrupt)
         assertEquals(good, File(dir, "entries.json").readText())
         assertEquals(good, File(dir, "entries.bak.json").readText())
+        // The unreadable one is kept, and so is a photo only it could have pointed at.
+        assertEquals(listOf("not json"), File(dir, "corrupt").listFiles().orEmpty().map { it.readText() })
+        assertTrue("p-newest.jpg" in Storage.listPhotos())
     }
 
     @Test

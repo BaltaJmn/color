@@ -2,6 +2,7 @@ package com.baltajmn.color
 
 import android.Manifest
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -62,6 +63,14 @@ class MainActivity : FragmentActivity() {
             handleLinkIntent(intent)
         }
         setContent { App() }
+    }
+
+    // The dark mode turning on at dusk no longer recreates the Activity (configChanges), so the
+    // status bar icons and the window behind Compose are picked again here.
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        enableEdgeToEdge()
+        window.setBackgroundDrawableResource(R.color.widget_background)
     }
 
     // singleTask: a widget tapped while the app is open arrives here and not in onCreate.
