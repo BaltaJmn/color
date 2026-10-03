@@ -31,7 +31,7 @@ Cada versión que sube a la prueba añade su fila aquí en el mismo commit que s
 | 10 | 1.0.7 | 01-10-2026 | Datos y fotos: un corte entre los dos renombres de la escritura devolvía la versión anterior. El aviso de fichero ilegible se perdía si lo encontraba un receiver. Con el disco lleno la foto quedaba a medias. Un móvil restaurado desde la copia de Android no recuperaba nunca las fotos desde el zip. Con el proceso muerto detrás de la cámara, la foto se perdía. Con la app abierta a las 03:00, tocar un color escribía en el día siguiente. Los días futuros de una copia abrían un año inexistente. | Revisión del código del 30-09-2026 (#47) |
 | 11 | 1.0.8 | 01-10-2026 | Recordatorio y widgets: con las notificaciones (o solo el canal del aviso) apagadas, el recordatorio seguía encendido sin llegar y sin decirlo. El aviso seguía en la bandeja tras elegir el color o al día siguiente. Tocarlo no llevaba a Hoy. Los widgets no pasaban de día a las 03:00 ni tras un cambio de hora, y no seguían el modo oscuro. | Revisión del código del 30-09-2026 (#48) |
 | 12 | 1.0.9 | 01-10-2026 | Pago: un pago pendiente parecía un error y Pro no llegaba hasta salir y volver a entrar. Un corte de red con el cobro hecho invitaba a pagar otra vez. Restaurar sin conexión decía "no hay nada que restaurar". La reseña gastaba su única petición al importar una copia o con la app parada. | Revisión del código del 30-09-2026 (#49) |
-| 13 | 1.0.10 | 01-10-2026 | Interfaz, accesibilidad y color: días casi blancos o casi negros parecían vacíos en Mi año, el póster y el widget. Con letra grande se partían palabras en la tarjeta, la cabecera y los botones. El selector de hora salía en lavanda. El lector de pantalla leía lo que había debajo de una capa. Las estadísticas daban por diferencia lo que era ruido y comparaban un año a medias contra uno entero. Los colores ofrecidos salían también de la parte recortada de la foto. Nuevo: zoom en la foto y copiar el hex. | Revisión del código del 30-09-2026 (#50, #51) |
+| 13 | 1.0.10 | 01-10-2026 | Interfaz, accesibilidad y color: días casi blancos o casi negros parecían vacíos en Mi año, el póster y el widget. Con letra grande se partían palabras en la tarjeta, la cabecera y los botones, y en el póster sin Pro la etiqueta PRO de "Guardar en Fotos" se partía en vertical. El selector de hora salía en lavanda. El lector de pantalla leía lo que había debajo de una capa. Las estadísticas daban por diferencia lo que era ruido y comparaban un año a medias contra uno entero. Los colores ofrecidos salían también de la parte recortada de la foto. Nuevo: zoom en la foto y copiar el hex. | Revisión del código del 30-09-2026 (#50, #51); la etiqueta PRO, un tester el 02-10-2026 |
 
 ## Comentarios de los testers
 
@@ -49,7 +49,10 @@ dijo (sin nombre) y qué se hizo.
   para qué es el día sin ningún onboarding". Nada que cambiar; confirma que la pantalla de hoy se
   entiende sin tutorial.
 - 02-10-2026, hilo del intercambio (1.0.6, pantalla 1080x2400): en el póster, la etiqueta PRO de
-  "Guardar en Fotos" no cabe y se parte en vertical (P / R / O). Pendiente de arreglar.
+  "Guardar en Fotos" no cabe y se parte en vertical (P / R / O). Arreglado en 1.0.10 (13): los dos
+  botones se repartían la fila a partes iguales y el texto se quedaba todo el ancho; ahora, si no caben
+  los dos, se apilan, y la etiqueta conserva su ancho. Comprobado en el emulador a 411 dp de ancho
+  (el de un 1080x2400) con la letra al 100, 130 y 200 %.
 - 02-10-2026, hilo del intercambio: con un solo día anotado, la vista Tira es un bloque de un solo
   color; mostrar el resto del año vacío explicaría en qué se convierte. Pendiente de decidir.
 
