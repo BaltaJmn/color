@@ -1,7 +1,1 @@
-- Les noms de couleur longs ne sont plus coupés au milieu du mot sur la carte.
-- Touche le nom ou le code de ta carte pour copier le code.
-- Zoome sur la photo à deux doigts ou d'un double toucher.
-- Les jours presque blancs ou noirs ressortent dans Mon année, l'affiche et le widget.
-- Les couleurs viennent seulement de la partie visible de la photo.
-- Les stats Pro ne prennent plus le bruit pour un écart et comparent les années au même jour.
-- Mieux avec un grand texte et un lecteur d'écran.
+- Avec peu de jours, la Bande de Mon année et de l'affiche montre chaque jour comme un trait fin, avec de la place pour les suivants, au lieu d'un bloc d'une seule couleur.
