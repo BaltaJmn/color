@@ -11,10 +11,11 @@ Cada versión que sube a la prueba añade su fila aquí en el mismo commit que s
 | | |
 |---|---|
 | Canal | Prueba cerrada - Alpha, grupo `chroma-testers` (`formularios.md` 3b) |
-| 12 testers con la prueba aceptada | Cumplido el 29-09-2026 |
-| 14 días seguidos | Como pronto el 13-10-2026 |
-| Fallos y ANR en Android vitals | 0 a 29-09-2026 |
-| Comentarios privados de testers en Play | 0 a 29-09-2026 |
+| Versión en el canal | 1.0.6 (9) publicada; 1.0.7 (10) en revisión de Play a 03-10-2026 |
+| 12 testers con la prueba aceptada | Cumplido el 29-09-2026. A 03-10-2026 siguen siendo 12, justos: el grupo tiene 25 miembros, pero unirse al grupo no cuenta sin aceptar la prueba |
+| 14 días seguidos | 4 de 14 a 03-10-2026; como pronto el 13-10-2026 |
+| Fallos y ANR en Android vitals | 0 a 03-10-2026 (últimos 28 días) |
+| Comentarios privados de testers en Play | 0 a 03-10-2026; todo lo recibido ha llegado por los hilos del intercambio |
 
 ## Versiones
 
@@ -47,6 +48,10 @@ dijo (sin nombre) y qué se hizo.
 - 30-09-2026, hilo del intercambio (HMD Pulse): la tarjeta de hoy con el hex vacío `#------` "te dice
   para qué es el día sin ningún onboarding". Nada que cambiar; confirma que la pantalla de hoy se
   entiende sin tutorial.
+- 02-10-2026, hilo del intercambio (1.0.6, pantalla 1080x2400): en el póster, la etiqueta PRO de
+  "Guardar en Fotos" no cabe y se parte en vertical (P / R / O). Pendiente de arreglar.
+- 02-10-2026, hilo del intercambio: con un solo día anotado, la vista Tira es un bloque de un solo
+  color; mostrar el resto del año vacío explicaría en qué se convierte. Pendiente de decidir.
 
 ## Para la solicitud de acceso a producción
 
