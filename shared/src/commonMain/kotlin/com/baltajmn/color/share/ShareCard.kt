@@ -74,6 +74,12 @@ enum class PosterStyle { Grid, Strip, Wallpaper }
 const val WALL_W = 1170
 const val WALL_H = 2532
 
+/**
+ * The strip keeps room for this many days while a year is young, the rest left blank: a first day is
+ * the first line of a barcode, not a block of one color. From here on it compresses to fill.
+ */
+const val STRIP_MIN_DAYS = 30
+
 // Always the light paper, whatever the theme: a poster is for printing and a wall.
 private val PAPER = Color(0xFFF3F3F3)
 private val PAPER_INK = Color(0xFF111111)
@@ -124,7 +130,15 @@ private fun stripPoster(year: Int, colors: List<Color>, watermark: Boolean, meas
     drawRect(PAPER)
     val title = posterTitle(year, measurer)
     val area = Rect(MARGIN, title.bottom + 40f, CARD_W - MARGIN, CARD_H - MARGIN - if (watermark) 56f else 0f)
-    clipPath(Path().apply { addRoundRect(RoundRect(area, CornerRadius(28f))) }) { bands(colors, area, vertical = true) }
+    val filled = area.copy(right = area.left + area.width * colors.size / maxOf(colors.size, STRIP_MIN_DAYS))
+    clipPath(Path().apply { addRoundRect(RoundRect(area, CornerRadius(28f))) }) {
+        drawRect(PAPER_EMPTY, area.topLeft, area.size)
+        bands(colors, filled, vertical = true)
+        // A near white last day would run into the blank and read as one day fewer.
+        if (filled.right < area.right && colors.isNotEmpty() && blendsInto(colors.last(), PAPER_EMPTY)) {
+            drawLine(PAPER_INK.copy(alpha = 0.13f), Offset(filled.right, area.top), Offset(filled.right, area.bottom), 2f)
+        }
+    }
     if (watermark) posterMark(measurer)
 }
 

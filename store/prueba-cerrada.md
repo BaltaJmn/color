@@ -54,7 +54,10 @@ dijo (sin nombre) y qué se hizo.
   los dos, se apilan, y la etiqueta conserva su ancho. Comprobado en el emulador a 411 dp de ancho
   (el de un 1080x2400) con la letra al 100, 130 y 200 %.
 - 02-10-2026, hilo del intercambio: con un solo día anotado, la vista Tira es un bloque de un solo
-  color; mostrar el resto del año vacío explicaría en qué se convierte. Pendiente de decidir.
+  color; mostrar el resto del año vacío explicaría en qué se convierte. Decidido el 03-10-2026: con
+  menos de 30 días, cada día ocupa 1/30 del ancho y el resto queda vacío, en Mi año y en el póster
+  Tira (el fondo de pantalla no cambia). El año entero vacío se descartó: al principio no se ve nada y
+  en diciembre los huecos parecen un reproche. Llega en la 1.0.11 (14).
 
 ## Para la solicitud de acceso a producción
 

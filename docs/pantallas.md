@@ -191,7 +191,11 @@ Tras la foto, en la misma pantalla:
   un borde de 1,5 en `onBackground`. Las celdas no pasan de 24: en un móvil ancho sobra sitio y el bloque
   (números de día incluidos) va centrado, no pegado a la izquierda.
 - **Tira**: el año como columnas de 1 día, sin separación, a toda la altura disponible (proporción
-  4:5). Los días vacíos no se pintan: la tira se comprime.
+  4:5). Los días vacíos no se pintan: la tira se comprime. Con menos de 30 días con color, cada uno
+  ocupa 1/30 del ancho desde la izquierda y el resto queda en `surfaceVariant`: el primer día se lee
+  como la primera raya de un código de barras, no como un bloque de un color. Si el último día casi no
+  se distingue de ese vacío, los separa una línea de 1 en `outline`. Las tiras de adorno (el paywall y la
+  fila de Pro en Ajustes) se comprimen siempre.
 - Tocar un día con entrada abre el día (sección 5). El lector de pantalla recorre los días en orden
   de fecha.
 - `poster` abre la misma capa que compartir (sección 5) con el póster del año y un

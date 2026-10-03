@@ -34,6 +34,7 @@ import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.color.nearestName
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.model.isoKey
+import com.baltajmn.color.share.STRIP_MIN_DAYS
 import com.baltajmn.color.ui.theme.Styles
 import kotlin.math.min
 import kotlinx.datetime.DateTimeUnit
@@ -144,9 +145,18 @@ fun YearStrip(year: Int, days: Map<String, String>, modifier: Modifier = Modifie
     } else {
         Modifier.aspectRatio(4f / 5f).clip(RoundedCornerShape(24.dp)).semantics { contentDescription = S.a11yYearStrip(year, colors.size) }
     }
+    // A band is decoration and compresses whatever it has; the picture keeps room for the days to come.
+    val slots = if (fill) colors.size else maxOf(colors.size, STRIP_MIN_DAYS)
+    val empty = MaterialTheme.colorScheme.surfaceVariant
+    val seam = MaterialTheme.colorScheme.outline
     Canvas(modifier.fillMaxWidth().then(shape)) {
         if (colors.isEmpty()) return@Canvas
-        val w = size.width / colors.size
+        val w = size.width / slots
+        if (slots > colors.size) drawRect(empty)
         colors.forEachIndexed { i, c -> drawRect(c, Offset(i * w, 0f), Size(w + 0.5f, size.height)) }
+        // A near white last day would run into the blank and read as one day fewer.
+        if (slots > colors.size && blendsInto(colors.last(), empty)) {
+            drawLine(seam, Offset(colors.size * w, 0f), Offset(colors.size * w, size.height), 1.dp.toPx())
+        }
     }
 }

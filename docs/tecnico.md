@@ -387,7 +387,9 @@ activa), y no hay dos peticiones en vuelo.
     año, con celdas rectangulares de radio 6 e iniciales de mes encima. Días sin color en
     `#E5E5E5`; los que no existen, papel.
   - Tira, 1080x1350: el año arriba y debajo una columna fina por día con color, en orden, sin los
-    días vacíos, dentro de un rectángulo de radio 28.
+    días vacíos, dentro de un rectángulo de radio 28. Con menos de 30 días (`STRIP_MIN_DAYS`), cada
+    columna mide 1/30 del rectángulo y el resto queda en `#E5E5E5`, con una línea de tinta al 13 % si
+    el último día se confunde con él.
   - Fondo de pantalla, 1170x2532: el año en bandas horizontales de arriba abajo, a sangre y sin
     texto, para que el reloj vaya encima.
   - Con `watermark`, "Chroma" abajo a la izquierda en la rejilla y la tira; nunca en el fondo.
