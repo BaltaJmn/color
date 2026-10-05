@@ -2,11 +2,8 @@
 
 Los workflows de publicación de las hermanas, copiados a `.github/workflows/`. La secuencia de Android
 vive en `BaltaJmn/ci` (`android-play-release.yml`): aquí solo está la llamada con el paquete, el CN
-de la firma, las tareas de Gradle y la carpeta de notas. `release-ios.yml` sale del de Purl, porque
-el proyecto de iOS sale de la misma plantilla (`Config.xcconfig`), con tres cambios: el nombre del
-archivo, `permissions: contents: read` y el certificado de distribución propio (abajo, en
-TestFlight). La puerta que lo saltaba mientras no había secretos de Apple se quitó con la cuenta ya
-creada: un fallo de iOS tiene que verse en rojo.
+de la firma, las tareas de Gradle y la carpeta de notas. `release-ios.yml` también
+es una llamada, a `ios-testflight-release.yml` del mismo repositorio (abajo, en TestFlight).
 
 ## Cómo se dispara
 
@@ -83,11 +80,15 @@ un binario a producción. RevenueCat guarda su JSON en sus servidores, así que 
 
 ## TestFlight
 
-`release-ios.yml` archiva `Chroma.xcarchive` con el esquema `iosApp`, y lo exporta y sube en un solo
-`xcodebuild` (`destination: upload`). La versión y el número de build son el `versionName` y el
+`release-ios.yml` solo llama a `ios-testflight-release.yml` de `BaltaJmn/ci`, el mismo en las cuatro
+apps de iOS; su README cuenta qué hace. La versión y el número de build son el `versionName` y el
 `versionCode` de `androidApp/build.gradle.kts`, los mismos que sube Play con esa etiqueta: las dos
 tiendas llevan siempre la misma versión, y lanzar el flujo a mano sin subir el `versionCode` lo
 rechazan las dos por build repetido.
+
+Sin máquina macOS libre, `~/keys/testflight.sh .` hace lo mismo desde el Mac. Pasó el 05-10-2026:
+el trabajo esperó 15 minutos y GitHub lo canceló con "The job was not acquired by Runner of type
+hosted even after multiple attempts", sin llegar a ningún paso.
 
 El repositorio es público para que Actions no cueste. Siendo privado, cada minuto de macOS contaba
 como diez del cupo gratuito, y el 05-10-2026 GitHub dejó de arrancar todos los trabajos, tests
@@ -100,34 +101,34 @@ Un trabajo que falla sin pasos ni registro es eso: se mira en *Settings > Billin
 | `APPSTORE_ISSUER_ID` | El Issuer ID, el mismo para todas las claves de la cuenta |
 | `APPSTORE_PRIVATE_KEY` | El contenido del `.p8`, entero, con sus líneas `BEGIN`/`END` |
 | `APPLE_TEAM_ID` | El Team ID de la cuenta de desarrollador |
-| `APPLE_DISTRIBUTION_P12` | El certificado Apple Distribution con su clave privada, `.p12` en base64 |
-| `APPLE_DISTRIBUTION_P12_PASSWORD` | La contraseña de ese `.p12` |
+| `APPLE_DEVELOPMENT_P12` | Certificado Apple Development con su clave, `.p12` en base64 |
+| `APPLE_DEVELOPMENT_P12_PASSWORD` | Su contraseña |
+| `APPLE_DISTRIBUTION_P12` | Certificado Apple Distribution con su clave, `.p12` en base64 |
+| `APPLE_DISTRIBUTION_P12_PASSWORD` | Su contraseña |
 
-Rol *App Manager* o superior, para que `-allowProvisioningUpdates` cree el certificado de desarrollo
-y los perfiles (app, widget y App Group). La de las hermanas sirve: es de cuenta. Los cuatro
-primeros secretos los pone `~/keys/credenciales.sh appstore` en todos los repos de iOS a la vez. Los
-dos del `.p12` salen de `~/keys/apple-distribution.p12`, con la contraseña en el Llavero
-(`dev.baltajmn.apple-distribution-p12`), y de momento solo están en este repositorio.
+Los ocho son de cuenta, iguales en los cuatro repos de iOS, y los pone `~/keys/credenciales.sh
+sincronizar`. La clave de la API tiene rol *Admin*: *App Manager* basta para que
+`-allowProvisioningUpdates` cree los perfiles (app, widget y App Group).
 
-### Por qué un `.p12` en un secreto
+### Por qué dos `.p12` en secretos
 
 Sin certificado de distribución en el llavero, Xcode firma el `.ipa` en la nube (*cloud signing*), y
 en este equipo eso no sube: App Store Connect lo rechaza con ITMS-90035, "Code failed to satisfy
-specified code requirement(s)". Al firmar en la nube Xcode le pasa a `codesign` el requisito
-designado como texto, con el nombre del certificado dentro, y `Process` de Foundation descompone la
-"é" de "Jiménez" por el camino (NFD, `e` + U+0301). El certificado la lleva compuesta (NFC, U+00E9),
-así que la firma no cumple su propio requisito: `codesign --verify --strict` lo dice igual en local.
-Con la clave privada en el llavero, `codesign` saca el requisito del certificado y coinciden.
-Comprobado el 05-10-2026 (CI con Xcode 26.6, local con 27): el `--requirements` sale en
-`IDEDistributionPipeline.log`, y `Process` con `"Jim\u{e9}nez"` entrega `Jime\u{301}nez` al programa
-que lanza. El mismo archivo exportado con la identidad local ya no pasa `--requirements`, y la app y
-el widget cumplen su requisito.
+specified code requirement(s)", en la app y en el widget. Al firmar en la nube Xcode le pasa a
+`codesign` el requisito designado como texto, con el nombre del certificado dentro, y `Process` de
+Foundation descompone la "é" de "Jiménez" por el camino (NFD, `e` + U+0301). El certificado la lleva
+compuesta (NFC, U+00E9), así que la firma no cumple su propio requisito: `codesign --verify --strict`
+lo dice igual en local. Con la clave privada en el llavero, `codesign` saca el requisito del
+certificado y coinciden. Comprobado el 05-10-2026 (CI con Xcode 26.6, local con 27): el
+`--requirements` sale en `IDEDistributionPipeline.log`. El mismo archivo exportado con la identidad
+local ya no pasa `--requirements`, cumple su requisito y App Store Connect lo aceptó (1.0.12, build 15).
 
-Afecta a toda app de la cuenta, porque el nombre es el del equipo: los otros repos de iOS necesitan
-el mismo paso y los dos secretos antes de subir a TestFlight. Hasta que Apple lo arregle, el
-certificado (`2A7JLW9543`) vive en `~/keys/apple-distribution.p12` y caduca el 05-10-2027. Se
-renueva creando otro por la API (`POST /v1/certificates`, tipo `DISTRIBUTION`, con una CSR nueva) y
-rehaciendo el `.p12` y los dos secretos.
+El de desarrollo evita otro problema: en una máquina recién creada no hay identidad de desarrollo, y
+`-allowProvisioningUpdates` crearía un certificado "Created via API" en cada ejecución hasta el
+límite de Apple.
+
+Los dos caducan el 05-10-2027 (`2A7JLW9543` el de distribución, `5Y22N2Z7FM` el de desarrollo). Se
+renuevan como se crearon, en `~/keys/LEEME.md`.
 
 Antes de la primera subida a TestFlight, la clave `appl_` de RevenueCat tiene que estar en
 `Billing.ios.kt`, o Pro no se podrá comprar en iOS.
