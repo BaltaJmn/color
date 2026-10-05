@@ -7,7 +7,7 @@ Qué hay en cada sitio. Se actualiza en el mismo commit que añade o mueve algo.
 | Ruta | Qué es |
 |---|---|
 | `SPEC.md` | Producto: el porqué |
-| `CLAUDE.md`, `AGENTS.md` | Contexto permanente para Claude Code y Codex (el mismo texto) |
+| `CLAUDE.md` | Contexto permanente para Claude Code |
 | `README.md` | Presentación corta |
 | `MAPA.md` | Este fichero |
 
