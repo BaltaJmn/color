@@ -16,7 +16,10 @@
             <key>NSPrivacyCollectedDataTypeTracking</key>
             <false/>
             <key>NSPrivacyCollectedDataTypePurposes</key>
-            <array><string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string></array>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+                <string>NSPrivacyCollectedDataTypePurposeAnalytics</string>
+            </array>
         </dict>
         <!-- RevenueCat's installation id, never linked; and the Friends account id (v1.1), linked to the account. -->
         <dict>

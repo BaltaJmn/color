@@ -167,8 +167,8 @@ los ficheros que ninguna tarjeta señala, para que ninguna se quede atrás) y el
 | Pregunta | Respuesta |
 |---|---|
 | ¿Recoges datos de esta app? | Sí |
-| Compras > Historial de compras | Recogido. Finalidad: funcionalidad de la app. **No** vinculado a la identidad. **No** usado para rastreo |
-| Identificadores > ID de usuario | Recogido. Funcionalidad de la app. No vinculado. No rastreo |
+| Compras > Historial de compras | Recogido. Finalidades: funcionalidad de la app y análisis de datos, las dos que pide la documentación de RevenueCat. **No** vinculado a la identidad. **No** usado para rastreo. Rellenado en App Store Connect el 05-10-2026 |
+| Identificadores | No se marcan. RevenueCat pide *ID de usuario* solo con IDs propios e *ID de dispositivo* solo con integraciones que usen el IDFA, y la app usa su ID anónimo. Así quedaron las cuatro apps de la familia. `PrivacyInfo.xcprivacy` declara además `UserID` y los datos de Amigos (nombre, correo, fotos, contenido): de más, no de menos, hasta que Amigos se habilite y se rellene el apartado 5b |
 | El resto de tipos | No recogidos |
 
 Si el informe de privacidad de Xcode sobre el primer archivo añade algo, se añade en los dos sitios.
