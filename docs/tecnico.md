@@ -13,7 +13,7 @@ La plantilla es **Purl** (`../line`): casi todo lo que no es color ni amigos sal
 
 | Qué | Valor |
 |---|---|
-| Nombre bajo el icono | `Chroma` (los cinco idiomas) |
+| Nombre bajo el icono | `Chroma` (los trece idiomas) |
 | Nombre de ficha | `Chroma: diario de color` y su versión en cada idioma (`store/listings/`): "diario" es lo que se busca, y separa a Chroma de Razer Chroma o Chroma DB |
 | `applicationId` y `namespace` de `androidApp` | `com.baltajmn.color` |
 | `namespace` de `shared` | `com.baltajmn.color.shared` |
@@ -295,7 +295,7 @@ plataforma en las comparaciones: todo en `Double`.
 
 ### 6.4 Nombres
 
-`Names.kt` tiene la tabla: clave, color de referencia en hex y nombre en los cinco idiomas. Es la
+`Names.kt` tiene la tabla: clave, color de referencia en hex y nombre en los trece idiomas. Es la
 **única fuente** de los nombres (no se copia en `docs/textos.md`, que solo fija el criterio). El
 nombre de un color es la entrada de la tabla con menor `deltaE`. La tabla cubre el círculo cromático
 en claros, medios y oscuros, más neutros cálidos y fríos, para que ningún gris salga con nombre de

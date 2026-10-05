@@ -445,7 +445,7 @@ private fun TimeDialog(hour: Int, minute: Int, onDismiss: () -> Unit, onPick: (I
 @Composable
 fun Section(label: String, content: @Composable () -> Unit) {
     Spacer(Modifier.height(28.dp))
-    Text(label.uppercase(), style = Styles.eyebrow, modifier = Modifier.padding(start = 4.dp).semantics { heading() })
+    Text(S.caps(label), style = Styles.eyebrow, modifier = Modifier.padding(start = 4.dp).semantics { heading() })
     Spacer(Modifier.height(8.dp))
     val line = MaterialTheme.colorScheme.outlineVariant
     val cuts = remember { mutableListOf<Int>() }

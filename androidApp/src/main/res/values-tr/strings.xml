@@ -1,0 +1,5 @@
+<resources>
+    <string name="widget_today_description">Bugünün rengi</string>
+    <string name="widget_preview_name">Fırtına mavisi</string>
+    <string name="widget_year_description">Renklerle yılın</string>
+</resources>

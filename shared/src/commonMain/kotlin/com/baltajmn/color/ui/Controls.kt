@@ -195,7 +195,7 @@ fun TextAction(
 @Composable
 fun ProTag(modifier: Modifier = Modifier) {
     Text(
-        S.proTag.uppercase(),
+        S.caps(S.proTag),
         style = Styles.eyebrow.copy(color = MaterialTheme.colorScheme.onBackground),
         modifier = modifier
             .clip(RoundedCornerShape(6.dp))
@@ -221,7 +221,7 @@ fun Masthead(day: Int, above: String, below: String, modifier: Modifier = Modifi
         Column(Modifier.weight(1f)) {
             val eyebrow = Styles.eyebrow
             val title = Styles.title.copy(fontWeight = FontWeight.Normal)
-            Text(above.uppercase(), style = eyebrow, maxLines = 1, autoSize = TextAutoSize.StepBased(minFontSize = 9.sp, maxFontSize = eyebrow.fontSize))
+            Text(S.caps(above), style = eyebrow, maxLines = 1, autoSize = TextAutoSize.StepBased(minFontSize = 9.sp, maxFontSize = eyebrow.fontSize))
             Text(below, style = title, maxLines = if (below.contains(' ')) 2 else 1, autoSize = TextAutoSize.StepBased(minFontSize = 14.sp, maxFontSize = title.fontSize))
         }
         actions()

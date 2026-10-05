@@ -1,0 +1,5 @@
+<resources>
+    <string name="widget_today_description">Цвет дня</string>
+    <string name="widget_preview_name">Грозовой синий</string>
+    <string name="widget_year_description">Твой год в цветах</string>
+</resources>

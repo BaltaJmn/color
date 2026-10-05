@@ -1,0 +1,5 @@
+<resources>
+    <string name="widget_today_description">오늘의 색</string>
+    <string name="widget_preview_name">스톰 블루</string>
+    <string name="widget_year_description">색으로 보는 한 해</string>
+</resources>

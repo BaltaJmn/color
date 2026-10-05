@@ -1,0 +1,5 @@
+<resources>
+    <string name="widget_today_description">Il colore di oggi</string>
+    <string name="widget_preview_name">Blu tempesta</string>
+    <string name="widget_year_description">Il tuo anno a colori</string>
+</resources>

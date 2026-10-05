@@ -330,7 +330,7 @@ private fun Picking(pending: Pending, onPick: (String) -> Unit, onCancel: () -> 
         modifier = Modifier.fillMaxWidth().aspectRatio(4f / 5f).clip(RoundedCornerShape(CARD_RADIUS)),
     )
     Spacer(Modifier.height(24.dp))
-    Text(S.pickColor.uppercase(), style = Styles.eyebrow, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+    Text(S.caps(S.pickColor), style = Styles.eyebrow, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
     Spacer(Modifier.height(12.dp))
     SwatchRow(pending.swatches, null, 56.dp, HapticFeedbackType.Confirm, onPick)
     Spacer(Modifier.height(8.dp))

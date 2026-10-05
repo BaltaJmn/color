@@ -1,0 +1,5 @@
+<resources>
+    <string name="widget_today_description">Dzisiejszy kolor</string>
+    <string name="widget_preview_name">Burzowy błękit</string>
+    <string name="widget_year_description">Twój rok w kolorach</string>
+</resources>

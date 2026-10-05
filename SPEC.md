@@ -78,7 +78,8 @@ métricas.
 - [x] Widget de hoy (gratis) y widget del año (Pro).
 - [x] Recordatorio a la hora que elijas, que se calla si ya tienes color.
 - [x] Exportar e importar en zip.
-- [x] Cinco idiomas: en, es, pt, de, fr.
+- [x] Cinco idiomas: en, es, pt, de, fr. Trece desde octubre de 2026, los de las fichas de Quilt: se
+  suman it, nl, pl, ru, tr, id, ja y ko.
 
 ### v1.1: Amigos
 
@@ -336,7 +337,7 @@ app sola.
 
 | Requisito | Dónde | Cómo lo cumplimos |
 |---|---|---|
-| Permiso de cámara con motivo | iOS `NSCameraUsageDescription` | Texto en los cinco idiomas. La galería usa el selector del sistema, sin permiso de fotos |
+| Permiso de cámara con motivo | iOS `NSCameraUsageDescription` | Texto en los trece idiomas. La galería usa el selector del sistema, sin permiso de fotos |
 | Contenido generado por usuarios | Apple 1.2, política de Play | Términos con tolerancia cero, reportar, bloquear y actuar en 24 horas (#36) |
 | Borrar la cuenta | Apple 5.1.1(v), formulario de Play | Desde Ajustes y desde una web (#37) |
 | Sign in with Apple | Apple 4.8 | Se ofrece junto a Google (#29) |
@@ -365,7 +366,7 @@ social/                cliente de Supabase, cola de subida, feed (v1.1)
 ui/                    Today, Year, Friends, Settings, Card, Poster, Pro
 widget/                WidgetState y widget.json
 billing/               RevenueCat
-Strings.kt             cinco idiomas por firma de función
+Strings.kt             trece idiomas por firma de función
 ```
 
 ### `entries.json`
@@ -407,7 +408,7 @@ Strings.kt             cinco idiomas por firma de función
 
 ### Nombres de color
 
-Una tabla de unos 100 colores, cada uno con su clave, su color de referencia y su nombre en los cinco
+Una tabla de unos 100 colores, cada uno con su clave, su color de referencia y su nombre en los trece
 idiomas. Se asigna el más cercano. La tabla vive solo en `Names.kt`: dos copias acaban divergiendo.
 
 ### Servidor (v1.1)

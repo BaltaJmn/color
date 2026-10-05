@@ -61,7 +61,7 @@ fun renderDayCard(
         text(measurer, it, TextStyle(fontSize = 56.sp, fontStyle = FontStyle.Italic, color = ink), MARGIN, y.bottom + 90f, maxWidth = (CARD_W - 2 * MARGIN).toInt())
     }
     val dateBaseline = if (watermark) CARD_H - MARGIN - 56f else CARD_H - MARGIN
-    text(measurer, S.dayMonthYear(date).uppercase(), TextStyle(fontSize = 34.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 4.sp, color = ink), MARGIN, dateBaseline)
+    text(measurer, S.caps(S.dayMonthYear(date)), TextStyle(fontSize = 34.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 4.sp, color = ink), MARGIN, dateBaseline)
     if (watermark) text(measurer, "Chroma", TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Medium, color = ink), MARGIN, CARD_H - MARGIN)
     photo?.let { thumbnail(it, Offset(CARD_W - MARGIN - THUMB, CARD_H - MARGIN - THUMB), THUMB, ink) }
 }

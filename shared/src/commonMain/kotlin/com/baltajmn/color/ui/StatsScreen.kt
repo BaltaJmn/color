@@ -36,15 +36,14 @@ import com.baltajmn.color.ui.theme.Styles
 fun StatsScreen(year: Int, onClose: () -> Unit) {
     val journal = ChromaRepository.journal
     val stats = remember(year, journal) { yearStats(year, journal) }
-    val months = remember { S.monthNames() }
 
     Overlay(S.statsTitle(year), onClose) {
         Spacer(Modifier.height(8.dp))
         if (stats.isEmpty) Line(S.statsEmpty)
-        stats.warmest?.let { Line(S.statsWarmest(months[it - 1])) }
-        stats.coldest?.let { Line(S.statsColdest(months[it - 1])) }
+        stats.warmest?.let { Line(S.statsWarmest(it)) }
+        stats.coldest?.let { Line(S.statsColdest(it)) }
         stats.repeated?.let { Line(S.statsRepeated(S.colorName(it)), BY_KEY[it]?.hex) }
-        stats.greyest?.let { Line(S.statsGreyest(months[it.months.first() - 1], months[it.months.last() - 1])) }
+        stats.greyest?.let { Line(S.statsGreyest(it.months.first(), it.months.last())) }
         stats.versus?.let {
             Line(
                 when (it) {

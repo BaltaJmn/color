@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Chroma";
+"NSCameraUsageDescription" = "Untuk mengambil foto yang menjadi sumber warna harimu.";
+"NSPhotoLibraryAddUsageDescription" = "Untuk menyimpan kartu dan postermu ke foto.";
+"NSFaceIDUsageDescription" = "Untuk membuka Chroma dengan Face ID saat kunci aktif.";

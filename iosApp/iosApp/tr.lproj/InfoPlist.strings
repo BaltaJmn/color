@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Chroma";
+"NSCameraUsageDescription" = "Gününün renginin geldiği fotoğrafı çekmek için.";
+"NSPhotoLibraryAddUsageDescription" = "Kartlarını ve posterlerini fotoğraflarına kaydetmek için.";
+"NSFaceIDUsageDescription" = "Kilit açıkken Chroma'yı Face ID ile açmak için.";

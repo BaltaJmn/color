@@ -68,7 +68,7 @@ fun YearScreen(today: LocalDate, onOpenDay: (LocalDate) -> Unit, onPoster: (Int)
             Row(Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 val i = years.indexOf(year)
                 Column(Modifier.weight(1f)) {
-                    Text(S.navYear.uppercase(), style = Styles.eyebrow)
+                    Text(S.caps(S.navYear), style = Styles.eyebrow)
                     // Grows like the day on Today and no further: at 2x the four figures took a third of the screen.
                     val density = LocalDensity.current
                     CompositionLocalProvider(LocalDensity provides Density(density.density, density.fontScale.coerceAtMost(1.15f))) {

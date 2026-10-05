@@ -1,0 +1,5 @@
+<resources>
+    <string name="widget_today_description">De kleur van vandaag</string>
+    <string name="widget_preview_name">Stormblauw</string>
+    <string name="widget_year_description">Je jaar in kleuren</string>
+</resources>

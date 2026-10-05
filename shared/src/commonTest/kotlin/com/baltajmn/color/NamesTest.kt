@@ -6,6 +6,7 @@ import com.baltajmn.color.color.deltaE
 import com.baltajmn.color.color.hexOf
 import com.baltajmn.color.color.labOf
 import com.baltajmn.color.color.nearestName
+import com.baltajmn.color.i18n.SUPPORTED
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -21,7 +22,9 @@ class NamesTest {
     @Test
     fun keysAreUniqueAndEveryLanguageIsFilled() {
         assertEquals(COLOR_NAMES.size, COLOR_NAMES.map { it.key }.toSet().size)
-        for (c in COLOR_NAMES) for (lang in listOf("en", "es", "pt", "de", "fr")) assertTrue(c.label(lang).isNotBlank())
+        for (c in COLOR_NAMES) for (lang in SUPPORTED) assertTrue(c.label(lang).isNotBlank())
+        // A language left out of label() would quietly show English.
+        for (lang in SUPPORTED - "en") assertTrue(COLOR_NAMES.count { it.label(lang) == it.en } < COLOR_NAMES.size / 2, lang)
     }
 
     @Test

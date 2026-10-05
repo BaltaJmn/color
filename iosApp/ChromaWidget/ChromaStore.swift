@@ -113,37 +113,75 @@ enum ChromaStore {
     }
 }
 
-/// The mirror of `Strings.kt` for the extension, which cannot reach Kotlin.
+/// The mirror of `Strings.kt` for the extension, which cannot reach Kotlin. Same thirteen languages.
 enum L {
     private static var code: String {
         let tag = Locale.preferredLanguages.first ?? "en"
         return String(tag.prefix(2))
     }
 
-    private static func t(_ en: String, _ es: String, _ pt: String, _ de: String, _ fr: String) -> String {
+    private static func t(
+        _ en: String, _ es: String, _ pt: String, _ de: String, _ fr: String, _ it: String, _ nl: String,
+        _ pl: String, _ ru: String, _ tr: String, _ id: String, _ ja: String, _ ko: String
+    ) -> String {
         switch code {
         case "es": return es
         case "pt": return pt
         case "de": return de
         case "fr": return fr
+        case "it": return it
+        case "nl": return nl
+        case "pl": return pl
+        case "ru": return ru
+        case "tr": return tr
+        case "id": return id
+        case "ja": return ja
+        case "ko": return ko
         default: return en
         }
     }
 
-    static var today: String { t("Today", "Hoy", "Hoje", "Heute", "Aujourd'hui") }
-    static var empty: String { t("No color yet", "Aún sin color", "Ainda sem cor", "Noch keine Farbe", "Pas encore de couleur") }
+    static var today: String {
+        t(
+            "Today", "Hoy", "Hoje", "Heute", "Aujourd'hui", "Oggi", "Vandaag", "Dziś", "Сегодня", "Bugün",
+            "Hari ini", "今日", "오늘"
+        )
+    }
+    static var empty: String {
+        t(
+            "No color yet", "Aún sin color", "Ainda sem cor", "Noch keine Farbe", "Pas encore de couleur",
+            "Ancora nessun colore", "Nog geen kleur", "Jeszcze bez koloru", "Пока без цвета", "Henüz renk yok",
+            "Belum ada warna", "まだ色がありません", "아직 색이 없어요"
+        )
+    }
     static var proTitle: String { "Chroma Pro" }
     static var unlock: String {
-        t("Tap to turn it on", "Toca para activarlo", "Toque para ativar", "Tippen zum Aktivieren", "Touche pour l'activer")
+        t(
+            "Tap to turn it on", "Toca para activarlo", "Toque para ativar", "Tippen zum Aktivieren",
+            "Touche pour l'activer", "Tocca per attivarlo", "Tik om aan te zetten", "Dotknij, aby włączyć",
+            "Нажми, чтобы включить", "Açmak için dokun", "Ketuk untuk mengaktifkan", "タップしてオンにする", "탭해서 켜기"
+        )
     }
     static var yearLabel: String {
-        t("Your year in color", "Tu año en color", "Seu ano em cores", "Dein Jahr in Farben", "Ton année en couleurs")
+        t(
+            "Your year in color", "Tu año en color", "Seu ano em cores", "Dein Jahr in Farben",
+            "Ton année en couleurs", "Il tuo anno a colori", "Je jaar in kleur", "Twój rok w kolorze",
+            "Твой год в цвете", "Renklerle yılın", "Tahunmu dalam warna", "色でつづる1年", "색으로 보는 한 해"
+        )
     }
     static var friendsToday: String {
         t(
             "Colors your friends picked today", "Los colores que tus amigos eligieron hoy",
             "As cores que seus amigos escolheram hoje", "Die Farben, die deine Freunde heute gewählt haben",
-            "Les couleurs choisies aujourd'hui par tes amis"
+            "Les couleurs choisies aujourd'hui par tes amis",
+            "I colori scelti oggi dai tuoi amici",
+            "De kleuren die je vrienden vandaag kozen",
+            "Kolory, które twoi znajomi wybrali dziś",
+            "Цвета, которые сегодня выбрали твои друзья",
+            "Arkadaşlarının bugün seçtiği renkler",
+            "Warna yang dipilih temanmu hari ini",
+            "友だちが今日選んだ色",
+            "친구들이 오늘 고른 색"
         )
     }
 }

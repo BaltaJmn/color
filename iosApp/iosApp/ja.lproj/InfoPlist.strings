@@ -1,0 +1,4 @@
+"CFBundleDisplayName" = "Chroma";
+"NSCameraUsageDescription" = "その日の色を選ぶ写真を撮るために使います。";
+"NSPhotoLibraryAddUsageDescription" = "カードやポスターを写真に保存するために使います。";
+"NSFaceIDUsageDescription" = "ロックがオンのとき、Face IDでChromaを開くために使います。";

@@ -47,8 +47,8 @@ toca en el mismo commit, y se sigue**.
 - Lo que nunca se cobra: la foto y el color, Mi año, compartir, la copia, el recordatorio, el widget de
   hoy y todo lo de Amigos.
 - La seguridad del servidor vive en RLS y funciones `security definer`, no en la app.
-- `Strings.kt` obliga a los cinco idiomas (en, es, pt, de, fr) por firma de función y es la fuente
-  única de los textos.
+- `Strings.kt` obliga a los trece idiomas (en, es, pt, de, fr, it, nl, pl, ru, tr, id, ja, ko) por firma de función y es la
+  fuente única de los textos.
 - **El `versionCode` no se reutiliza nunca.**
 
 ## Seguridad, sin excepciones

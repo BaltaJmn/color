@@ -1,6 +1,6 @@
 # Capturas de las fichas
 
-Seis escenas, las mismas en las dos tiendas, en **en-US** y **es-ES**. Portugués, alemán y francés
+Seis escenas, las mismas en las dos tiendas, en **en-US** y **es-ES**. Los otros once idiomas
 heredan las de en-US, que es lo que hacen Play y App Store cuando un idioma no trae las suyas. Se
 sacan con el año de demostración, nunca con uno real.
 

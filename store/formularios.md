@@ -209,7 +209,7 @@ que no puede pasar nunca es lo contrario.
 | Inicio de sesión para la revisión | No hace falta en v1.0 |
 | Publicación | Manual, para salir el mismo día que Play |
 
-Usos declarados en el `Info.plist`, en los cinco idiomas (`<lang>.lproj/InfoPlist.strings`):
+Usos declarados en el `Info.plist`, en los trece idiomas (`<lang>.lproj/InfoPlist.strings`):
 `NSCameraUsageDescription` (la foto del día) y `NSPhotoLibraryAddUsageDescription` (guardar una
 tarjeta o un póster, solo añadir).
 

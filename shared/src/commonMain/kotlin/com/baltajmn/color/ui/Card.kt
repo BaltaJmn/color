@@ -181,7 +181,7 @@ fun ChromaCard(
                     contentAlignment = Alignment.CenterStart,
                 ) { Text(it, style = Styles.body.copy(color = ink, fontWeight = FontWeight.Medium)) }
             }
-            Text(S.shortDate(date).uppercase(), style = Styles.eyebrow.copy(color = ink))
+            Text(S.caps(S.shortDate(date)), style = Styles.eyebrow.copy(color = ink))
         }
         photo?.let { image ->
             Box(
