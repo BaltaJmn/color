@@ -3,24 +3,20 @@
 <plist version="1.0">
 <dict>
 	<!-- Compose Multiplatform refuses to start without this: it caps the display link at 60 Hz
-	     on ProMotion iPhones. See androidx.compose.ui.uikit.PlistSanityCheck. -->
+	     on ProMotion iPhones. See androidx.compose.ui.uikit.PlistSanityCheck.
+	     The usage descriptions, the display name and the export compliance answer live in the
+	     target build settings (INFOPLIST_KEY_*); their translations in <lang>.lproj. -->
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-	<key>CFBundleDisplayName</key>
-	<string>Chroma</string>
-	<!-- Sin esta clave la camara del sistema no abre. Traducciones en <lang>.lproj. -->
-	<key>NSFaceIDUsageDescription</key>
-	<string>To open Chroma with Face ID when the lock is on.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>To take the photo your color of the day comes from.</string>
-	<!-- Guardar una tarjeta o el poster pide acceso solo para añadir; sin la clave iOS cierra la app. -->
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>To save your cards and posters to your photos.</string>
-	<!-- La app no usa cifrado propio, solo HTTPS del sistema. Sin esta clave App Store Connect
-	     pregunta por el cumplimiento de exportacion en cada build y la retiene hasta responder. -->
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<!-- El widget abre la app con com.baltajmn.color://today. -->
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>es</string>
+		<string>pt</string>
+		<string>de</string>
+		<string>fr</string>
+	</array>
+	<!-- The widgets open the app with com.baltajmn.color://today, ://year and ://pro. -->
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -31,14 +27,6 @@
 				<string>com.baltajmn.color</string>
 			</array>
 		</dict>
-	</array>
-	<key>CFBundleLocalizations</key>
-	<array>
-		<string>en</string>
-		<string>es</string>
-		<string>pt</string>
-		<string>de</string>
-		<string>fr</string>
 	</array>
 </dict>
 </plist>

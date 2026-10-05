@@ -11,7 +11,8 @@ actual object AppInfo {
         get() = NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String ?: ""
 
     actual fun open(url: String) {
-        NSURL.URLWithString(url)?.let { UIApplication.sharedApplication.openURL(it) }
+        // openURL(_:) without options stopped opening anything on iOS 18: it just returns false.
+        NSURL.URLWithString(url)?.let { UIApplication.sharedApplication.openURL(it, emptyMap<Any?, Any>(), null) }
     }
 
     // A trip of our own: coming back does not ask for the lock after one minute, nor for a rating.
