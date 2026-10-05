@@ -10,13 +10,15 @@ Herramientas:
 - `tools/store/capturas.py`: el marco de Purl, con las seis escenas de abajo.
 - `tools/store/widgets.py`: la escena de los widgets, limpia.
 - `tools/store/fichas.py`: comprueba los topes de las dos fichas y sube la de Play (`--subir`).
+- `tools/store/iphone.py`: las seis de iPhone sin Mac, de principio a fin (sección 5).
+- `tools/demo/atardecer.py`: la foto de la escena 01.
 
 ## 1. Tamaños
 
 | Destino | Dispositivo | Captura cruda | Imagen final |
 |---|---|---|---|
 | `play` | Emulador Pixel 8, API 36 | 1080x2400 | 1200x2100 PNG |
-| `iphone` | Simulador iPhone 17 Pro Max | 1320x2868 | 1320x2868 PNG (6,9") |
+| `iphone` | iPhone 17 Pro Max: `tools/store/iphone.py` (sección 5) o el simulador | 1320x2868 | 1320x2868 PNG (6,9") |
 
 Sin iPad: la v1.0 es solo iPhone (`docs/tecnico.md` 1), y App Store Connect no pide capturas de un
 dispositivo que la app no declara.
@@ -61,8 +63,10 @@ python3 tools/demo/generar.py --idioma es-ES [--hoy AAAA-MM-DD]
 Del 1 de enero hasta ayer, un 86 % de días con color, por estaciones, y una palabra suelta de vez en
 cuando en el idioma pedido. Hoy queda vacío: la escena 01 es hacer la foto. Deja
 `tools/demo/salida/entries.json`, con Pro encendido para enseñar el póster y el widget del año (una
-demo no es una compra; las claves de RevenueCat son `null` y nada lo apaga). `tools/demo/salida/`
-va en `.gitignore`.
+demo no es una compra). En un móvil o simulador con las claves de RevenueCat puestas, la tienda
+contesta que no hay compra y apaga Pro al abrir: para las escenas 05 y 06 hay que quitar la clave de
+la build de depuración o usar la sección 5, donde no hay tienda. `tools/demo/salida/` va en
+`.gitignore`.
 
 Cargarlo con la app cerrada:
 
@@ -76,3 +80,30 @@ cp tools/demo/salida/entries.json "$(xcrun simctl get_app_container booted com.b
 adb push tools/demo/salida/entries.json /data/local/tmp/entries.json
 adb shell run-as com.baltajmn.color cp /data/local/tmp/entries.json files/entries.json
 ```
+
+## 5. iPhone sin Mac
+
+```bash
+python3 tools/store/iphone.py en-US es-ES
+```
+
+La interfaz es Compose común: la misma que pinta iOS. `StoreScreenshots.kt` (en `androidHostTest`)
+la dibuja en la JVM con Robolectric a 440x860 pt a 3x, que es el área segura del iPhone 17 Pro Max,
+sobre el año de demostración y la foto de `atardecer.py`, y recorre las escenas pulsando como lo haría
+una persona: Mi año, Tira, Póster, y Compartir con la foto apagada. Hoy lleva la extracción de verdad
+sobre esa foto y el candidato claro más saturado elegido. `iphone.py` vuelve a poner arriba y abajo los
+62 y 34 pt de la barra de estado y del indicador de inicio, y enmarca con `capturas.py iphone`.
+
+Solo corre si se pide (`-Pcapturas=<carpeta>`): `./gradlew :shared:testAndroidHostTest` lo excluye.
+La primera vez Robolectric baja su Android (`android-all-instrumented`, unos 200 MB).
+
+Lo que no es igual que en el simulador:
+
+- La letra es Roboto, la del sistema de Android; en iOS es SF Pro. Medidas, colores y textos son
+  los mismos.
+- La escena 05 no es una captura: WidgetKit no corre fuera de un Mac. Son `ChromaWidget.swift` y
+  `ChromaYearWidget.swift` dibujados otra vez con sus medidas (170x170 y 364x170 pt, márgenes de 16,
+  las mismas letras, grises y rejilla) a partir del mismo `widget.json`. Si cambia un widget de iOS,
+  cambia también aquí.
+
+Con un Mac, el simulador sigue valiendo: sección 1 y 4, y las crudas a `capturas.py`.

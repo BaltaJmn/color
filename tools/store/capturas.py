@@ -72,10 +72,13 @@ def marco(png, lineas, fondo, salida, destino):
     y = alto - alto_movil - round(90 * k)
     escala = alto_movil / alto_util
 
+    # The headline grows with the width, not the height: the iPhone is taller than the Play sheet,
+    # and a font scaled by height ran the longest line past the right edge.
+    letra = min(k, ancho / BASE_W)
     texto = "".join(
         '<text x="%d" y="%d" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" '
         'font-size="%d" font-weight="600" fill="%s">%s</text>'
-        % (round(96 * ancho / BASE_W), round((170 + i * 82) * k), round(62 * k), TINTA,
+        % (round(96 * ancho / BASE_W), round(170 * k + i * 82 * letra), round(62 * letra), TINTA,
            linea.replace("&", "&amp;").replace("<", "&lt;"))
         for i, linea in enumerate(lineas)
     )

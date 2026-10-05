@@ -105,6 +105,27 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
+        getByName("androidHostTest").dependencies {
+            implementation(libs.robolectric)
+            implementation(libs.compose.uiTestJunit4)
+            implementation(libs.compose.uiTestManifest)
+        }
+    }
+}
+
+// The store screenshots are not a test: they boot a whole Android framework and write pictures, so
+// they run only when asked for with -Pcapturas=<folder> (tools/store/iphone.py), and then alone.
+tasks.withType<Test>().configureEach {
+    val shots = providers.gradleProperty("capturas").orNull
+    if (shots == null) {
+        exclude("**/StoreScreenshots*")
+    } else {
+        systemProperty("capturas", shots)
+        systemProperty("capturas.idioma", providers.gradleProperty("capturas.idioma").getOrElse("en"))
+        filter { includeTestsMatching("*StoreScreenshots*") }
+        // Robolectric's Android 16 reaches into FileDescriptor internals that a modern JDK hides.
+        jvmArgs("--add-opens=java.base/jdk.internal.access=ALL-UNNAMED", "--add-opens=java.base/java.io=ALL-UNNAMED")
+        outputs.upToDateWhen { false }
     }
 }
 

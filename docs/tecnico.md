@@ -908,6 +908,10 @@ Comunes (`commonTest`) salvo que se diga.
 `shared/build/extract-preview.png`, una hoja con cada foto y sus candidatos, para juzgar la extracción a ojo.
 Sin la variable no hace nada.
 
+`StoreScreenshots` (`androidHostTest`, con Robolectric y `ui-test-junit4`) tampoco es un test: dibuja
+las capturas de iPhone de `store/capturas.md` 5. Gradle lo excluye salvo con `-Pcapturas=<carpeta>`, y
+entonces corre solo; Robolectric y sus dependencias no entran en el binario.
+
 ---
 
 ## 11. Qué gobierna cada issue

@@ -23,6 +23,9 @@ play-review = "2.0.2"
 supabase = "3.8.0"
 # The one supabase-kt 3.8.0 is built against: an engine of another minor breaks at runtime, not at build.
 ktor = "3.5.1"
+# Store screenshots only (store/capturas.md): the shared UI drawn on the JVM.
+robolectric = "4.17"
+compose-uiTest = "1.11.2"
 
 [libraries]
 glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
@@ -59,6 +62,9 @@ supabase-functions = { module = "io.github.jan-tennert.supabase:functions-kt" }
 supabase-composeAuth = { module = "io.github.jan-tennert.supabase:compose-auth" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+compose-uiTestJunit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-uiTest" }
+compose-uiTestManifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose-uiTest" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
