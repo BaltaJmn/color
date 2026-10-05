@@ -37,5 +37,3 @@ L'affiche de l'année, en trois styles à imprimer ou à mettre en fond d'écran
 CE QUE TU NE TROUVERAS PAS ICI
 
 Pas de séries, pas de filtres, pas de likes, pas de pub, pas d'analytique.
-
-Chroma fonctionne sur iPhone et iPad.

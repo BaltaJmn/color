@@ -48,7 +48,6 @@ TITULARES = {
 DESTINOS = {
     "play": {"final": (1200, 2100), "crudo": (1080, 2400), "recorte": (90, 60)},
     "iphone": {"final": (1320, 2868), "crudo": (1320, 2868), "recorte": (170, 70)},
-    "ipad": {"final": (2064, 2752), "crudo": (2064, 2752), "recorte": (60, 40)},
 }
 
 # La ley del marco, en la proporcion de la lamina de Play, que es donde se ajusto a ojo.

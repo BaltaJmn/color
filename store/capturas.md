@@ -17,7 +17,9 @@ Herramientas:
 |---|---|---|---|
 | `play` | Emulador Pixel 8, API 36 | 1080x2400 | 1200x2100 PNG |
 | `iphone` | Simulador iPhone 17 Pro Max | 1320x2868 | 1320x2868 PNG (6,9") |
-| `ipad` | Simulador iPad Pro 13" | 2064x2752 | 2064x2752 PNG (13") |
+
+Sin iPad: la v1.0 es solo iPhone (`docs/tecnico.md` 1), y App Store Connect no pide capturas de un
+dispositivo que la app no declara.
 
 ```bash
 python3 tools/store/capturas.py <carpeta-de-crudas> <idioma> <destino>

@@ -20,6 +20,7 @@ La plantilla es **Purl** (`../line`): casi todo lo que no es color ni amigos sal
 | Paquete Kotlin | `com.baltajmn.color` |
 | Bundle id de la app iOS | `com.baltajmn.color` (`APP_BUNDLE_ID` en `Config.xcconfig`) |
 | Bundle id del widget iOS | `com.baltajmn.color.widget` |
+| Dispositivos iOS | Solo iPhone (`TARGETED_DEVICE_FAMILY = 1`, app y widget). El iPad se puede añadir en una actualización, pero App Store Connect no deja quitarlo una vez publicado. En un iPad se instala en modo compatibilidad |
 | Target y producto del widget | `ChromaWidget`, `ChromaWidgetExtension` |
 | App Group | `group.com.baltajmn.color` |
 | Kinds de WidgetKit | `ChromaTodayWidget`, `ChromaYearWidget` |
