@@ -30,7 +30,7 @@ jobs:
       GOOGLE_CLIENT_ID: placeholder
       GOOGLE_SECRET: placeholder
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: supabase/setup-cli@v1
         with:
           version: latest
