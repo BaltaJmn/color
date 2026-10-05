@@ -209,7 +209,7 @@ que no puede pasar nunca es lo contrario.
 | Inicio de sesión para la revisión | No hace falta en v1.0 |
 | Publicación | Manual, para salir el mismo día que Play |
 | Idioma principal | Inglés (EE. UU.): los idiomas sin capturas propias toman las suyas |
-| Versión | `1.0.11`, la de Play (`MARKETING_VERSION` en `Config.xcconfig`) |
+| Versión | La de Play: `MARKETING_VERSION` en `Config.xcconfig` va igual que `versionName` |
 | Precio y disponibilidad | Gratis; Pro va aparte, como compra integrada. Todos los países menos China continental, que pide un número de registro ICP |
 | URL de la política de privacidad | `https://color.baltajmn.dev/` (Privacidad de la app) |
 | Textos de la ficha | `store/app-store/<idioma>/`, trece idiomas: nombre, subtítulo, descripción, palabras clave y texto promocional. `tools/store/fichas.py` comprueba los topes |
