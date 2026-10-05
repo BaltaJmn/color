@@ -6,9 +6,11 @@ dock stay), so the capture is taken as it is and only the app's widgets are kept
 Usage:
   adb shell uiautomator dump /sdcard/ui.xml && adb pull /sdcard/ui.xml
   python3 tools/store/widgets.py <home.png> <ui.xml> <app name> <out.png>
+  python3 tools/store/widgets.py <home.png> <x0,y0,x1,y1> [<x0,y0,x1,y1> ...] <out.png>
 
 The widgets are the launcher host views whose content-desc is the app name, stacked top to bottom
-in the order they sit on the home screen, left edges aligned and the block centered.
+in the order they sit on the home screen, left edges aligned and the block centered. The iOS
+simulator has no uiautomator, so there the boxes are read off the capture and given in pixels.
 """
 import re
 import sys
@@ -39,12 +41,17 @@ def rounded(card):
 
 
 def main():
-    if len(sys.argv) != 5:
+    args = sys.argv[1:]
+    if len(args) >= 3 and all(re.fullmatch(r"\d+,\d+,\d+,\d+", a) for a in args[1:-1]):
+        home, out = args[0], args[-1]
+        boxes = sorted((tuple(map(int, a.split(","))) for a in args[1:-1]), key=lambda b: (b[1], b[0]))
+    elif len(args) == 4:
+        home, xml, name, out = args
+        boxes = bounds(open(xml, encoding="utf-8").read(), name)
+        if not boxes:
+            sys.exit("No widget of %s in %s" % (name, xml))
+    else:
         sys.exit(__doc__)
-    home, xml, name, out = sys.argv[1:]
-    boxes = bounds(open(xml, encoding="utf-8").read(), name)
-    if not boxes:
-        sys.exit("No widget of %s in %s" % (name, xml))
     img = Image.open(home).convert("RGB")
     screen = Image.new("RGB", img.size, GREY)
     cards = [img.crop(b) for b in boxes]

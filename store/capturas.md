@@ -18,7 +18,7 @@ Herramientas:
 | Destino | Dispositivo | Captura cruda | Imagen final |
 |---|---|---|---|
 | `play` | Emulador Pixel 8, API 36 | 1080x2400 | 1200x2100 PNG |
-| `iphone` | iPhone 17 Pro Max: `tools/store/iphone.py` (sección 5) o el simulador | 1320x2868 | 1320x2868 PNG (6,9") |
+| `iphone` | Simulador iPhone 17 Pro Max (sección 6); sin Mac, `tools/store/iphone.py` (sección 5) | 1320x2868 | 1320x2868 PNG (6,9") |
 
 Sin iPad: la v1.0 es solo iPhone (`docs/tecnico.md` 1), y App Store Connect no pide capturas de un
 dispositivo que la app no declara.
@@ -38,7 +38,7 @@ Espera dentro `01_hoy.png` a `06_poster.png` y deja el resultado en
 | `02_ano` | Mi año, rejilla | La rejilla llena hasta hoy, con huecos sueltos |
 | `03_tira` | Mi año, tira | La tira del año, del gris del invierno al verano |
 | `04_tarjeta` | Compartir | La tarjeta de 1080x1350 en la vista previa con "Incluir la foto" apagado |
-| `05_widgets` | Pantalla de inicio | El widget de hoy (2x2) y el del año (4x2), recortados de la pantalla de inicio y puestos sobre gris liso con `tools/store/widgets.py` (usa el volcado de `uiautomator` para encontrarlos). El launcher del emulador no deja quitar su relleno (Calendario, reloj, carpeta de Google, dock) por adb, y los widgets son los de verdad |
+| `05_widgets` | Pantalla de inicio | El widget de hoy (2x2) y el del año (4x2), recortados de la pantalla de inicio y puestos sobre gris liso con `tools/store/widgets.py` (usa el volcado de `uiautomator` para encontrarlos). El launcher del emulador no deja quitar su relleno (Calendario, reloj, carpeta de Google, dock) por adb, y los widgets son los de verdad. En iOS, sección 6 |
 | `06_poster` | Póster | La rejilla del póster en la vista previa |
 
 ## 3. Titulares
@@ -106,4 +106,30 @@ Lo que no es igual que en el simulador:
   las mismas letras, grises y rejilla) a partir del mismo `widget.json`. Si cambia un widget de iOS,
   cambia también aquí.
 
-Con un Mac, el simulador sigue valiendo: sección 1 y 4, y las crudas a `capturas.py`.
+Con un Mac, mejor el simulador: sección 6.
+
+## 6. iPhone con Mac: el simulador
+
+Las de `store/screenshots/iphone/` salen de aquí, con la letra SF Pro y los widgets de WidgetKit de
+verdad.
+
+1. Un simulador propio, para no pisar los de otras sesiones:
+   `xcrun simctl create "Chroma capturas" com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max <runtime>`.
+   Recién creado, `simctl addmedia` se queda colgado hasta que se abre Fotos una vez.
+2. Build de depuración sin la clave `appl_` de `Billing.ios.kt`, que se devuelve en cuanto acaba
+   (con ella la tienda apaga Pro y no hay póster ni widget del año), firmada ad hoc para que el App
+   Group llegue a los widgets:
+   `xcodebuild ... -destination 'platform=iOS Simulator,id=<udid>' CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= build`.
+3. El año de `generar.py` cargado como en la sección 4, y la foto de `atardecer.py` con
+   `xcrun simctl addmedia`: no lleva fecha, así que la app la toma por de hoy.
+4. El idioma, el del simulador y no el de la app, para que los widgets cambien con ella:
+   `xcrun simctl spawn <udid> defaults write -g AppleLanguages -array <idioma>`, lo mismo con
+   `AppleLocale`, y reiniciar el simulador.
+5. Escena 05: los dos widgets en una página vacía de la pantalla de inicio, y `widgets.py` con sus
+   cajas en píxeles, 6 px por dentro del borde: la esquina de un widget de iOS mide unos 90 px y
+   `widgets.py` redondea a 75, así que con la caja justa asoma el fondo. En el 17 Pro Max con iOS 27
+   quedan `99,288,1221,806` (año) y `99,940,617,1458` (hoy).
+
+La captura para la revisión de la compra (`revision-compra.png`, cruda y sin marco) sale de la misma
+build con Pro apagado en `entries.json` y el botón de compra forzado con un precio a mano: sin tienda,
+`Pro.kt` lo esconde. Ese cambio solo vive en esa build y no se sube nunca.
