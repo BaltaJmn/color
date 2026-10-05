@@ -44,8 +44,8 @@ struct iOSApp: App {
             ZStack {
                 ContentView()
                 if scenePhase != .active && ChromaBridge.shared.isLockOn() {
-                    Color(colorScheme == .dark ? UIColor(red: 0.071, green: 0.071, blue: 0.071, alpha: 1)
-                                               : UIColor(red: 0.953, green: 0.953, blue: 0.953, alpha: 1))
+                    Color(colorScheme == .dark ? UIColor(red: 0.055, green: 0.055, blue: 0.055, alpha: 1)
+                                               : UIColor(red: 0.945, green: 0.945, blue: 0.945, alpha: 1))
                         .ignoresSafeArea()
                 }
             }

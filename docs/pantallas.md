@@ -443,7 +443,7 @@ se desplaza: el botón de compra nunca se queda fuera.
 | Widget | Tamaño | Contenido |
 |---|---|---|
 | Hoy | Pequeño (2x2) | La misma lectura que la app: el día grande y fino arriba. Con entrada: el color a sangre, abajo su nombre en negrita y el hex, en tinta. Sin entrada: `surfaceVariant`, `widgetEmpty` y `#------`, como la ficha en blanco. v1.2: tira de amigos de 8 de alto y radio 4 abajo, con o sin entrada, en orden de hora y sin nombres; sin amigos, no hay tira |
-| Año | Mediano (4x2) | El año arriba y la rejilla tumbada: 12 filas de meses por 31 columnas, porque el widget es más ancho que alto. Días futuros más tenues. En Android la rejilla es una imagen que no sigue el modo oscuro, así que un día casi blanco o casi negro lleva siempre un borde gris tenue. Sin Pro: la rejilla vacía con `proTitle` y `widgetUnlock` encima |
+| Año | Mediano (4x2) | El año arriba y la rejilla tumbada: 12 filas de meses por 31 columnas, porque el widget es más ancho que alto. Días futuros más tenues. Un día casi blanco o casi negro lleva siempre un borde gris tenue, en las dos plataformas y en los dos modos: en Android la rejilla es una imagen que no sigue el modo oscuro, e iOS hace lo mismo para que se vean igual. Sin Pro: la rejilla vacía con `proTitle` y `widgetUnlock` encima |
 
 Tocar abre Hoy o Mi año; el del año sin Pro abre el paywall, que explica más que una rejilla vacía.
 La rejilla del año es una imagen: el lector de pantalla la anuncia como `a11yYearWidget`, y la tira de

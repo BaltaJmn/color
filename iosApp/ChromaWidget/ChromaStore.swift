@@ -91,12 +91,25 @@ enum ChromaStore {
         return Color(.sRGB, red: r, green: g, blue: b)
     }
 
-    /// Pure white or pure black, whichever contrasts more: the same answer as `inkFor`.
-    static func ink(_ hex: String) -> Color {
+    private static func luminance(_ hex: String) -> Double {
         func ch(_ c: Double) -> Double { c <= 0.04045 ? c / 12.92 : pow((c + 0.055) / 1.055, 2.4) }
         let (r, g, b) = rgb(hex)
-        let l = 0.2126 * ch(r) + 0.7152 * ch(g) + 0.0722 * ch(b)
-        return 1.05 / (l + 0.05) >= (l + 0.05) / 0.05 ? .white : .black
+        return 0.2126 * ch(r) + 0.7152 * ch(g) + 0.0722 * ch(b)
+    }
+
+    private static func contrast(_ a: Double, _ b: Double) -> Double { (max(a, b) + 0.05) / (min(a, b) + 0.05) }
+
+    /// Pure white or pure black, whichever contrasts more: the same answer as `inkFor`.
+    static func ink(_ hex: String) -> Color {
+        let l = luminance(hex)
+        return contrast(l, 1) >= contrast(l, 0) ? .white : .black
+    }
+
+    /// `blendsInto` of Contrast.kt against both backgrounds of the widget (#F1F1F1 and #0E0E0E), as
+    /// the Android one does: the edge does not depend on the mode.
+    static func blendsIntoBackground(_ hex: String) -> Bool {
+        let l = luminance(hex)
+        return [luminance("#F1F1F1"), luminance("#0E0E0E")].contains { contrast(l, $0) < 1.3 }
     }
 }
 

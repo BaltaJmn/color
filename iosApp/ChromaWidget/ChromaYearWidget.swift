@@ -50,6 +50,11 @@ private struct YearGrid: View {
                     let cell = Path(roundedRect: box, cornerRadius: side / 5)
                     if let hex = days[key] {
                         context.fill(cell, with: .color(ChromaStore.color(hex)))
+                        // A near-white day vanishes on the light background and a near-black one on
+                        // the dark: either gets the faint edge it has on My year and on Android.
+                        if ChromaStore.blendsIntoBackground(hex) {
+                            context.stroke(cell, with: .color(Color(white: 0.5, opacity: 0.2)), lineWidth: 1)
+                        }
                     } else {
                         // The days still to come are fainter, so the year reads as far as it has got.
                         context.fill(cell, with: .color(Color("WidgetEmpty").opacity(key > today ? 0.45 : 1)))
