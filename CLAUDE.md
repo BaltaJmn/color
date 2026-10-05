@@ -3,7 +3,7 @@
 Una foto al día, un color que eliges, y un año pintado en una rejilla. Amigos opcionales, sin
 métricas. Android + iOS, Compose Multiplatform sobre Kotlin Multiplatform. Nombre bajo el icono
 **Chroma**; ficha **Chroma: diario de color**. Identificador en las dos tiendas: `com.baltajmn.color`.
-Repositorio `BaltaJmn/color`, **privado**. La web (política, términos, borrado, `.well-known`) vive
+Repositorio `BaltaJmn/color`, **público** desde el 05-10-2026, para que Actions no cueste. La web (política, términos, borrado, `.well-known`) vive
 aparte, en el repositorio público `BaltaJmn/chroma-privacy` (clon en `../chroma-privacy`).
 
 Este fichero lo carga Claude Code solo en cualquier sesión abierta sobre este repositorio. Es el
@@ -53,8 +53,8 @@ toca en el mismo commit, y se sigue**.
 
 ## Seguridad, sin excepciones
 
-El repositorio fue público hasta octubre de 2026: lo que entró en su historia se da por publicado, y
-estas reglas siguen igual por si vuelve a serlo. `chroma-privacy` es público y no lleva nada privado.
+El repositorio es público (lo fue hasta octubre de 2026, y otra vez desde el 05-10-2026): todo lo que
+entra en su historia se publica. `chroma-privacy` es público y tampoco lleva nada privado.
 
 - El `.jks`, `keystore.properties` y `local.properties` nunca se suben.
 - Los secretos viven en GitHub repository secrets o en los secretos de Supabase.
@@ -92,4 +92,4 @@ xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp \
 Iterar con el objetivo mínimo del módulo tocado; el build de todo, una vez al final.
 
 Publicar: subir el `versionCode`, y `git tag vX.Y && git push origin vX.Y` dispara Play (`alpha`) y
-TestFlight, este último solo cuando existan los secretos de Apple (`store/ci.md`).
+TestFlight (`store/ci.md`).

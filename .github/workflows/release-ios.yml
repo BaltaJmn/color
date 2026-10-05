@@ -10,28 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  # Until the Apple account exists this repository has no iOS secrets, and a job that fails on every
-  # tag trains you to ignore the red mark next to the Android one that matters. Checked on Linux:
-  # the repository is private, and a macOS minute costs ten of the free allowance just to say no.
-  gate:
-    runs-on: ubuntu-latest
-    outputs:
-      ready: ${{ steps.check.outputs.ready }}
-    steps:
-      # Through env and not interpolated into the script, like every other secret here.
-      - id: check
-        env:
-          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
-        run: |
-          if [ -n "$KEY_ID" ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::No App Store Connect secrets yet, skipping the iOS release."
-          fi
-
   testflight:
-    needs: gate
-    if: needs.gate.outputs.ready == 'true'
     # macos-26 and not macos-15: Compose links against UIKit classes that only exist from the
     # iOS 26 SDK on, so an older image fails the archive with undefined symbols.
     runs-on: macos-26
@@ -53,12 +32,15 @@ jobs:
           ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
           PRIVATE_KEY: ${{ secrets.APPSTORE_PRIVATE_KEY }}
           TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          DIST_P12: ${{ secrets.APPLE_DISTRIBUTION_P12 }}
+          DIST_P12_PASSWORD: ${{ secrets.APPLE_DISTRIBUTION_P12_PASSWORD }}
         run: |
           set -euo pipefail
 
           # An App Store Connect API key instead of an Apple ID: `-allowProvisioningUpdates` can
-          # then create and download the certificate and the two provisioning profiles itself, so
-          # no .p12 and no .mobileprovision ever have to live in a secret.
+          # then create the development certificate and the provisioning profiles itself, so no
+          # .mobileprovision ever has to live in a secret. The distribution certificate cannot be
+          # left to it: see the keychain below.
           KEY_PATH="$RUNNER_TEMP/AuthKey_$KEY_ID.p8"
           printf '%s\n' "$PRIVATE_KEY" > "$KEY_PATH"
 
@@ -89,6 +71,22 @@ jobs:
             MARKETING_VERSION="$VERSION_NAME" \
             CURRENT_PROJECT_VERSION="$VERSION_CODE"
 
+          # Without a local distribution identity Xcode signs the export in the cloud, and that path
+          # breaks on this team: it hands codesign the designated requirement as an argument with the
+          # certificate name in it, Foundation decomposes the "é" of "Jiménez" on the way (NFD), and
+          # App Store Connect rejects a requirement that no longer matches the certificate
+          # (ITMS-90035). With the private key here, codesign derives the requirement itself.
+          KEYCHAIN="$RUNNER_TEMP/signing.keychain-db"
+          KEYCHAIN_PASSWORD=$(uuidgen)
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          printf '%s' "$DIST_P12" | base64 --decode > "$RUNNER_TEMP/dist.p12"
+          security import "$RUNNER_TEMP/dist.p12" -k "$KEYCHAIN" -P "$DIST_P12_PASSWORD" -T /usr/bin/codesign
+          rm "$RUNNER_TEMP/dist.p12"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" > /dev/null
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+
           # `destination: upload` hands the build straight to App Store Connect, which saves
           # exporting an ipa only to feed it to altool in the next step.
           cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
@@ -112,6 +110,8 @@ jobs:
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
             "${AUTH[@]}"
 
-      - name: Shred the API key
+      - name: Shred the keys
         if: always()
-        run: rm -f "$RUNNER_TEMP"/AuthKey_*.p8
+        run: |
+          rm -f "$RUNNER_TEMP"/AuthKey_*.p8 "$RUNNER_TEMP/dist.p12"
+          security delete-keychain "$RUNNER_TEMP/signing.keychain-db" 2>/dev/null || true

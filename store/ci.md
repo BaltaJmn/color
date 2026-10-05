@@ -2,10 +2,11 @@
 
 Los workflows de publicación de las hermanas, copiados a `.github/workflows/`. La secuencia de Android
 vive en `BaltaJmn/ci` (`android-play-release.yml`): aquí solo está la llamada con el paquete, el CN
-de la firma, las tareas de Gradle y la carpeta de notas. `release-ios.yml` es el de Purl, porque el
-proyecto de iOS sale de la misma plantilla (`Config.xcconfig`), con tres cambios: el nombre del
-archivo, `permissions: contents: read` y el secreto de la puerta pasado por `env` en vez de
-interpolado en el script.
+de la firma, las tareas de Gradle y la carpeta de notas. `release-ios.yml` sale del de Purl, porque
+el proyecto de iOS sale de la misma plantilla (`Config.xcconfig`), con tres cambios: el nombre del
+archivo, `permissions: contents: read` y el certificado de distribución propio (abajo, en
+TestFlight). La puerta que lo saltaba mientras no había secretos de Apple se quitó con la cuenta ya
+creada: un fallo de iOS tiene que verse en rojo.
 
 ## Cómo se dispara
 
@@ -86,9 +87,12 @@ un binario a producción. RevenueCat guarda su JSON en sus servidores, así que 
 `xcodebuild` (`destination: upload`). La versión y el número de build son el `versionName` y el
 `versionCode` de `androidApp/build.gradle.kts`, los mismos que sube Play con esa etiqueta: las dos
 tiendas llevan siempre la misma versión, y lanzar el flujo a mano sin subir el `versionCode` lo
-rechazan las dos por build repetido. Mientras no
-exista `APPSTORE_KEY_ID`, el trabajo se salta solo y deja un aviso en vez de salir en rojo. Lo comprueba un trabajo previo en
-Linux: el repositorio es privado, y cada minuto de macOS cuenta como diez del cupo gratuito.
+rechazan las dos por build repetido.
+
+El repositorio es público para que Actions no cueste. Siendo privado, cada minuto de macOS contaba
+como diez del cupo gratuito, y el 05-10-2026 GitHub dejó de arrancar todos los trabajos, tests
+incluidos, con "recent account payments have failed or your spending limit needs to be increased".
+Un trabajo que falla sin pasos ni registro es eso: se mira en *Settings > Billing & plans*.
 
 | Secreto | Qué es |
 |---|---|
@@ -96,8 +100,34 @@ Linux: el repositorio es privado, y cada minuto de macOS cuenta como diez del cu
 | `APPSTORE_ISSUER_ID` | El Issuer ID, el mismo para todas las claves de la cuenta |
 | `APPSTORE_PRIVATE_KEY` | El contenido del `.p8`, entero, con sus líneas `BEGIN`/`END` |
 | `APPLE_TEAM_ID` | El Team ID de la cuenta de desarrollador |
+| `APPLE_DISTRIBUTION_P12` | El certificado Apple Distribution con su clave privada, `.p12` en base64 |
+| `APPLE_DISTRIBUTION_P12_PASSWORD` | La contraseña de ese `.p12` |
 
-Rol *App Manager* o superior, para que `-allowProvisioningUpdates` cree certificado y perfiles
-(app, widget y App Group) sin meter un `.p12` en un secreto. La de las hermanas sirve: es de cuenta.
+Rol *App Manager* o superior, para que `-allowProvisioningUpdates` cree el certificado de desarrollo
+y los perfiles (app, widget y App Group). La de las hermanas sirve: es de cuenta. Los cuatro
+primeros secretos los pone `~/keys/credenciales.sh appstore` en todos los repos de iOS a la vez. Los
+dos del `.p12` salen de `~/keys/apple-distribution.p12`, con la contraseña en el Llavero
+(`dev.baltajmn.apple-distribution-p12`), y de momento solo están en este repositorio.
+
+### Por qué un `.p12` en un secreto
+
+Sin certificado de distribución en el llavero, Xcode firma el `.ipa` en la nube (*cloud signing*), y
+en este equipo eso no sube: App Store Connect lo rechaza con ITMS-90035, "Code failed to satisfy
+specified code requirement(s)". Al firmar en la nube Xcode le pasa a `codesign` el requisito
+designado como texto, con el nombre del certificado dentro, y `Process` de Foundation descompone la
+"é" de "Jiménez" por el camino (NFD, `e` + U+0301). El certificado la lleva compuesta (NFC, U+00E9),
+así que la firma no cumple su propio requisito: `codesign --verify --strict` lo dice igual en local.
+Con la clave privada en el llavero, `codesign` saca el requisito del certificado y coinciden.
+Comprobado el 05-10-2026 (CI con Xcode 26.6, local con 27): el `--requirements` sale en
+`IDEDistributionPipeline.log`, y `Process` con `"Jim\u{e9}nez"` entrega `Jime\u{301}nez` al programa
+que lanza. El mismo archivo exportado con la identidad local ya no pasa `--requirements`, y la app y
+el widget cumplen su requisito.
+
+Afecta a toda app de la cuenta, porque el nombre es el del equipo: los otros repos de iOS necesitan
+el mismo paso y los dos secretos antes de subir a TestFlight. Hasta que Apple lo arregle, el
+certificado (`2A7JLW9543`) vive en `~/keys/apple-distribution.p12` y caduca el 05-10-2027. Se
+renueva creando otro por la API (`POST /v1/certificates`, tipo `DISTRIBUTION`, con una CSR nueva) y
+rehaciendo el `.p12` y los dos secretos.
+
 Antes de la primera subida a TestFlight, la clave `appl_` de RevenueCat tiene que estar en
 `Billing.ios.kt`, o Pro no se podrá comprar en iOS.
