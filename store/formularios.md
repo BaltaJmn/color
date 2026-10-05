@@ -220,8 +220,29 @@ Chroma has no account and no server. Everything is stored on the device, so no d
 
 Take a photo (or pick one taken today from the gallery) and choose one of the colors it offers. That color becomes the day; My year shows every day as a grid. The simulator has no camera: use "From the gallery" with a photo taken today.
 
-Chroma Pro is a one-time non-consumable purchase (pro_lifetime). It opens when exporting the year poster (My year > Poster), from the locked year widget, and from Settings > Chroma Pro. Restore Purchase is in Settings and in the purchase dialog.
+Chroma Pro is a one-time non-consumable purchase (com.baltajmn.color.pro_lifetime). It opens when exporting the year poster (My year > Poster), from the locked year widget, and from Settings > Chroma Pro. Restore Purchase is in Settings and in the purchase dialog.
 ```
+
+### Compra integrada
+
+| Campo | Valor |
+|---|---|
+| Tipo | No consumible |
+| Nombre de referencia | `Chroma Pro` |
+| ID de producto | `com.baltajmn.color.pro_lifetime`. En Apple un ID no se repite entre apps de la misma cuenta: va el bundle delante y tras el último punto el de Play. Irreversible |
+| Precio | 2,99 EUR de base en España (en Apple ya lleva IVA), el escaparate de Play |
+| En RevenueCat | App "Chroma (App Store)", mismo derecho `pro` y mismo paquete `$rc_lifetime` que Android; su `appl_` en `Billing.ios.kt` |
+| Captura para la revisión | El diálogo de Pro, con el botón de compra |
+
+Nombre visible `Chroma Pro` en todos; descripción (tope 45), de `proSubtitle` en `Strings.kt`:
+
+| Idioma | Descripción |
+|---|---|
+| en-US | Year poster, year widget, year in words. |
+| es-ES | Póster, widget del año y tu año en palabras. |
+| pt-BR | Pôster, widget do ano e seu ano em palavras. |
+| de-DE | Jahresposter, Jahres-Widget, Jahr in Worten. |
+| fr-FR | Affiche, widget de l'année, année en mots. |
 
 ## 6b. v1.1: contenido de usuarios
 
