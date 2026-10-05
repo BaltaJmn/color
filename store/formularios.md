@@ -208,6 +208,14 @@ que no puede pasar nunca es lo contrario.
 | URL de soporte | `https://color.baltajmn.dev/` (lleva el correo de contacto) |
 | Inicio de sesión para la revisión | No hace falta en v1.0 |
 | Publicación | Manual, para salir el mismo día que Play |
+| Idioma principal | Inglés (EE. UU.): los idiomas sin capturas propias toman las suyas |
+| Versión | `1.0.11`, la de Play (`MARKETING_VERSION` en `Config.xcconfig`) |
+| Precio y disponibilidad | Gratis; Pro va aparte, como compra integrada. Todos los países menos China continental, que pide un número de registro ICP |
+| URL de la política de privacidad | `https://color.baltajmn.dev/` (Privacidad de la app) |
+| Textos de la ficha | `store/app-store/<idioma>/`, trece idiomas: nombre, subtítulo, descripción, palabras clave y texto promocional. `tools/store/fichas.py` comprueba los topes |
+| Capturas | `store/screenshots/iphone/en-US` y `es-ES`, iPhone de 6,9" (`store/capturas.md`). Los otros once idiomas heredan las de en-US. Sin iPad |
+| Estado de comerciante (UE) | Lo declara el titular de la cuenta. Vendiendo una compra integrada lo normal es declararse comerciante, y entonces la dirección, el teléfono y el correo que se den salen en la ficha europea |
+| Contacto para la revisión | Nombre, teléfono y correo del titular, solo los ve Apple |
 
 Usos declarados en el `Info.plist`, en los trece idiomas (`<lang>.lproj/InfoPlist.strings`):
 `NSCameraUsageDescription` (la foto del día) y `NSPhotoLibraryAddUsageDescription` (guardar una
@@ -218,7 +226,7 @@ Notas para el revisor, en inglés:
 ```
 Chroma has no account and no server. Everything is stored on the device, so no demo account is needed.
 
-Take a photo (or pick one taken today from the gallery) and choose one of the colors it offers. That color becomes the day; My year shows every day as a grid. The simulator has no camera: use "From the gallery" with a photo taken today.
+Take a photo (or pick one taken today from the gallery) and choose one of the colors it offers. That color becomes the day; My year shows every day as a grid. The simulator has no camera: use "Choose from today's photos" with a photo taken today.
 
 Chroma Pro is a one-time non-consumable purchase (com.baltajmn.color.pro_lifetime). It opens when exporting the year poster (My year > Poster), from the locked year widget, and from Settings > Chroma Pro. Restore Purchase is in Settings and in the purchase dialog.
 ```
@@ -232,9 +240,11 @@ Chroma Pro is a one-time non-consumable purchase (com.baltajmn.color.pro_lifetim
 | ID de producto | `com.baltajmn.color.pro_lifetime`. En Apple un ID no se repite entre apps de la misma cuenta: va el bundle delante y tras el último punto el de Play. Irreversible |
 | Precio | 2,99 EUR de base en España (en Apple ya lleva IVA), el escaparate de Play |
 | En RevenueCat | App "Chroma (App Store)", mismo derecho `pro` y mismo paquete `$rc_lifetime` que Android; su `appl_` en `Billing.ios.kt` |
-| Captura para la revisión | El diálogo de Pro, con el botón de compra |
+| Captura para la revisión | `store/screenshots/iphone/revision-compra.png`: el diálogo de Pro con el botón de compra, sacado del simulador con el precio puesto a mano porque la tienda aún no lo da |
 
-Nombre visible `Chroma Pro` en todos; descripción (tope 45), de `proSubtitle` en `Strings.kt`:
+Nombre visible `Chroma Pro` en todos; descripción (tope 45), de `proSubtitle` en `Strings.kt`. Las
+ocho últimas salen recortando la misma frase y, como el resto de esos idiomas, no han pasado una
+revisión nativa (`docs/textos.md` 3):
 
 | Idioma | Descripción |
 |---|---|
@@ -243,6 +253,14 @@ Nombre visible `Chroma Pro` en todos; descripción (tope 45), de `proSubtitle` e
 | pt-BR | Pôster, widget do ano e seu ano em palavras. |
 | de-DE | Jahresposter, Jahres-Widget, Jahr in Worten. |
 | fr-FR | Affiche, widget de l'année, année en mots. |
+| it | Poster, widget dell'anno, anno in parole. |
+| nl-NL | Jaarposter, jaarwidget en je jaar in woorden. |
+| pl | Plakat, widżet roku i twój rok w słowach. |
+| ru | Постер, виджет года и твой год в словах. |
+| tr | Yıl posteri, yıl widget'ı, kelimelerle yılın. |
+| id | Poster dan widget tahun, tahunmu dalam kata. |
+| ja | 1年のポスター、1年のウィジェット、ことばで振り返る1年。 |
+| ko | 한 해 포스터, 한 해 위젯, 글로 보는 한 해. |
 
 ## 6b. v1.1: contenido de usuarios
 
