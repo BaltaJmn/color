@@ -69,6 +69,15 @@ jobs:
             -authenticationKeyIssuerID "$ISSUER_ID"
           )
 
+          # The same version and build number as the Play release of this tag: both come from the
+          # Android build file, so the two stores cannot drift apart.
+          VERSION_NAME=$(sed -n 's/^ *versionName = "\(.*\)"$/\1/p' androidApp/build.gradle.kts)
+          VERSION_CODE=$(sed -n 's/^ *versionCode = \([0-9]*\)$/\1/p' androidApp/build.gradle.kts)
+          if [ -z "$VERSION_NAME" ] || [ -z "$VERSION_CODE" ]; then
+            echo "::error::No versionName or versionCode in androidApp/build.gradle.kts"
+            exit 1
+          fi
+
           xcodebuild archive \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
@@ -77,7 +86,8 @@ jobs:
             -archivePath "$RUNNER_TEMP/Chroma.xcarchive" \
             "${AUTH[@]}" \
             TEAM_ID="$TEAM_ID" \
-            CURRENT_PROJECT_VERSION=${{ github.run_number }}
+            MARKETING_VERSION="$VERSION_NAME" \
+            CURRENT_PROJECT_VERSION="$VERSION_CODE"
 
           # `destination: upload` hands the build straight to App Store Connect, which saves
           # exporting an ipa only to feed it to altool in the next step.

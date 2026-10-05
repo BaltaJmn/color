@@ -83,7 +83,10 @@ un binario a producción. RevenueCat guarda su JSON en sus servidores, así que 
 ## TestFlight
 
 `release-ios.yml` archiva `Chroma.xcarchive` con el esquema `iosApp`, y lo exporta y sube en un solo
-`xcodebuild` (`destination: upload`). El número de build sale de `github.run_number`. Mientras no
+`xcodebuild` (`destination: upload`). La versión y el número de build son el `versionName` y el
+`versionCode` de `androidApp/build.gradle.kts`, los mismos que sube Play con esa etiqueta: las dos
+tiendas llevan siempre la misma versión, y lanzar el flujo a mano sin subir el `versionCode` lo
+rechazan las dos por build repetido. Mientras no
 exista `APPSTORE_KEY_ID`, el trabajo se salta solo y deja un aviso en vez de salir en rojo. Lo comprueba un trabajo previo en
 Linux: el repositorio es privado, y cada minuto de macOS cuenta como diez del cupo gratuito.
 
