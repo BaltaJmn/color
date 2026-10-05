@@ -217,6 +217,24 @@ que no puede pasar nunca es lo contrario.
 | Estado de comerciante (UE) | Lo declara el titular de la cuenta. Vendiendo una compra integrada lo normal es declararse comerciante, y entonces la dirección, el teléfono y el correo que se den salen en la ficha europea |
 | Contacto para la revisión | Nombre, teléfono y correo del titular, solo los ve Apple |
 
+Cómo quedó en App Store Connect el 05-10-2026, al enviar la 1.0.12 (15) a revisión. Lo que estaba
+mal o faltaba, por si vuelve a pasar en otra app de la cuenta:
+
+- El idioma principal era español: se pasó a inglés, que es de donde heredan las capturas.
+- China continental estaba disponible: se quitó (`territoryAvailabilities`).
+- La versión en preparación era la 1.0.11: tiene que ser la `versionName` de la build.
+- La ficha estaba en cinco idiomas y la compra integrada también, sin captura para la revisión. Los
+  ocho idiomas que faltaban salen de `store/app-store/` con `~/keys/appstore.py ficha`, y la compra,
+  de la tabla de abajo.
+- **La primera compra no consumible va en el mismo envío que la versión.** La API no la añade
+  (`FIRST_NON_CONSUMABLE_MUST_BE_SUBMITTED_ON_VERSION`): en la web, *Añadir a revisión* en la versión
+  y después en la compra, y se envían juntas. El primer envío salió sin ella.
+- TestFlight: grupo interno `Equipo` con el titular, para instalar cada build en el iPhone.
+- El estado de comerciante de la UE se declaró el 05-10-2026 y queda en revisión en Apple: hasta que lo
+  aprueben, los 27 países de la UE salen como `TRADER_STATUS_NOT_PROVIDED`.
+
+`~/keys/appstore.py estado com.baltajmn.color` dice qué falta antes de enviar.
+
 Usos declarados en el `Info.plist`, en los trece idiomas (`<lang>.lproj/InfoPlist.strings`):
 `NSCameraUsageDescription` (la foto del día) y `NSPhotoLibraryAddUsageDescription` (guardar una
 tarjeta o un póster, solo añadir).

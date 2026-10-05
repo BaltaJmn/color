@@ -88,12 +88,12 @@ que el sistema confíe en el dominio, la web lleva tres datos de las cuentas:
   01-10-2026 (leído de la API, `generatedApks`; también en *Play Console > Prueba y publicación >
   Integridad de la app*). Si se quiere probar una build firmada con la clave de subida, se añade
   también la suya a la lista.
-- `.well-known/apple-app-site-association`: `TEAM_ID` por el Team ID de `Config.xcconfig`. El
-  App ID necesita la capacidad *Associated Domains*. En v1.0 se quitaron de `iosApp.entitlements`
+- `.well-known/apple-app-site-association`: el Team ID `BR5ZH8XYP6`, **ya puesto** el 05-10-2026.
+  El App ID necesita la capacidad *Associated Domains*. En v1.0 se quitaron de `iosApp.entitlements`
   `associated-domains` (`applinks:color.baltajmn.dev`) y `applesignin` (`Default`): un equipo
   personal de Xcode no firma con ellas. Volver a ponerlas al activar Amigos.
-- `404.html`: `APP_STORE_ID` por el identificador numérico de la app en App Store Connect. Vacío,
-  la página solo enseña Google Play.
+- `404.html`: el identificador de la app en App Store Connect, `6819301462`, **ya puesto** el
+  05-10-2026. Enseña la App Store junto a Google Play.
 
 Comprobación: `adb shell pm verify-app-links --re-verify com.baltajmn.color` y después
 `adb shell pm get-app-links com.baltajmn.color` dice `verified`. En iOS, el enlace pegado en Notas y
