@@ -11,7 +11,7 @@ Cada versión que sube a la prueba añade su fila aquí en el mismo commit que s
 | | |
 |---|---|
 | Canal | Prueba cerrada - Alpha, grupo `chroma-testers` (`formularios.md` 3b) |
-| Versión en el canal | 1.0.7 (10) publicada; 1.0.8 (11) subida el 04-10-2026, en revisión de Play |
+| Versión en el canal | 1.0.9 (12) subida el 05-10-2026, en revisión de Play; antes, 1.0.8 (11) |
 | 12 testers con la prueba aceptada | Cumplido el 29-09-2026. A 03-10-2026 siguen siendo 12, justos: el grupo tiene 25 miembros, pero unirse al grupo no cuenta sin aceptar la prueba |
 | 14 días seguidos | 4 de 14 a 03-10-2026; como pronto el 13-10-2026 |
 | Fallos y ANR en Android vitals | 0 a 03-10-2026 (últimos 28 días) |
