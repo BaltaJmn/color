@@ -228,7 +228,8 @@ mal o faltaba, por si vuelve a pasar en otra app de la cuenta:
   de la tabla de abajo.
 - **La primera compra no consumible va en el mismo envío que la versión.** La API no la añade
   (`FIRST_NON_CONSUMABLE_MUST_BE_SUBMITTED_ON_VERSION`): en la web, *Añadir a revisión* en la versión
-  y después en la compra, y se envían juntas. El primer envío salió sin ella.
+  y después en la compra, y se envían juntas. El primer envío salió sin ella: se canceló y a las
+  23:10 se reenvió con las dos (versión y compra en `WAITING_FOR_REVIEW`, publicación manual).
 - TestFlight: grupo interno `Equipo` con el titular, para instalar cada build en el iPhone.
 - El estado de comerciante de la UE se declaró el 05-10-2026 y queda en revisión en Apple: hasta que lo
   aprueben, los 27 países de la UE salen como `TRADER_STATUS_NOT_PROVIDED`.
