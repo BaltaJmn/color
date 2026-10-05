@@ -4,9 +4,11 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asSkiaBitmap
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.useContents
 import kotlinx.cinterop.usePinned
 import org.jetbrains.skia.EncodedImageFormat
 import org.jetbrains.skia.Image
+import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSData
 import platform.Foundation.create
 import platform.Photos.PHAccessLevelAddOnly
@@ -32,17 +34,22 @@ actual object Sharing {
 
     actual fun sharePng(png: ByteArray) {
         val image = png.toNSData()?.let { UIImage.imageWithData(it) } ?: return
-        val host = topViewController() ?: return
-        val sheet = UIActivityViewController(activityItems = listOf(image), applicationActivities = null)
-        // iPad presents this as a popover and needs an anchor.
-        sheet.popoverPresentationController?.sourceView = host.view
-        host.presentViewController(sheet, animated = true, completion = null)
+        present(UIActivityViewController(activityItems = listOf(image), applicationActivities = null))
     }
 
     actual fun shareText(text: String) {
+        present(UIActivityViewController(activityItems = listOf(text), applicationActivities = null))
+    }
+
+    private fun present(sheet: UIActivityViewController) {
         val host = topViewController() ?: return
-        val sheet = UIActivityViewController(activityItems = listOf(text), applicationActivities = null)
-        sheet.popoverPresentationController?.sourceView = host.view
+        // iPad shows this as a popover. A view alone anchors it at the corner, off screen; Compose has
+        // no UIView for the button that asked, so it opens in the middle with no arrow.
+        sheet.popoverPresentationController?.apply {
+            sourceView = host.view
+            sourceRect = host.view.bounds.useContents { CGRectMake(size.width / 2, size.height / 2, 0.0, 0.0) }
+            permittedArrowDirections = 0uL
+        }
         host.presentViewController(sheet, animated = true, completion = null)
     }
 
