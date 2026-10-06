@@ -1,0 +1,32 @@
+name: Store listings
+
+# Same file in every app of the family; only the values under `with:` change (BaltaJmn/ci README).
+# Apart from release.yml on purpose: listings change far more often than the app, and need neither
+# a Gradle build nor a versionCode. A push only checks store/; writing to a store is chosen by hand.
+on:
+  push:
+    branches: [main]
+    paths: ['store/**']
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Where to upload the listing
+        type: choice
+        options: [check, play, app-store, both]
+        default: check
+
+permissions:
+  contents: read
+
+jobs:
+  listings:
+    uses: BaltaJmn/ci/.github/workflows/store-listings.yml@main
+    with:
+      package-name: com.baltajmn.color
+      website: https://color.baltajmn.dev/
+      target: ${{ inputs.target || 'check' }}
+    secrets:
+      PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+      APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+      APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+      APPSTORE_PRIVATE_KEY: ${{ secrets.APPSTORE_PRIVATE_KEY }}

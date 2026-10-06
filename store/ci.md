@@ -1,63 +1,38 @@
 # Publicar desde GitHub Actions
 
-Los workflows de publicación de las hermanas, copiados a `.github/workflows/`. La secuencia de Android
-vive en `BaltaJmn/ci` (`android-play-release.yml`): aquí solo está la llamada con el paquete, el CN
-de la firma, las tareas de Gradle y la carpeta de notas. `release-ios.yml` también
-es una llamada, a `ios-testflight-release.yml` del mismo repositorio (abajo, en TestFlight).
+Igual en las cuatro apps de la familia: el proceso, los workflows y los scripts viven en
+`BaltaJmn/ci` (`README.md` y `PUBLICAR.md`). Aquí, solo lo que es de Chroma.
 
-## Cómo se dispara
+| Qué | Valor |
+|---|---|
+| Paquete de Play y bundle id de Apple | `com.baltajmn.color` |
+| Clave de subida | `~/keys/chroma-upload.jks`, alias `upload`, `CN=BaltaJmn` (el `signer-cn` de `release.yml`) |
+| Versión de las dos tiendas | `versionName` y `versionCode` de `androidApp/build.gradle.kts` |
+| Web: contacto de Play, soporte y privacidad de Apple | https://color.baltajmn.dev/ |
+| Pro | `pro_lifetime` en Play, `com.baltajmn.color.pro_lifetime` en Apple; 1,99 EUR en las dos |
 
-**Por etiqueta**, no en cada push a `main`. Cada subida quema un `versionCode` y les llega a los
-testers.
+La primera subida a Play fue un borrador por CI (24-09-2026, `-f stores=play -f track=internal -f status=draft`, `versionCode` 2): Play acepta la primera subida por API y aplica solo su firma de apps.
 
-1. Subir el `versionCode` en `androidApp/build.gradle.kts` (y `versionName` si toca).
-2. Reescribir `store/whatsnew/whatsnew-<idioma>` si cambia algo visible (tope 500).
-3. Mientras dure la prueba cerrada, su fila en `store/prueba-cerrada.md`.
-4. Commit, y la etiqueta:
+## Publicar una versión
 
-```bash
-git tag v1.0 && git push origin v1.0
-```
+1. Subir el `versionCode` (y `versionName` si toca). Un `versionCode` no se reutiliza nunca.
+2. Si cambia algo visible, reescribir `store/whatsnew/whatsnew-<idioma>` en todos los idiomas (tope 500).
+3. Commit, y `git tag vX.Y && git push origin vX.Y`: Play `alpha` y TestFlight, la misma versión.
+4. Producción en Play y el envío a revisión de Apple, a mano en cada consola.
 
-La misma etiqueta dispara `release.yml` (Play, canal `alpha`, la prueba cerrada) y `release-ios.yml`
-(TestFlight). Si se olvida el paso 1, Play rechaza la subida con "Version code N has already been
-used", después de construir.
+Otro canal o una sola tienda: `gh workflow run release.yml -f stores=play -f track=internal`
+(`-f status=draft` mientras la app no haya publicado nada en Play).
 
-Disparo manual, para otro canal:
+## Ficha
 
-```bash
-gh workflow run release.yml --ref main -f track=internal
-```
-
-**Mientras la app no tenga ninguna versión publicada** en ningún canal, Play solo acepta versiones en
-borrador: `-f status=draft`, y la versión se lanza después desde la consola. Así se hizo la primera
-de Chroma (24-09-2026, `-f track=internal -f status=draft`, `versionCode` 2): Play acepta la primera
-subida por API y aplica solo su firma de apps.
-
-**`internal` y `alpha` no son el mismo sitio.** La prueba interna se activa en minutos; los 14 días
-con 12 testers solo corren en la **cerrada** (`alpha`). Un `versionCode` gastado en un canal no vale
-en otro.
-
-## La firma
-
-La clave de subida de Chroma dice `CN=BaltaJmn`, así que `release.yml` pasa `signer-cn`: el valor por
-defecto del workflow compartido es `CN=Baltasar` y rechazaría un paquete bien firmado. Comprobado
-con el mismo `jarsigner -verify -verbose:summary -certs` que usa el workflow.
-
-Sin `keystore.properties` el build de release cae a la clave de debug en silencio. El workflow lo
-detecta antes de subir: es esa comprobación del CN.
+Textos, gráficos y capturas en `store/`, con la estructura del README de `ci`. Cada push a `store/`
+la comprueba; para subirla, `gh workflow run listings.yml -f target=play` (o `app-store`, `both`).
+La App Store solo acepta cambios con una versión en preparación.
 
 ## Secretos del repositorio
 
-| Secreto | Qué es | De dónde sale |
-|---|---|---|
-| `KEYSTORE_BASE64` | El `.jks` de subida, en base64 | `~/keys/chroma-upload.jks` |
-| `KEYSTORE_PASSWORD` | La del almacén | `keystore.properties` |
-| `KEY_ALIAS` | `upload` | |
-| `KEY_PASSWORD` | La de la clave (la misma) | `keystore.properties` |
-| `PLAY_SERVICE_ACCOUNT_JSON` | La cuenta de servicio **de publicar** | `~/keys/play-service-account.json`; al rotarla con `credenciales.sh play` se actualiza sola |
-
-Se ponen sin que el valor pase por la pantalla:
+Los cinco de Play salen de la clave de esta app y de la cuenta de servicio que publica. Se ponen sin
+que el valor pase por la pantalla:
 
 ```bash
 base64 -i ~/keys/chroma-upload.jks | gh secret set KEYSTORE_BASE64 -R BaltaJmn/color
@@ -67,68 +42,5 @@ printf upload | gh secret set KEY_ALIAS -R BaltaJmn/color
 gh secret set PLAY_SERVICE_ACCOUNT_JSON -R BaltaJmn/color < ~/keys/play-service-account.json
 ```
 
-### Dos cuentas de servicio, siempre
-
-**La que publica y la de RevenueCat no se juntan nunca.** La de RevenueCat es de solo lectura
-(datos financieros y pedidos): si se filtra su JSON, te leen los pedidos. La de publicar puede subir
-un binario a producción. RevenueCat guarda su JSON en sus servidores, así que ahí va la de lectura.
-
-| Cuenta | Dónde vive | Permisos en Play Console |
-|---|---|---|
-| `play-publisher@chroma-baltajmn` | `~/keys/play-service-account.json`, este secreto y `~/keys/play.sh` | Publicar en canales de prueba y en producción, gestionar canales y testers, gestionar presencia en la tienda |
-| La de RevenueCat | `~/keys/revenuecat-play-service-account.json` y la app de Play en RevenueCat | Ver información de la app, ver datos financieros, gestionar pedidos |
-
-## TestFlight
-
-`release-ios.yml` solo llama a `ios-testflight-release.yml` de `BaltaJmn/ci`, el mismo en las cuatro
-apps de iOS; su README cuenta qué hace. La versión y el número de build son el `versionName` y el
-`versionCode` de `androidApp/build.gradle.kts`, los mismos que sube Play con esa etiqueta: las dos
-tiendas llevan siempre la misma versión, y lanzar el flujo a mano sin subir el `versionCode` lo
-rechazan las dos por build repetido.
-
-Sin máquina macOS libre, `~/keys/testflight.sh .` hace lo mismo desde el Mac. Pasó el 05-10-2026:
-el trabajo esperó 15 minutos y GitHub lo canceló con "The job was not acquired by Runner of type
-hosted even after multiple attempts", sin llegar a ningún paso.
-
-El repositorio es público para que Actions no cueste. Siendo privado, cada minuto de macOS contaba
-como diez del cupo gratuito, y el 05-10-2026 GitHub dejó de arrancar todos los trabajos, tests
-incluidos, con "recent account payments have failed or your spending limit needs to be increased".
-Un trabajo que falla sin pasos ni registro es eso: se mira en *Settings > Billing & plans*.
-
-| Secreto | Qué es |
-|---|---|
-| `APPSTORE_KEY_ID` | El Key ID de la clave de la App Store Connect API |
-| `APPSTORE_ISSUER_ID` | El Issuer ID, el mismo para todas las claves de la cuenta |
-| `APPSTORE_PRIVATE_KEY` | El contenido del `.p8`, entero, con sus líneas `BEGIN`/`END` |
-| `APPLE_TEAM_ID` | El Team ID de la cuenta de desarrollador |
-| `APPLE_DEVELOPMENT_P12` | Certificado Apple Development con su clave, `.p12` en base64 |
-| `APPLE_DEVELOPMENT_P12_PASSWORD` | Su contraseña |
-| `APPLE_DISTRIBUTION_P12` | Certificado Apple Distribution con su clave, `.p12` en base64 |
-| `APPLE_DISTRIBUTION_P12_PASSWORD` | Su contraseña |
-
-Los ocho son de cuenta, iguales en los cuatro repos de iOS, y los pone `~/keys/credenciales.sh
-sincronizar`. La clave de la API tiene rol *Admin*: *App Manager* basta para que
-`-allowProvisioningUpdates` cree los perfiles (app, widget y App Group).
-
-### Por qué dos `.p12` en secretos
-
-Sin certificado de distribución en el llavero, Xcode firma el `.ipa` en la nube (*cloud signing*), y
-en este equipo eso no sube: App Store Connect lo rechaza con ITMS-90035, "Code failed to satisfy
-specified code requirement(s)", en la app y en el widget. Al firmar en la nube Xcode le pasa a
-`codesign` el requisito designado como texto, con el nombre del certificado dentro, y `Process` de
-Foundation descompone la "é" de "Jiménez" por el camino (NFD, `e` + U+0301). El certificado la lleva
-compuesta (NFC, U+00E9), así que la firma no cumple su propio requisito: `codesign --verify --strict`
-lo dice igual en local. Con la clave privada en el llavero, `codesign` saca el requisito del
-certificado y coinciden. Comprobado el 05-10-2026 (CI con Xcode 26.6, local con 27): el
-`--requirements` sale en `IDEDistributionPipeline.log`. El mismo archivo exportado con la identidad
-local ya no pasa `--requirements`, cumple su requisito y App Store Connect lo aceptó (1.0.12, build 15).
-
-El de desarrollo evita otro problema: en una máquina recién creada no hay identidad de desarrollo, y
-`-allowProvisioningUpdates` crearía un certificado "Created via API" en cada ejecución hasta el
-límite de Apple.
-
-Los dos caducan el 05-10-2027 (`2A7JLW9543` el de distribución, `5Y22N2Z7FM` el de desarrollo). Se
-renuevan como se crearon, en `~/keys/LEEME.md`.
-
-Antes de la primera subida a TestFlight, la clave `appl_` de RevenueCat tiene que estar en
-`Billing.ios.kt`, o Pro no se podrá comprar en iOS.
+Los ocho de Apple (`APPSTORE_*`, `APPLE_*`) son de cuenta, iguales en las cuatro apps: los pone
+`~/keys/credenciales.sh sincronizar`, que también renueva `PLAY_SERVICE_ACCOUNT_JSON` al rotarla.

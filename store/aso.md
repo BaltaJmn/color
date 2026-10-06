@@ -103,7 +103,7 @@ tienda, segun la competencia local encontrada.
 
 ## Notas para quien traduzca despues
 
-- Los topes de Play son title 30, short 80, full 4000 (`tools/store/fichas.py`, dict `TOPES`).
+- Los topes de Play son title 30, short 80, full 4000 (`tienda/comprobar.py` de `BaltaJmn/ci`).
 - No usar "mood tracker" ni sus traducciones como funcion propia: es solo el termino de contraste
   ("a diferencia de un mood tracker...") que ya usan los `full.txt` reescritos. Chroma no pide elegir
   un animo de una lista.

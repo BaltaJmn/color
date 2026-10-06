@@ -212,7 +212,7 @@ que no puede pasar nunca es lo contrario.
 | Versión | La de Play: `MARKETING_VERSION` en `Config.xcconfig` va igual que `versionName` |
 | Precio y disponibilidad | Gratis; Pro va aparte, como compra integrada. Todos los países menos China continental, que pide un número de registro ICP |
 | URL de la política de privacidad | `https://color.baltajmn.dev/` (Privacidad de la app) |
-| Textos de la ficha | `store/app-store/<idioma>/`, trece idiomas: nombre, subtítulo, descripción, palabras clave y texto promocional. `tools/store/fichas.py` comprueba los topes |
+| Textos de la ficha | `store/app-store/<idioma>/`, trece idiomas: nombre, subtítulo, descripción, palabras clave y texto promocional. `listings.yml` comprueba los topes |
 | Capturas | `store/screenshots/iphone/en-US` y `es-ES`, iPhone de 6,9" (`store/capturas.md`). Los otros once idiomas heredan las de en-US. Sin iPad |
 | Estado de comerciante (UE) | Lo declara el titular de la cuenta. Vendiendo una compra integrada lo normal es declararse comerciante, y entonces la dirección, el teléfono y el correo que se den salen en la ficha europea |
 | Contacto para la revisión | Nombre, teléfono y correo del titular, solo los ve Apple |
@@ -283,7 +283,7 @@ One non-consumable product, Chroma Pro (com.baltajmn.color.pro_lifetime): a one-
 | Tipo | No consumible |
 | Nombre de referencia | `Chroma Pro` |
 | ID de producto | `com.baltajmn.color.pro_lifetime`. En Apple un ID no se repite entre apps de la misma cuenta: va el bundle delante y tras el último punto el de Play. Irreversible |
-| Precio | 2,99 EUR de base en España (en Apple ya lleva IVA), el escaparate de Play |
+| Precio | 1,99 EUR de base en España (con IVA), igual en las dos tiendas con `compra.py` de `BaltaJmn/ci` (Play desde el 06-10-2026; Apple cuando se apruebe la versión en revisión) |
 | En RevenueCat | App "Chroma (App Store)", mismo derecho `pro` y mismo paquete `$rc_lifetime` que Android; su `appl_` en `Billing.ios.kt` |
 | Captura para la revisión | `store/screenshots/iphone/revision-compra.png`: el diálogo de Pro con el botón de compra, sacado del simulador con el precio puesto a mano porque la tienda aún no lo da |
 

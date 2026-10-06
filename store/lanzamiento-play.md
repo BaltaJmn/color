@@ -228,16 +228,17 @@ búsquedas, y "diario" es lo que la gente escribe para encontrar este tipo de ap
 poniendo **Chroma**. Los cinco títulos, cortos y largos están comprobados contra los topes:
 
 ```bash
-python3 tools/store/fichas.py
+python3 ../ci/tienda/comprobar.py .
 ```
 
-**Atajo: subir los cinco idiomas de golpe.** En vez de pegar quince campos a mano, el mismo script los
-sube por la API en una sola edición (entran todos o ninguno). Necesita que la app exista y tenga un AAB
-subido, y la cuenta de servicio **de publicar** (`store/ci.md`), nunca la de RevenueCat:
+**Atajo: subir todos los idiomas de golpe.** En vez de pegar los campos a mano, la ficha entera (textos,
+gráficos, capturas y contacto) sube por la API en una sola edición (entra todo o nada). Necesita que la
+app exista y tenga un AAB subido, y la cuenta de servicio **de publicar** (`store/ci.md`), nunca la de
+RevenueCat:
 
 ```bash
-pip3 install google-api-python-client google-auth
-PLAY_SERVICE_ACCOUNT_JSON="$(< ~/keys/play-service-account.json)" python3 tools/store/fichas.py --subir
+gh workflow run listings.yml -f target=play
+/Users/baltajmn/keys/play.sh ficha com.baltajmn.color . https://color.baltajmn.dev/   # lo mismo, desde el Mac
 ```
 
 Opcional y barato: Play trata el español de España y el de Latinoamérica como fichas distintas. Si
@@ -291,7 +292,7 @@ Qué espera el código, que no hay que tocar:
 | Derecho (entitlement) | `pro`, exacto | `Billing.kt`: Pro está activo si este derecho está activo |
 | Oferta (offering) | La marcada como **actual** (current); se llamará `default` | `Billing.kt`: pide la actual, no un nombre |
 | Paquete | El primero de la oferta actual. Tiene que haber **uno solo** | `Billing.kt` |
-| Producto | `pro_lifetime`, compra única, 2,99 EUR | Solo en Play y RevenueCat; el precio que ve el usuario lo da la tienda |
+| Producto | `pro_lifetime`, compra única, 1,99 EUR | Solo en Play y RevenueCat; el precio que ve el usuario lo da la tienda |
 | Clave pública Android | `goog_...` | `shared/src/androidMain/kotlin/com/baltajmn/color/billing/Billing.android.kt`, línea 4 |
 
 Mientras la clave sea `null`, la app funciona gratis y el panel de Pro dice que la tienda no está
@@ -318,7 +319,8 @@ cobras con Quilt, está).
 4. Categoría fiscal: la que proponga para apps (servicios digitales).
 5. **Opción de compra**: tipo *Comprar*, ID `buy`, y márcala **compatible con versiones anteriores**
    (backwards compatible). Es la que ven las versiones de la librería de facturación como la de Chroma.
-6. **Precio**: *Set prices* > *Editar precios en bloque*, todos los países, **`2,47 EUR`**. El precio
+6. **Precio**: hoy lo pone `tienda/compra.py` de `BaltaJmn/ci` (1,99 EUR, el de Apple en cada país). A mano
+   era así: *Set prices* > *Editar precios en bloque*, todos los países, **`2,47 EUR`**. El precio
    en bloque es **sin IVA** (2,99 / 1,21 del IVA español): con `2,99` España saldría a 3,59. Con
    2,47 casi toda la zona euro queda en 2,99, Alemania en 2,89, EE. UU. en 2,79 USD y Reino Unido
    en 2,49 GBP (redondeos de Play, se dejan así).

@@ -11,7 +11,7 @@ Cada versión que sube a la prueba añade su fila aquí en el mismo commit que s
 | | |
 |---|---|
 | Canal | Prueba cerrada - Alpha, grupo `chroma-testers` (`formularios.md` 3b) |
-| Versión en el canal | 1.0.9 (12) subida el 05-10-2026, en revisión de Play; antes, 1.0.8 (11) |
+| Versión en el canal | 1.0.12 (15) subida el 05-10-2026 con la etiqueta `v1.0.12`, en revisión de Play; antes, 1.0.9 (12), que no llegó a salir de revisión |
 | 12 testers con la prueba aceptada | Cumplido el 29-09-2026. A 03-10-2026 siguen siendo 12, justos: el grupo tiene 25 miembros, pero unirse al grupo no cuenta sin aceptar la prueba |
 | 14 días seguidos | 4 de 14 a 03-10-2026; como pronto el 13-10-2026 |
 | Fallos y ANR en Android vitals | 0 a 03-10-2026 (últimos 28 días) |
@@ -60,6 +60,15 @@ dijo (sin nombre) y qué se hizo.
   menos de 30 días, cada día ocupa 1/30 del ancho y el resto queda vacío, en Mi año y en el póster
   Tira (el fondo de pantalla no cambia). El año entero vacío se descartó: al principio no se ve nada y
   en diciembre los huecos parecen un reproche. Llega en la 1.0.11 (14).
+- 03-10-2026, respuesta a las tres preguntas del grupo (emulador Android 16, 1080x2400): nada cortado
+  ni ilegible. Los colores salen de la foto, pero solo de las zonas dominantes: un objeto pequeño y
+  saturado sobre fondo liso puede quedarse sin muestra. El recordatorio solo se ofrece al guardar el
+  primer color, así que quien abre la app y no anota nada nunca recibe aviso; propone ofrecerlo al
+  abrirla o tras el primer día sin anotar. Pendiente de decidir las dos cosas.
+- 04-10-2026, hilo del intercambio (emulador Android 11 x86): tras inscribirse, Play decía "Item not
+  found" y la ficha web, "Not Found". El paquete lleva x86 y pide Android 8, así que no parece de
+  compatibilidad; lo más probable es el retraso de Play tras la inscripción, como el del 29-09. Se le
+  pidió que lo reintentara (06-10-2026).
 
 ## Para la solicitud de acceso a producción
 

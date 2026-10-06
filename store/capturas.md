@@ -9,7 +9,7 @@ Herramientas:
 - `tools/demo/generar.py`: escribe el año de demostración.
 - `tools/store/capturas.py`: el marco de Purl, con las seis escenas de abajo.
 - `tools/store/widgets.py`: la escena de los widgets, limpia.
-- `tools/store/fichas.py`: comprueba los topes de las dos fichas y sube la de Play (`--subir`).
+- Topes y subida de las dos fichas: `listings.yml`, con `tienda/` de `BaltaJmn/ci` (`store/ci.md`).
 - `tools/store/iphone.py`: las seis de iPhone sin Mac, de principio a fin (sección 5).
 - `tools/demo/atardecer.py`: la foto de la escena 01.
 
