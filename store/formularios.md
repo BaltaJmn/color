@@ -249,7 +249,7 @@ plantilla de las otras apps de la cuenta.
 
 ```
 1. Screen recording
-Attached: a recording made on a physical iPhone running the latest iOS, from launching the app through the typical flow: taking the photo of the day and choosing its color, My year, sharing a card, Settings, and buying Chroma Pro with a sandbox account, then a Pro feature and Restore purchase. Chroma has no account registration, login or account deletion, and in this version nothing is shared with other users (no user-generated content), so those flows do not exist.
+Attached: a recording made on a physical iPhone running the latest iOS. It starts on the Home Screen, launches the app and follows the typical flow: taking the photo of the day, choosing its color and adding a word, My year, Settings, buying Chroma Pro with a sandbox account (the purchase dialog also shows Restore), and the Pro features: the year in words and the year poster in its three styles. Chroma has no account registration, login or account deletion, and in this version nothing is shared with other users (no user-generated content), so those flows do not exist.
 
 2. Purpose and audience
 Chroma is a one-photo-a-day color diary. Once a day you take a photo, the app finds up to five colors in it and you choose one: that color is your day. My year paints every day as a grid, so after a year you have your year in colors. It is for anyone who wants a journaling habit that takes a second a day, without writing, accounts or social pressure. Everything stays on the device.
