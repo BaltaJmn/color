@@ -283,7 +283,7 @@ One non-consumable product, Chroma Pro (com.baltajmn.color.pro_lifetime): a one-
 | Tipo | No consumible |
 | Nombre de referencia | `Chroma Pro` |
 | ID de producto | `com.baltajmn.color.pro_lifetime`. En Apple un ID no se repite entre apps de la misma cuenta: va el bundle delante y tras el último punto el de Play. Irreversible |
-| Precio | 1,99 EUR de base en España (con IVA), igual en las dos tiendas con `compra.py` de `BaltaJmn/ci` (Play desde el 06-10-2026; Apple cuando se apruebe la versión en revisión) |
+| Precio | 1,99 EUR de base en España (con IVA), igual en las dos tiendas con `compra.py` de `BaltaJmn/ci` (las dos desde el 06-10-2026) |
 | En RevenueCat | App "Chroma (App Store)", mismo derecho `pro` y mismo paquete `$rc_lifetime` que Android; su `appl_` en `Billing.ios.kt` |
 | Captura para la revisión | `store/screenshots/iphone/revision-compra.png`: el diálogo de Pro con el botón de compra, sacado del simulador con el precio puesto a mano porque la tienda aún no lo da |
 
