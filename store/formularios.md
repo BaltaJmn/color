@@ -240,14 +240,40 @@ Usos declarados en el `Info.plist`, en los trece idiomas (`<lang>.lproj/InfoPlis
 `NSCameraUsageDescription` (la foto del día) y `NSPhotoLibraryAddUsageDescription` (guardar una
 tarjeta o un póster, solo añadir).
 
-Notas para el revisor, en inglés:
+Notas para el revisor, en inglés. El 06-10-2026 Apple paró el primer envío con la 2.1 *Information
+Needed*, la que manda a las cuentas con poco historial de revisiones: pide un vídeo grabado en un
+iPhone de verdad con la última versión de iOS, desde que se abre la app y pasando por la compra, y
+las siete respuestas de abajo, en la contestación y también en las notas para los siguientes envíos.
+El vídeo va además como archivo adjunto de la información para la revisión. El mismo texto es la
+plantilla de las otras apps de la cuenta.
 
 ```
-Chroma has no account and no server. Everything is stored on the device, so no demo account is needed.
+1. Screen recording
+Attached: a recording made on a physical iPhone running the latest iOS, from launching the app through the typical flow: taking the photo of the day and choosing its color, My year, sharing a card, Settings, and buying Chroma Pro with a sandbox account, then a Pro feature and Restore purchase. Chroma has no account registration, login or account deletion, and in this version nothing is shared with other users (no user-generated content), so those flows do not exist.
 
-Take a photo (or pick one taken today from the gallery) and choose one of the colors it offers. That color becomes the day; My year shows every day as a grid. The simulator has no camera: use "Choose from today's photos" with a photo taken today.
+2. Purpose and audience
+Chroma is a one-photo-a-day color diary. Once a day you take a photo, the app finds up to five colors in it and you choose one: that color is your day. My year paints every day as a grid, so after a year you have your year in colors. It is for anyone who wants a journaling habit that takes a second a day, without writing, accounts or social pressure. Everything stays on the device.
 
-Chroma Pro is a one-time non-consumable purchase (com.baltajmn.color.pro_lifetime). It opens when exporting the year poster (My year > Poster), from the locked year widget, and from Settings > Chroma Pro. Restore Purchase is in Settings and in the purchase dialog.
+3. How to use it
+No login, no setup and no sample files are needed.
+- Today: tap "Take a photo", or "Choose from today's photos" (only photos taken today are accepted; on a simulator, which has no camera, use this with a photo taken today). Pick one of the colors offered and, if you like, add one word. The entry can be changed until the day ends at 3:00 a.m.; past days cannot be filled in.
+- My year: the grid of the year. Tap a day to open its card, and share the card as an image from there.
+- Settings: daily reminder, lock with Face ID, export and import a backup (zip file), Chroma Pro and Restore purchase.
+- Widgets: the today widget is free; the year widget is part of Chroma Pro.
+
+4. External services
+- Apple In-App Purchase (StoreKit), for the single purchase.
+- RevenueCat (revenuecat.com), to validate that purchase and know whether Chroma Pro is active. It receives the purchase and an anonymous ID, never a name or an email.
+Nothing else: no account system, no server of our own, no analytics, no ads and no AI services. The colors are extracted on the device.
+
+5. Regions
+The app works the same in every region. It is available in every App Store country except mainland China, in 13 languages, and the price of Chroma Pro follows Apple's regional pricing.
+
+6. Regulated industries and third-party material
+Not applicable: Chroma is not in a regulated industry and includes no protected third-party material. The photos are the user's own and never leave the device.
+
+7. In-App Purchase
+One non-consumable product, Chroma Pro (com.baltajmn.color.pro_lifetime): a one-time payment, no subscription. It unlocks the year poster in three styles, the year widget, and your year told in short sentences; everything else is free forever. The purchase dialog opens from Settings > Chroma Pro, from My year > Poster, and from the locked year widget. Restore purchase is in Settings and in the purchase dialog.
 ```
 
 ### Compra integrada
