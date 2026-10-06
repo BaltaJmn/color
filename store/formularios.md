@@ -267,7 +267,7 @@ No login, no setup and no sample files are needed.
 Nothing else: no account system, no server of our own, no analytics, no ads and no AI services. The colors are extracted on the device.
 
 5. Regions
-The app works the same in every region. It is available in every App Store country except mainland China, in 13 languages, and the price of Chroma Pro follows Apple's regional pricing.
+The app works the same in every region. It is available in every App Store country except mainland China, in 13 languages, and Chroma Pro costs $1.99 (1.99 EUR in Spain), with Apple's regional pricing elsewhere. The recording was made when Pro cost 2.99, so it shows that earlier price.
 
 6. Regulated industries and third-party material
 Not applicable: Chroma is not in a regulated industry and includes no protected third-party material. The photos are the user's own and never leave the device.

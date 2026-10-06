@@ -287,6 +287,11 @@ tienes y más miras. Es el incentivo que queremos evitar.
 
 ### Precio
 
+**Desde el 06-10-2026, 1,99 EUR**: el mismo precio en las cuatro apps de la familia y en las dos
+tiendas, en cada país el de Apple (`tienda/compra.py` de `BaltaJmn/ci`). Es el escalón más bajo que deja
+más de un euro por venta: 1,99 / 1,21 de IVA y menos el 15 % de comisión son ~1,40 EUR netos. Quien
+compró antes conserva Pro. Lo que sigue es el razonamiento del precio anterior, como historia.
+
 **2,99 EUR**, sin descuento de lanzamiento, con precios regionales en las dos tiendas. El paquete de
 v1.0 es fino (póster y widget) y las apps parecidas son gratis, así que va por debajo de Quilt: mejor
 muchas ventas pequeñas que pocas. Los redondeos de cada país los deja la tienda (Alemania 2,89,
