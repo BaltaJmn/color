@@ -49,6 +49,6 @@ Qué hay en cada sitio. Se actualiza en el mismo commit que añade o mueve algo.
 | `tools/icon.py` | Genera todos los iconos desde una geometría |
 | `tools/demo/generar.py`, `tools/demo/atardecer.py` | El año de demostración de las capturas y la foto de la escena 01 |
 | `tools/store/capturas.py` | Marco de las capturas. Topes y subida de las fichas: `listings.yml` y `tienda/` de `BaltaJmn/ci` |
-| `tools/store/iphone.py` | Las capturas de iPhone sin Mac, con `StoreScreenshots.kt` de `shared/src/androidHostTest` |
+| `tools/store/escenas.py` | Las capturas de iPhone y de Play sin móvil, con `StoreScreenshots.kt` de `shared/src/androidHostTest` |
 | `store/screenshots/<destino>/<idioma>/` | Capturas finales: `play` y `iphone`, en en-US y es-ES |
 | `gradle/libs.versions.toml` | Versiones, las de Purl sin tocar |

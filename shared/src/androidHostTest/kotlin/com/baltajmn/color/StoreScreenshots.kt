@@ -29,6 +29,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -67,18 +68,22 @@ import org.robolectric.annotation.GraphicsMode
 /**
  * Not a test: the raw iPhone captures of store/capturas.md, drawn by the same Compose code the iOS
  * app runs. 440 x 860 pt at 3x is the iPhone 17 Pro Max (6.9") without its status bar and home
- * indicator; tools/store/iphone.py puts those margins back before framing. Only runs with
+ * indicator; tools/store/escenas.py puts those margins back before framing. Only runs with
  * -Pcapturas=<folder>, which holds entries.json and photos/ and receives the PNGs.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [36], qualifiers = "w440dp-h860dp-xxhdpi")
-class StoreScreenshots {
+open class StoreScreenshots {
 
     @get:Rule
     val compose = createAndroidComposeRule<ComponentActivity>()
 
-    private val out = File(System.getProperty("capturas") ?: ".")
+    /** Where under -Pcapturas this device's PNGs go. */
+    protected open val folder = ""
+
+    private val out get() = File(System.getProperty("capturas") ?: ".")
+    private val shots get() = File(out, folder).apply { mkdirs() }
 
     @Test
     fun scenes() {
@@ -98,18 +103,17 @@ class StoreScreenshots {
 
         compose.onAllNodesWithText(S.navYear).onFirst().performClick()
         shot("02_ano")
-        compose.onAllNodesWithText(S.viewStrip).onFirst().performClick()
+        compose.onNodeWithContentDescription(S.viewStrip).performClick()
         shot("03_tira")
-        compose.onAllNodesWithText(S.viewGrid).onFirst().performClick()
+        compose.onNodeWithContentDescription(S.viewGrid).performClick()
 
         compose.onAllNodesWithText(S.poster).onFirst().performClick()
         shot("06_poster")
         compose.onNodeWithContentDescription(S.a11yClose).performClick()
 
+        // The photo starts off in the share preview, as the scene wants it.
         compose.onAllNodesWithText(S.navToday).onFirst().performClick()
-        compose.onNodeWithContentDescription(S.a11yMore).performClick()
-        compose.onAllNodesWithText(S.share).onFirst().performClick()
-        compose.onAllNodesWithText(S.includePhoto).onFirst().performClick()
+        compose.onAllNodesWithText(S.share).onFirst().performScrollTo().performClick()
         shot("04_tarjeta")
     }
 
@@ -166,7 +170,7 @@ class StoreScreenshots {
             val view = compose.activity.window.decorView
             val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
             view.draw(android.graphics.Canvas(bitmap))
-            File(out, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            File(shots, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
         }
     }
 }
@@ -215,4 +219,13 @@ private fun YearWidget(state: WidgetState, day: LocalDate) {
             }
         }
     }
+}
+
+/**
+ * The same scenes for Play: a Pixel 8 (1080 x 2400 at 420 dpi) without the 90 px of status bar and
+ * the 60 px of gesture bar that capturas.py crops anyway, in -Pcapturas/play.
+ */
+@Config(sdk = [36], qualifiers = "w411dp-h857dp-420dpi")
+class PlayScreenshots : StoreScreenshots() {
+    override val folder = "play"
 }

@@ -10,15 +10,15 @@ Herramientas:
 - `tools/store/capturas.py`: el marco de Purl, con las seis escenas de abajo.
 - `tools/store/widgets.py`: la escena de los widgets, limpia.
 - Topes y subida de las dos fichas: `listings.yml`, con `tienda/` de `BaltaJmn/ci` (`store/ci.md`).
-- `tools/store/iphone.py`: las seis de iPhone sin Mac, de principio a fin (sección 5).
+- `tools/store/escenas.py`: las de iPhone y las de Play sin móvil, de principio a fin (sección 5).
 - `tools/demo/atardecer.py`: la foto de la escena 01.
 
 ## 1. Tamaños
 
 | Destino | Dispositivo | Captura cruda | Imagen final |
 |---|---|---|---|
-| `play` | Emulador Pixel 8, API 36 | 1080x2400 | 1200x2100 PNG |
-| `iphone` | Simulador iPhone 17 Pro Max (sección 6); sin Mac, `tools/store/iphone.py` (sección 5) | 1320x2868 | 1320x2868 PNG (6,9") |
+| `play` | Emulador Pixel 8, API 36; sin emulador, `tools/store/escenas.py` (sección 5) | 1080x2400 | 1200x2100 PNG |
+| `iphone` | Simulador iPhone 17 Pro Max (sección 6); sin Mac, `tools/store/escenas.py` (sección 5) | 1320x2868 | 1320x2868 PNG (6,9") |
 
 Sin iPad: la v1.0 es solo iPhone (`docs/tecnico.md` 1), y App Store Connect no pide capturas de un
 dispositivo que la app no declara.
@@ -81,18 +81,24 @@ adb push tools/demo/salida/entries.json /data/local/tmp/entries.json
 adb shell run-as com.baltajmn.color cp /data/local/tmp/entries.json files/entries.json
 ```
 
-## 5. iPhone sin Mac
+## 5. Sin móvil: iPhone y Play
 
 ```bash
-python3 tools/store/iphone.py en-US es-ES
+python3 tools/store/escenas.py en-US es-ES
 ```
 
 La interfaz es Compose común: la misma que pinta iOS. `StoreScreenshots.kt` (en `androidHostTest`)
 la dibuja en la JVM con Robolectric a 440x860 pt a 3x, que es el área segura del iPhone 17 Pro Max,
 sobre el año de demostración y la foto de `atardecer.py`, y recorre las escenas pulsando como lo haría
 una persona: Mi año, Tira, Póster, y Compartir con la foto apagada. Hoy lleva la extracción de verdad
-sobre esa foto y el candidato claro más saturado elegido. `iphone.py` vuelve a poner arriba y abajo los
+sobre esa foto y el candidato claro más saturado elegido. `escenas.py` vuelve a poner arriba y abajo los
 62 y 34 pt de la barra de estado y del indicador de inicio, y enmarca con `capturas.py iphone`.
+
+Para Play, `PlayScreenshots` dibuja las mismas escenas en un Pixel 8 (411x857 dp a 420 dpi: los
+1080x2400 sin los 90 y 60 px de barra de estado y de gestos, que `capturas.py` recorta igual), y
+`escenas.py` vuelve a poner esos márgenes y enmarca con `capturas.py play`. Sin la 05: los widgets de
+Android no se dibujan aquí, y la 05 de Play sigue siendo la del emulador (sección 2). La letra es la
+de verdad, Roboto.
 
 Solo corre si se pide (`-Pcapturas=<carpeta>`): `./gradlew :shared:testAndroidHostTest` lo excluye.
 La primera vez Robolectric baja su Android (`android-all-instrumented`, unos 200 MB).
