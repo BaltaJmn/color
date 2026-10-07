@@ -11,7 +11,7 @@ Cada versión que sube a la prueba añade su fila aquí en el mismo commit que s
 | | |
 |---|---|
 | Canal | Prueba cerrada - Alpha, grupo `chroma-testers` (`formularios.md` 3b) |
-| Versión en el canal | 1.0.13 (16) subida el 07-10-2026 con `gh workflow run release.yml -f stores=play`, sin etiqueta: la `v1.0.13` espera a que Apple apruebe la 1.0.12 para subir también a TestFlight. Antes, 1.0.12 (15), del 05-10-2026 con la etiqueta `v1.0.12`, y 1.0.9 (12), que no llegó a salir de revisión |
+| Versión en el canal | 1.0.13 (16) subida el 07-10-2026 con `gh workflow run release.yml -f stores=play`. La etiqueta `v1.0.13` llegó después y su Release falló en Play (la 16 ya estaba) y se canceló antes de TestFlight; la 1.0.13 de iOS sube con `-f stores=app-store` cuando Apple apruebe la 1.0.12. Antes, 1.0.12 (15), del 05-10-2026 con la etiqueta `v1.0.12`, y 1.0.9 (12), que no llegó a salir de revisión |
 | 12 testers con la prueba aceptada | Cumplido el 29-09-2026. A 03-10-2026 siguen siendo 12, justos: el grupo tiene 25 miembros, pero unirse al grupo no cuenta sin aceptar la prueba |
 | 14 días seguidos | 4 de 14 a 03-10-2026; como pronto el 13-10-2026 |
 | Fallos y ANR en Android vitals | 0 a 03-10-2026 (últimos 28 días) |

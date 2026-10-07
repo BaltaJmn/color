@@ -68,22 +68,18 @@ import org.robolectric.annotation.GraphicsMode
 /**
  * Not a test: the raw iPhone captures of store/capturas.md, drawn by the same Compose code the iOS
  * app runs. 440 x 860 pt at 3x is the iPhone 17 Pro Max (6.9") without its status bar and home
- * indicator; tools/store/escenas.py puts those margins back before framing. Only runs with
+ * indicator; tools/store/iphone.py puts those margins back before framing. Only runs with
  * -Pcapturas=<folder>, which holds entries.json and photos/ and receives the PNGs.
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 @Config(sdk = [36], qualifiers = "w440dp-h860dp-xxhdpi")
-open class StoreScreenshots {
+class StoreScreenshots {
 
     @get:Rule
     val compose = createAndroidComposeRule<ComponentActivity>()
 
-    /** Where under -Pcapturas this device's PNGs go. */
-    protected open val folder = ""
-
-    private val out get() = File(System.getProperty("capturas") ?: ".")
-    private val shots get() = File(out, folder).apply { mkdirs() }
+    private val out = File(System.getProperty("capturas") ?: ".")
 
     @Test
     fun scenes() {
@@ -170,7 +166,7 @@ open class StoreScreenshots {
             val view = compose.activity.window.decorView
             val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
             view.draw(android.graphics.Canvas(bitmap))
-            File(shots, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            File(out, "$name.png").outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
         }
     }
 }
@@ -221,11 +217,3 @@ private fun YearWidget(state: WidgetState, day: LocalDate) {
     }
 }
 
-/**
- * The same scenes for Play: a Pixel 8 (1080 x 2400 at 420 dpi) without the 90 px of status bar and
- * the 60 px of gesture bar that capturas.py crops anyway, in -Pcapturas/play.
- */
-@Config(sdk = [36], qualifiers = "w411dp-h857dp-420dpi")
-class PlayScreenshots : StoreScreenshots() {
-    override val folder = "play"
-}
