@@ -45,12 +45,18 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import com.baltajmn.color.color.ColorName
 import com.baltajmn.color.color.colorOf
 import com.baltajmn.color.color.extractSwatches
@@ -85,6 +91,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 
+private val EMPTY_RESERVE = 320.dp
+private val EMPTY_MIN = 200.dp
+
 /** A photo taken and analysed, waiting for the user to pick one of its colors. */
 private class Pending(val jpeg: ByteArray, val image: ImageBitmap, val swatches: List<String>)
 
@@ -108,6 +117,8 @@ fun TodayScreen(
     // Only the card that follows a pick is revealed; coming back to Today later just shows it.
     var justPicked by remember(today) { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    var viewport by remember { mutableStateOf(Dp.Infinity) }
+    val density = LocalDensity.current
 
     fun capture(from: suspend () -> Picked?) {
         if (working) return
@@ -145,7 +156,9 @@ fun TodayScreen(
         Trip.start()
         capture { Capture.gallery() }
     }
-    LaunchedEffect(Unit) { capture { Capture.leftover() } }
+    // On resume, not once: an Activity rebuilt while the picker is open composes Today before the
+    // answer arrives, and only the return to the front comes after it.
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { capture { Capture.leftover() } }
     // A photo still waiting for its color when the day turns is yesterday's: dropped, and said.
     LaunchedEffect(today) {
         if (pending != null) {
@@ -155,7 +168,10 @@ fun TodayScreen(
     }
 
     Column(
-        Modifier.fillMaxSize().screenInsets().verticalScroll(rememberScrollState()),
+        Modifier.fillMaxSize()
+            .onSizeChanged { viewport = with(density) { it.height.toDp() } }
+            .screenInsets()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
@@ -250,6 +266,7 @@ fun TodayScreen(
                     week = weekColor(today).takeIf { ChromaRepository.settings.weekColorOn },
                     firstTime = journal.isEmpty(),
                     working = working,
+                    viewport = viewport,
                     onCamera = camera,
                     onGallery = gallery,
                 )
@@ -278,11 +295,25 @@ fun TodayScreen(
  * question where the name goes and an empty code where the hex will be.
  */
 @Composable
-private fun Empty(week: ColorName?, firstTime: Boolean, working: Boolean, onCamera: () -> Unit, onGallery: () -> Unit) {
+private fun Empty(
+    week: ColorName?,
+    firstTime: Boolean,
+    working: Boolean,
+    viewport: Dp,
+    onCamera: () -> Unit,
+    onGallery: () -> Unit,
+) {
+    // A 1080x1920 phone showed only the card: the buttons it is waiting for fell below the fold.
+    // The reserve is the header above plus the help and both buttons below.
+    val cardMax = (viewport - EMPTY_RESERVE).coerceAtLeast(EMPTY_MIN)
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             Modifier.fillMaxWidth()
-                .aspectRatio(4f / 5f)
+                .layout { measurable, constraints ->
+                    val height = minOf(constraints.maxWidth * 5 / 4, cardMax.roundToPx())
+                    val placeable = measurable.measure(Constraints.fixed(constraints.maxWidth, height))
+                    layout(placeable.width, placeable.height) { placeable.place(0, 0) }
+                }
                 .clip(RoundedCornerShape(CARD_RADIUS))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .padding(24.dp),

@@ -36,15 +36,18 @@ expect object Capture {
     /** The last [camera] or [gallery] found nothing on the phone to open (Android). */
     val launchFailed: Boolean
 
-    /** Null when the user cancels or the photo cannot be read. */
+    /**
+     * Null when the user cancels. A photo that came back but cannot be read is null on iOS and an
+     * empty [Picked.jpeg] on Android, which Today reports as unreadable.
+     */
     suspend fun camera(): Picked?
 
     suspend fun gallery(): Picked?
 
     /**
-     * A photo the camera handed back while nobody was waiting for it: the process died behind the
-     * camera, or the Activity was rebuilt. Fresh ones only, and only once. Null on iOS, where the
-     * camera lives inside the app.
+     * A photo the camera or the picker handed back while nobody was waiting for it: the process
+     * died behind them, or the Activity was rebuilt. Fresh ones only, and only once. Null on iOS,
+     * where both live inside the app.
      */
     suspend fun leftover(): Picked?
 }

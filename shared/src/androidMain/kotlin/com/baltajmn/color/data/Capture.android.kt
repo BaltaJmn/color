@@ -29,10 +29,14 @@ actual object Capture {
 
     // The answer comes back to the Activity, and what is waiting for it lives here. The wait belongs
     // to Today's composition, so a process killed behind the camera (or an Activity rebuilt, say by
-    // a language change) finds nobody waiting: shot.jpg stays, and leftover() hands it to the next
-    // Today instead of losing the photo of the moment.
+    // a language change) finds nobody waiting: shot.jpg stays, and leftover() hands it to Today on
+    // its return to the front instead of losing the photo of the moment.
     private var waiting: ((Uri?) -> Unit)? = null
     private var shooting = false
+
+    // The gallery's shot.jpg. Up to Android 11 the picker is the full-screen documents app, and
+    // Chroma behind it can be killed like behind the camera.
+    private var orphan: Uri? = null
 
     // A camera is not enough: a work profile or a disabled camera app leaves nobody to answer the
     // intent. Seeing that answer needs the <queries> entry in the manifest. Asked once per process,
@@ -71,10 +75,7 @@ actual object Capture {
                 file.delete()
                 return null
             }
-            return withContext(Dispatchers.IO) {
-                runCatching { process { AndroidContext.value.contentResolver.openInputStream(answer) } }.getOrNull()
-                    .also { file.delete() }
-            }
+            return read(answer).also { file.delete() }
         } finally {
             shooting = false
         }
@@ -82,21 +83,29 @@ actual object Capture {
 
     actual suspend fun leftover(): Picked? {
         if (shooting || waiting != null) return null
+        // Asked on every return to the front: a launch that failed long ago is not news again.
+        failed = false
+        orphan?.let {
+            orphan = null
+            return read(it)
+        }
         val file = shot
         if (!file.exists()) return null
         // An old one is a photo the user already gave up on.
         val fresh = file.length() > 0 && System.currentTimeMillis() - file.lastModified() in 0..LEFTOVER_MS
-        return withContext(Dispatchers.IO) {
-            (if (fresh) runCatching { process { file.inputStream() } }.getOrNull() else null).also { file.delete() }
-        }
+        return (if (fresh) read(Uri.fromFile(file)) else null).also { file.delete() }
     }
 
     actual suspend fun gallery(): Picked? {
         val launch = launchGallery ?: return null
         val answer = await(launch) ?: return null
-        return withContext(Dispatchers.IO) {
-            runCatching { process { AndroidContext.value.contentResolver.openInputStream(answer) } }.getOrNull()
-        }
+        return read(answer)
+    }
+
+    // Empty, not null: a photo that came back unreadable is said so, not taken for a cancel.
+    private suspend fun read(uri: Uri): Picked = withContext(Dispatchers.IO) {
+        runCatching { process { AndroidContext.value.contentResolver.openInputStream(uri) } }.getOrNull()
+            ?: Picked(ByteArray(0), null)
     }
 
     /** Called by MainActivity when the camera answers: the photo is at the uri it was given. */
@@ -106,7 +115,9 @@ actual object Capture {
     }
 
     /** Called by MainActivity when the photo picker answers. */
-    fun onGallery(uri: Uri?) = deliver(uri)
+    fun onGallery(uri: Uri?) {
+        if (waiting == null) orphan = uri else deliver(uri)
+    }
 
     private fun deliver(uri: Uri?) {
         val answer = waiting ?: return

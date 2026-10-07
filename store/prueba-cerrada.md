@@ -68,7 +68,21 @@ dijo (sin nombre) y qué se hizo.
 - 04-10-2026, hilo del intercambio (emulador Android 11 x86): tras inscribirse, Play decía "Item not
   found" y la ficha web, "Not Found". El paquete lleva x86 y pide Android 8, así que no parece de
   compatibilidad; lo más probable es el retraso de Play tras la inscripción, como el del 29-09. Se le
-  pidió que lo reintentara (06-10-2026).
+  pidió que lo reintentara (06-10-2026) y el 07-10-2026 ya instaló la 1.0.12 sin borrar la caché de
+  Play: era el retraso.
+- 07-10-2026, mismo tester (emulador Android 11 x86, 1080x1920): en Hoy, la tarjeta vacía de la foto
+  ocupa casi toda la primera pantalla y hay que desplazarse para descubrir "Hacer una foto" y "Elegir
+  de las fotos de hoy"; propone que la galería se vea antes. "Elegir de las fotos de hoy" abrió el
+  selector de documentos de Android (en Android 11 `PickVisualMedia` cae a él) y, con una imagen
+  sintética, la selección no volvió a Chroma ni tras reabrir; él mismo no descarta que sea el
+  selector de ese emulador. Arreglado el mismo día, para la versión siguiente: el selector de
+  documentos tapa Chroma entera y Android puede matar el proceso detrás; la respuesta llegaba sin
+  nadie esperándola y se tiraba (la cámara ya guardaba la suya en `shot.jpg`). Ahora se guarda y Hoy
+  la recoge al volver a primer plano. Una foto que vuelve y no se lee avisa con `photoUnreadable` en
+  vez de no hacer nada. Reproducido en el emulador con el selector de documentos y el proceso muerto
+  detrás (`am kill`), y comprobado después con la foto de vuelta en Hoy y con un fichero roto. La
+  ficha en blanco se acorta en pantallas bajas para que los dos botones quepan sin desplazarse
+  (`pantallas.md` 3); comprobado a 1080x1920 con navegación por gestos y con tres botones.
 
 ## Para la solicitud de acceso a producción
 

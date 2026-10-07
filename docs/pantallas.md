@@ -132,7 +132,10 @@ paywall y el bloqueo.
 - Debajo, **la ficha en blanco**: la tarjeta antes de tener color, del mismo tamaño y forma (4:5,
   radio 28) en `surfaceVariant`, con `todayPrompt` en `display` donde irá el nombre y `#------` en
   `code` donde irá el hex. Sin ilustración ni icono dentro: el círculo con cámara que hubo aquí era un
-  segundo botón sin texto que hacía lo mismo que el de debajo.
+  segundo botón sin texto que hacía lo mismo que el de debajo. En una pantalla baja la ficha se
+  acorta, con el mismo ancho, hasta dejar 320 de alto para la cabecera, `firstHelp` y los dos
+  botones (nunca menos de 200 de ficha): en un 1080x1920 la ficha entera dejaba `takePhoto` y
+  `fromGallery` fuera de la primera pantalla.
 - Primera sesión: bajo la ficha, `firstHelp` en `onMuted`.
 - Botón principal a lo ancho con el icono de cámara: `takePhoto`. Debajo, botón de texto:
   `fromGallery`.
