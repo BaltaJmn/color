@@ -31,6 +31,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.data.ChromaRepository
@@ -61,7 +63,7 @@ internal fun Overlay(
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER)) {
             Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
                 GlyphButton(Glyph.CLOSE, S.a11yClose, onClose, Modifier.offset(x = (-12).dp), tint = MaterialTheme.colorScheme.onBackground)
-                Text(title, style = Styles.title, modifier = Modifier.weight(1f))
+                Text(title, style = Styles.title, modifier = Modifier.weight(1f).semantics { heading() })
                 action?.invoke()
             }
             content()

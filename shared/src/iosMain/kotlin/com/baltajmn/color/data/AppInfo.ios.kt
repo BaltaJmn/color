@@ -2,6 +2,7 @@ package com.baltajmn.color.data
 
 import platform.Foundation.NSBundle
 import platform.Foundation.NSURL
+import platform.UIKit.UIAccessibilityIsReduceMotionEnabled
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationOpenSettingsURLString
 
@@ -25,3 +26,5 @@ actual object AppInfo {
 actual val Sibling.storeUrl: String? get() = iosUrl
 
 actual val onIos: Boolean = true
+
+actual fun reduceMotion(): Boolean = UIAccessibilityIsReduceMotionEnabled()

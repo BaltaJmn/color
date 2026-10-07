@@ -28,8 +28,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -237,26 +239,6 @@ fun GlyphTile(glyph: Glyph, modifier: Modifier = Modifier) {
     ) { GlyphIcon(glyph, size = 18.dp, tint = MaterialTheme.colorScheme.onBackground) }
 }
 
-/** A tile of surface that does one thing: its glyph, its name and, when it opens the paywall, the Pro tag. */
-@Composable
-fun ActionTile(glyph: Glyph, label: String, onClick: () -> Unit, modifier: Modifier = Modifier, pro: Boolean = false) {
-    Column(
-        modifier
-            .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(14.dp),
-    ) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            GlyphTile(glyph)
-            Spacer(Modifier.weight(1f))
-            if (pro) ProTag()
-        }
-        Spacer(Modifier.heightIn(min = 14.dp))
-        Text(label, style = Styles.body.copy(fontWeight = FontWeight.Medium))
-    }
-}
-
 @Composable
 fun Ask(
     title: String?,
@@ -286,6 +268,8 @@ fun Ask(
 fun Notice(message: String, vararg actions: Pair<String, () -> Unit>, glyph: Glyph? = null) {
     Column(
         Modifier.fillMaxWidth()
+            // A photo turned down or a save that failed shows up here: a screen reader has to hear it.
+            .semantics { liveRegion = LiveRegionMode.Polite }
             .padding(vertical = 8.dp)
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.surface)

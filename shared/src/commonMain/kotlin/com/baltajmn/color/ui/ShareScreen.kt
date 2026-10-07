@@ -67,7 +67,8 @@ fun ShareScreen(date: LocalDate, onClose: () -> Unit) {
     val entry = ChromaRepository.entryOn(date) ?: return
     val watermark = ChromaRepository.settings.watermark
     val photo = Photos.get(entry.photo)
-    var withPhoto by remember(date) { mutableStateOf(photo != null) }
+    // Off until asked for: what is not shared does not leave the phone, and the photo is the private part.
+    var withPhoto by remember(date) { mutableStateOf(false) }
     val measurer = rememberPixelMeasurer()
     val card = remember(entry, withPhoto, watermark) {
         renderDayCard(entry, date, photo.takeIf { withPhoto }, watermark, measurer)

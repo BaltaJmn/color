@@ -42,8 +42,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -57,6 +59,7 @@ import com.baltajmn.color.color.inkColorFor
 import com.baltajmn.color.color.weekHit
 import com.baltajmn.color.data.ChromaRepository
 import com.baltajmn.color.data.Photos
+import com.baltajmn.color.data.reduceMotion
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.model.ChromaEntry
 import com.baltajmn.color.ui.theme.CARD_RADIUS
@@ -64,6 +67,8 @@ import com.baltajmn.color.ui.theme.Styles
 import kotlin.math.hypot
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
+
+private const val REACH = 1.15f
 
 /**
  * The card (docs/pantallas.md 6): the color to the edges, its name, and the photo small in the
@@ -91,12 +96,15 @@ fun ChromaCard(
     marks: @Composable RowScope.() -> Unit = {},
 ) {
     // Changing the color during the day fades between the two instead of jumping.
-    val fill by animateColorAsState(colorOf(entry.color), tween(400))
-    val ink by animateColorAsState(inkColorFor(entry.color), tween(400))
-    val spread = remember { Animatable(if (reveal) 0f else 1f) }
+    val still = remember { reduceMotion() }
+    val fill by animateColorAsState(colorOf(entry.color), tween(if (still) 0 else 400))
+    val ink by animateColorAsState(inkColorFor(entry.color), tween(if (still) 0 else 400))
+    val spread = remember { Animatable(if (reveal && !still) 0f else 1f) }
     LaunchedEffect(Unit) { spread.animateTo(1f, tween(700, easing = FastOutSlowInEasing)) }
-    // The words arrive once the color has mostly covered the card, never on the bare background.
-    val words = ((spread.value - 0.5f) / 0.5f).coerceIn(0f, 1f)
+    // The words arrive as the color reaches them, never on the bare background: the circle overshoots
+    // so that the top left corner, where the name is, is covered well before the end (at 0.87), and a
+    // frame caught mid-reveal never shows a name over a cut corner.
+    val words = ((spread.value - 0.8f) / 0.2f).coerceIn(0f, 1f)
     val pad = if (compact) 16.dp else 24.dp
     val thumbMargin = if (compact) 12.dp else 20.dp
     @Suppress("DEPRECATION") // LocalClipboard needs a platform ClipEntry for plain text; this does not.
@@ -125,7 +133,7 @@ fun ChromaCard(
                     val side = size.width * 0.3f
                     val margin = thumbMargin.toPx()
                     val origin = Offset(size.width - margin - side / 2, size.height - margin - side / 2)
-                    drawCircle(fill, radius = hypot(origin.x, origin.y) * spread.value, center = origin)
+                    drawCircle(fill, radius = hypot(origin.x, origin.y) * REACH * spread.value, center = origin)
                 }
             },
     ) {
@@ -137,7 +145,8 @@ fun ChromaCard(
                 // card: on a friend's, the top of the card is theirs, not a control.
                 .then(
                     if (author != null) Modifier
-                    else Modifier.clickable(role = Role.Button, onClickLabel = S.a11yCopyHex) {
+                    // A live region, so "Copied" is heard as well as seen.
+                    else Modifier.semantics { liveRegion = LiveRegionMode.Polite }.clickable(role = Role.Button, onClickLabel = S.a11yCopyHex) {
                         @Suppress("DEPRECATION")
                         clipboard.setText(AnnotatedString(entry.color))
                         haptic.performHapticFeedback(HapticFeedbackType.Confirm)

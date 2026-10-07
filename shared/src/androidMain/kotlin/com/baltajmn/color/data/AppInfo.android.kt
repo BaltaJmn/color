@@ -31,3 +31,6 @@ actual object AppInfo {
 actual val Sibling.storeUrl: String? get() = androidUrl
 
 actual val onIos: Boolean = false
+
+actual fun reduceMotion(): Boolean =
+    Settings.Global.getFloat(AndroidContext.value.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) == 0f

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -50,6 +49,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Constraints
@@ -91,8 +91,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 
+// What a card or a photo leaves for the rest of the screen: the header above, and below either the
+// help and both buttons or the instruction, the candidates and Cancel.
 private val EMPTY_RESERVE = 320.dp
 private val EMPTY_MIN = 200.dp
+
+/** The card's 4:5, but never taller than [max]: on a short phone what waits under it stays in sight. */
+private fun Modifier.cardShape(max: Dp) = layout { measurable, constraints ->
+    val height = minOf(constraints.maxWidth * 5 / 4, max.roundToPx())
+    val placeable = measurable.measure(Constraints.fixed(constraints.maxWidth, height))
+    layout(placeable.width, placeable.height) { placeable.place(0, 0) }
+}
 
 /** A photo taken and analysed, waiting for the user to pick one of its colors. */
 private class Pending(val jpeg: ByteArray, val image: ImageBitmap, val swatches: List<String>)
@@ -179,7 +188,6 @@ fun TodayScreen(
                 if (entry != null && pending == null) {
                     CardMenu(
                         onRetake = { if (Capture.cameraAvailable) camera() else gallery() },
-                        onShare = { onShare(today) },
                         onDelete = { confirmDelete = true },
                     )
                 }
@@ -210,6 +218,8 @@ fun TodayScreen(
                     },
                 )
                 entry == null || pending != null -> Unit
+                // Not over the color just picked: the offers wait for the next time Today is opened.
+                justPicked -> Unit
                 // One offer at a time, and each only once: waving it away counts as an answer.
                 !settings.reminderOffered -> Notice(
                     S.offerReminder(settings.reminderHour, settings.reminderMinute),
@@ -235,7 +245,7 @@ fun TodayScreen(
             Spacer(Modifier.height(8.dp))
             val waiting = pending
             when {
-                waiting != null -> Picking(waiting, onPick = { hex ->
+                waiting != null -> Picking(waiting, viewport, onPick = { hex ->
                     // The day turns at 03:00 up to a minute before App notices: the photo is then
                     // yesterday's, and says so like one from the gallery.
                     if (ChromaRepository.isStillToday(today)) {
@@ -255,7 +265,8 @@ fun TodayScreen(
                         ChromaRepository.pick(today, hex, entry.swatches, nearestName(hex).key)
                     }
                     Spacer(Modifier.height(12.dp))
-                    WordField(today, entry.word)
+                    // Sharing is free on purpose, and what makes the app known: in sight, not in a menu.
+                    WordField(today, entry.word) { OutlinedAction(S.share, { onShare(today) }, glyph = Glyph.SHARE) }
                     // On the session, not on the profile: that is only loaded once Friends has been opened.
                     if (hasAccount() && !Social.needsName) {
                         Spacer(Modifier.height(20.dp))
@@ -309,11 +320,7 @@ private fun Empty(
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             Modifier.fillMaxWidth()
-                .layout { measurable, constraints ->
-                    val height = minOf(constraints.maxWidth * 5 / 4, cardMax.roundToPx())
-                    val placeable = measurable.measure(Constraints.fixed(constraints.maxWidth, height))
-                    layout(placeable.width, placeable.height) { placeable.place(0, 0) }
-                }
+                .cardShape(cardMax)
                 .clip(RoundedCornerShape(CARD_RADIUS))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .padding(24.dp),
@@ -353,35 +360,49 @@ private fun Empty(
 }
 
 @Composable
-private fun Picking(pending: Pending, onPick: (String) -> Unit, onCancel: () -> Unit) {
+private fun Picking(pending: Pending, viewport: Dp, onPick: (String) -> Unit, onCancel: () -> Unit) {
+    // The candidates are what this step is for: a short phone shortens the photo, not them.
     Image(
         pending.image,
         null,
         contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxWidth().aspectRatio(4f / 5f).clip(RoundedCornerShape(CARD_RADIUS)),
+        modifier = Modifier.fillMaxWidth().cardShape((viewport - EMPTY_RESERVE).coerceAtLeast(EMPTY_MIN)).clip(RoundedCornerShape(CARD_RADIUS)),
     )
     Spacer(Modifier.height(24.dp))
-    Text(S.caps(S.pickColor), style = Styles.eyebrow, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+    // The one instruction of the step, at reading size. Held down, a candidate says its name here
+    // before it is chosen: two circles can look alike, and not everyone tells them apart by hue.
+    var held by remember { mutableStateOf<String?>(null) }
+    Text(
+        held?.let { S.colorName(nearestName(it).key) } ?: S.pickColor,
+        style = Styles.body.copy(fontWeight = FontWeight.SemiBold),
+        modifier = Modifier.fillMaxWidth(),
+        textAlign = TextAlign.Center,
+    )
     Spacer(Modifier.height(12.dp))
-    SwatchRow(pending.swatches, null, 56.dp, HapticFeedbackType.Confirm, onPick)
+    SwatchRow(pending.swatches, null, 56.dp, HapticFeedbackType.Confirm, onHeld = { held = it }, onPick = onPick)
     Spacer(Modifier.height(8.dp))
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { TextAction(S.cancel, onCancel, quiet = true) }
 }
 
-/** The optional word: closed until asked for, a single line, with the limit in sight. */
+/**
+ * The optional word: closed until asked for, a single line, with the limit in sight. [share] goes
+ * beside the closed word when both fit (a whole row less, so a tall phone still shows it without
+ * scrolling) and under the open field otherwise.
+ */
 @Composable
-private fun WordField(today: LocalDate, word: String?) {
+private fun WordField(today: LocalDate, word: String?, share: @Composable () -> Unit) {
     var open by remember(today) { mutableStateOf(word != null) }
     var value by remember(today) { mutableStateOf(TextFieldValue(word.orEmpty())) }
     // Asked for with a tap, the keyboard comes with it; an existing word just sits there.
     var asked by remember(today) { mutableStateOf(false) }
     val focus = remember { FocusRequester() }
     if (!open) {
-        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        ActionRow(Modifier.fillMaxWidth()) {
             TextAction(S.addWord, {
                 open = true
                 asked = true
             })
+            share()
         }
         return
     }
@@ -422,16 +443,17 @@ private fun WordField(today: LocalDate, word: String?) {
         )
         Text(S.counter(value.text.codePointCount(), WORD_MAX), style = Styles.caption)
     }
+    Spacer(Modifier.height(12.dp))
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { share() }
 }
 
 @Composable
-private fun CardMenu(onRetake: () -> Unit, onShare: () -> Unit, onDelete: () -> Unit) {
+private fun CardMenu(onRetake: () -> Unit, onDelete: () -> Unit) {
     var open by remember { mutableStateOf(false) }
     Box {
         GlyphButton(Glyph.MORE, S.a11yMore, { open = true })
         DropdownMenu(open && !LocalLocked.current, onDismissRequest = { open = false }, containerColor = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(18.dp)) {
             DropdownMenuItem(text = { Text(S.retakePhoto, style = Styles.body) }, onClick = { open = false; onRetake() })
-            DropdownMenuItem(text = { Text(S.share, style = Styles.body) }, onClick = { open = false; onShare() })
             DropdownMenuItem(
                 text = { Text(S.deleteDay, style = Styles.body, color = MaterialTheme.colorScheme.error) },
                 onClick = { open = false; onDelete() },

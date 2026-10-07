@@ -44,7 +44,7 @@ pintura.
 | `title` | 22 / SemiBold, espaciado -0,3 | Títulos de capa (compartir, póster, En palabras) |
 | `body` | 17 / Regular | Texto normal, el de los botones en SemiBold (el cuerpo de iOS; 16 se queda corto para leer sin gafas) |
 | `label` | 14 / Medium | Subtítulos, la cápsula de navegación |
-| `eyebrow` | 12 / SemiBold, espaciado 1,4, en mayúsculas | Nombres de sección, el día de la semana, `pickColor`, la fecha en la tarjeta |
+| `eyebrow` | 12 / SemiBold, espaciado 1,4, en mayúsculas | Nombres de sección, el día de la semana, la fecha en la tarjeta |
 | `code` | 14 / Medium, espaciado 1, cifras tabulares | El hex, en la tarjeta y en la ficha en blanco (`#------`) |
 | `caption` | 13 / Regular | Notas pequeñas; nada baja de 13 (salvo `eyebrow`, que va en mayúsculas y seminegrita) |
 
@@ -63,19 +63,24 @@ en una línea a su tamaño; si no (letra grande), uno encima del otro a todo el 
 Rejilla de 4. Márgenes laterales 20. Radio de tarjeta 28, de hoja 28 arriba, de botón 24 (píldora),
 de tarjeta de ajustes y de tesela 20, de miniatura 14, de tesela de icono 11 (36 de lado, glifo de 18). Tocables de 48 como mínimo, sin excepción de estilo: el botón principal mide 52, el
 de borde, el de texto y cada opción de un segmentado, 48. La única excepción es la celda de la
-rejilla del año (unos 22), porque el año entero tiene que caber de un vistazo; cada día se puede
-abrir igual con el lector de pantalla.
+rejilla del año (unos 24 de ancho y de 12 a 24 de alto), porque el año entero tiene que caber de un
+vistazo. Cada día se toca en su celda más la mitad del hueco que la rodea, sin zonas muertas entre
+días, y se puede abrir igual con el lector de pantalla.
 
 ### Movimiento y tacto
 
 Un solo momento se mueve de verdad: **al elegir el color del día, el color brota de la miniatura de la
 foto** y se extiende hasta cubrir la tarjeta (700 ms, frenando al final), porque de ahí ha salido. El
-nombre, el hex y la fecha llegan al final, nunca sobre el fondo vacío. Solo justo tras elegir: en Mi
+nombre, el hex y la fecha llegan al final, nunca sobre el fondo vacío: el círculo crece un 15 % más
+allá de la esquina de arriba a la izquierda, que queda cubierta antes de acabar, y las palabras salen
+del 80 % en adelante, cuando el color ya está debajo. Un fotograma a medias nunca enseña el nombre
+junto a una esquina sin pintar. Solo justo tras elegir: en Mi
 año, en el feed o al volver a Hoy, la tarjeta está sin más.
 
 Cambiar el color durante el día funde el viejo en el nuevo (400 ms). Nada más se anima: una app que
 se mueve por todas partes deja de enseñar el color. Con "Reducir movimiento" (iOS) o las animaciones
-apagadas (Android) todo esto se salta solo, porque Compose lo respeta.
+apagadas (Android) no se anima nada: la app se lo pregunta al sistema (`reduceMotion()`) en vez de
+contar con que Compose siga el ajuste de iOS.
 
 El tacto, igual de escaso: un toque de hecho al guardar el color del día y al aceptar a un amigo, que
 pasan una vez; un tic ligero al cambiar el color después. Nada más vibra.
@@ -87,7 +92,9 @@ pasan una vez; un tic ligero al cambiar el color después. Nada más vibra.
 - **Un aviso a la vez.** Si coinciden varios, se ve el más urgente: fallo al guardar, fichero
   ilegible, aviso pasajero, cámara sin permiso (`cameraDenied`, con `openSystemSettings`), recordatorio
   aceptado en la oferta y bloqueado por el sistema (`reminderBlocked`, una vez), y solo después las
-  ofertas (recordatorio, copia).
+  ofertas (recordatorio, copia). Las ofertas nunca salen justo tras elegir el color, encima del
+  momento que acaba de pasar: esperan a la próxima vez que se abra Hoy. Un aviso es región viva: el
+  lector de pantalla lo lee al aparecer, como se ve.
 - **Lo que no se deshace se marca en rojo** (`error`): el botón que confirma borrar un día, borrar la
   cuenta, eliminar o bloquear a un amigo y cambiar el enlace de invitación. Y la entrada del menú que
   lleva a borrar. Nada más usa rojo.
@@ -147,14 +154,19 @@ paywall y el bloqueo.
 
 Tras la foto, en la misma pantalla:
 
-- La foto ocupa el ancho con radio 28 y proporción 4:5.
+- La foto ocupa el ancho con radio 28 y proporción 4:5, más baja con el mismo tope que la ficha en
+  blanco: en un 1080x1920 la foto entera dejaba los candidatos fuera de la pantalla, y son a lo que
+  viene este paso.
 - Debajo, los candidatos: círculos de 56 con borde `outline` de 1, separados 12, centrados. El
   elegido lleva un anillo de 3 en `onBackground` a 4 de distancia. Si no caben (cinco piden unos 400
   y un móvil deja unos 320), encogen todos por igual y siguen redondos.
 - Tocar un candidato lo elige y guarda al momento. No hay botón de confirmar.
 - Debajo, siempre, `cancel`: vuelve a lo que había antes de la foto, también con la primera del día.
   Nada se guarda hasta tocar un color.
-- Sobre los círculos, `pickColor` en `eyebrow`: la primera vez no es obvio que hay que tocar uno.
+- Sobre los círculos, `pickColor` en `body` seminegrita: es la única instrucción del paso y la
+  primera vez no es obvio que hay que tocar uno, así que se lee a tamaño de lectura y no como una
+  etiqueta. Mantener pulsado un candidato pone su nombre en ese sitio y, al soltar, no elige nada: dos
+  círculos pueden parecerse, y no todo el mundo los distingue por el tono. `pickColor` lo dice.
 - Mientras se analiza la foto (menos de 100 ms), los botones se desactivan y sale `working`.
 - Si la foto de galería no es de hoy: aviso `galleryNotToday` y se vuelve al estado sin entrada.
 - Si el teléfono no tiene nada que abra la cámara o el selector: aviso `captureFailed`, y la cámara
@@ -167,25 +179,36 @@ Tras la foto, en la misma pantalla:
 - Debajo, `addWord` como botón de texto; tocarlo abre un campo de una línea con tope visible (`n/24`)
   y el teclado a la vez: un toque, no dos. El campo entero sube por encima del teclado, no solo la
   línea del cursor. Una palabra ya escrita no abre el teclado al volver a Hoy.
-- En v1.1, el control de compartir (sección 8.5).
-- Menú de la tarjeta (tres puntos): `retakePhoto`, `share`, `deleteDay` (este en `error`).
+- `share`, como botón con borde y su icono: al lado de `addWord`, a medias, si los dos caben así (en
+  un iPhone grande, una fila menos es lo que hace caber Hoy sin desplazar); si no, o con el campo
+  abierto, debajo y centrado. Compartir es gratis a propósito y es lo que da a conocer la app: dentro
+  de un menú no lo veía nadie.
+- En v1.1, el control de compartir con amigos (sección 8.5).
+- Menú de la tarjeta (tres puntos): `retakePhoto` y `deleteDay` (este en `error`).
 
 ---
 
 ## 4. Mi año
 
-- Cabecera: `navYear` en `eyebrow` y el año en `numeral`, la misma lectura que el día en Hoy. Con
-  más de un año con entradas, las flechas al final de la fila. Empieza 20 dp bajo la barra de estado,
-  no 8 como Hoy: aquí lo primero es el `eyebrow`, pequeño y sin el aire propio del `numeral`, y a 8 dp
-  quedaba pegado a la barra (y el recorte de las capturas de la ficha se lo comía).
-- Debajo, `poster` y `stats` (v1.2) como dos teselas lado a lado (en `surface`, radio 20, icono y
-  nombre). Van antes de la rejilla, que mide unos 800 y las dejaba fuera de la pantalla. Sin Pro,
-  `stats` lleva `proTag` y abre el paywall.
-- Después, el segmentado de vista: `viewGrid` y `viewStrip`, con el elegido relleno de tinta. Solo con
-  entradas: en un año vacío no hay nada que ver de otra forma.
-- La rejilla va sobre una tarjeta en `surface`, radio 24.
-- **Rejilla**: una columna por mes y una fila por día (12 x 31), como Purl: en un móvil da celdas de
-  unos 24, que se tocan bien; girada saldrían de 10. Celdas cuadradas con 3 de separación y radio 3;
+El año es la pantalla: cabecera, acciones y rejilla caben juntas, sin desplazar, para ver el año
+entero de un vistazo. Antes la rejilla medía unos 800 y se veía del 1 al 17.
+
+- Cabecera: el año en `numeral`, como el día en Hoy y a su misma altura (8 bajo la barra de estado).
+  Sin `navYear` encima: la cápsula de abajo ya dice dónde se está, y cada línea de más es una fila de
+  días menos. Al final de la fila, con entradas, el cambio de vista: un icono de tira o de rejilla
+  que se nombra por la vista a la que lleva (`viewStrip`, `viewGrid`). Con más de un año con
+  entradas, las flechas detrás.
+- Debajo, `poster` y `stats` (v1.2) como dos botones con borde y su icono, cada uno a su ancho y no a
+  medias: a medias, `stats` y su `proTag` pasaban a dos líneas y la pareja se apilaba. Sin Pro,
+  `stats` lleva `proTag` y abre el paywall; tras comprar, En palabras se abre solo, sin pedir otro
+  toque.
+- La rejilla va sobre una tarjeta en `surface`, radio 24, y ocupa lo que queda de pantalla hasta 16
+  del borde de abajo.
+- **Rejilla**: una columna por mes y una fila por día (12 x 31), como Purl; girada saldrían celdas de
+  10. De ancho, cada celda mide lo que da la pantalla (24 como mucho); de alto, lo que cabe para que
+  entren las 31 filas: más planas que anchas, como las fichas de una carta de pintura, nunca por
+  debajo de 12 (en una pantalla aún más baja, la rejilla se desplaza). Sin un alto que llenar (el año
+  de un amigo), cuadradas. 3 de separación y radio 3;
   inicial del mes arriba y los días 1, 10, 20 y 30 a la izquierda, en `caption`. Días sin color en
   `surfaceVariant` (los futuros, más claros); días que no existen (31 de febrero), vacíos. Un día cuyo
   color casi no se distingue de la tarjeta o del vacío (contraste por debajo de 1,3: una pared blanca,
@@ -199,8 +222,9 @@ Tras la foto, en la misma pantalla:
   como la primera raya de un código de barras, no como un bloque de un color. Si el último día casi no
   se distingue de ese vacío, los separa una línea de 1 en `outline`. Las tiras de adorno (el paywall y la
   fila de Pro en Ajustes) se comprimen siempre.
-- Tocar un día con entrada abre el día (sección 5). El lector de pantalla recorre los días en orden
-  de fecha.
+- Tocar un día con entrada abre el día (sección 5). El lector de pantalla recorre el año mes a mes,
+  columna abajo; cada mes con días es una cabecera con su nombre, para saltar de mes en mes, y el día
+  de hoy lo dice (`navToday`).
 - `poster` abre la misma capa que compartir (sección 5) con el póster del año y un
   segmentado de tres: `posterGrid`, `posterStrip`, `posterWallpaper`. Mirarlo es gratis; sin Pro,
   compartir y guardar llevan `proTag` y abren el paywall.
@@ -231,7 +255,7 @@ Capa a pantalla completa desde el menú de Hoy o desde el día abierto. Arriba, 
 `surfaceVariant` de radio 28 y con una sombra suave, como una copia que se mira antes de llevársela. El lector de pantalla la lee como el color, su hex y la fecha (el póster,
 como el año y su estilo): es todo lo que hay en la pantalla. En medio, la
 tarjeta de 1080x1350 (`tecnico.md` 6.9) a 320 de ancho como mucho, con radio 12.
-Debajo, si el día tiene foto, una fila con interruptor en su tarjeta, `includePhoto` (empieza encendido): apagarlo
+Debajo, si el día tiene foto, una fila con interruptor en su tarjeta, `includePhoto` (empieza apagado: lo que no se comparte no sale del teléfono, y la foto es la parte privada del día): apagarlo
 quita la miniatura de la imagen, no del día. No usa las palabras de compartir con amigos
 (`shareColorOnly`, `shareWithPhoto`) porque son dos ajustes distintos y con las mismas palabras
 parecían uno. Después, lado a lado, `share` como botón principal con su icono (hoja del sistema) y
@@ -437,7 +461,9 @@ tira de 56 de alto con los colores del usuario; lo que incluye, una fila por cos
 solo cuando Amigos existe, v1.1); el botón principal a lo ancho con el precio leído de la tienda
 (`buy`), y debajo `restore` y `notNow` como botones de texto en gris. Si la compra o la restauración
 no llegan a la tienda, `storeUnavailable`; un pago pendiente, `buyPending`. Con letra grande el panel
-se desplaza: el botón de compra nunca se queda fuera.
+se desplaza: el botón de compra nunca se queda fuera. Mientras la tienda contesta, el botón ocupa su
+sitio desactivado y con `working`, para que el diálogo no salte al llegar el precio. Abierto desde algo
+concreto (En palabras), al llegar Pro se abre eso mismo.
 
 ---
 

@@ -29,6 +29,12 @@ expect val Sibling.storeUrl: String?
 expect val onIos: Boolean
 
 /**
+ * Reduce Motion (iOS) or animations turned off (Android). Asked directly instead of left to Compose:
+ * the iOS setting is not one Compose can be counted on to follow.
+ */
+expect fun reduceMotion(): Boolean
+
+/**
  * The sister apps. A store URL only once that app is in production on that store the day Chroma is
  * published; until then it is null and its row is not shown.
  */

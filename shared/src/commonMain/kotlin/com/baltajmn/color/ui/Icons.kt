@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
  */
 enum class Glyph {
     BACK, FORWARD, SHARE, SETTINGS, YEAR, CLOSE, PHOTO, CAMERA, TODAY, FRIENDS, MORE, TRASH, CHECK,
-    BELL, LOCK, DOC, DIAMOND, STAMP, EXPORT, IMPORT, SPARK, RESTORE, WORDS, WIDGET, POSTER, APPS,
+    BELL, LOCK, DOC, DIAMOND, STAMP, EXPORT, IMPORT, SPARK, RESTORE, WORDS, WIDGET, POSTER, APPS, STRIP,
 }
 
 /** A 48dp tap target with no background: the glyph is the whole control. */
@@ -179,6 +179,9 @@ fun GlyphIcon(glyph: Glyph, size: Dp = 20.dp, tint: Color = MaterialTheme.colorS
                 drawRoundRect(tint, topLeft = at(0.18f, 0.12f), size = Size(0.64f * side, 0.76f * side), cornerRadius = CornerRadius(0.08f * side), style = stroke)
                 listOf(0.34f, 0.50f, 0.66f).forEach { y -> listOf(0.36f, 0.50f, 0.64f).forEach { x -> dot(x, y, 0.045f) } }
             }
+            // The Strip view of My year: the three columns of YEAR's dots drawn as bars. Six thin bars
+            // at 20 dp ran together into a black block.
+            Glyph.STRIP -> listOf(0.25f, 0.50f, 0.75f).forEach { x -> line(x to 0.22f, x to 0.78f) }
             Glyph.APPS -> listOf(0.32f, 0.68f).forEach { y ->
                 listOf(0.32f, 0.68f).forEach { x ->
                     drawRoundRect(tint, topLeft = at(x - 0.13f, y - 0.13f), size = Size(0.26f * side, 0.26f * side), cornerRadius = CornerRadius(0.07f * side), style = stroke)

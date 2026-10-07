@@ -23,6 +23,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -45,6 +47,8 @@ import kotlinx.datetime.plus
 private val LEFT = 20.dp
 private val GAP = 3.dp
 private val CELL_MAX = 24.dp
+private val ROW_MIN = 12.dp
+private val HEAD = 20.dp
 private const val ROWS = 31
 
 /**
@@ -52,6 +56,10 @@ private const val ROWS = 31
  * is the neutral of the theme, never a warning. Painted in one Canvas; the taps and the screen
  * reader ride on top, one node per day that has a color. [days] maps an ISO date to its color, so
  * the same grid draws my year and a friend's.
+ *
+ * Given a bounded height, the 31 rows fit in it: the year at a glance, with cells flatter than they
+ * are wide, like the chips of a paint strip, down to [ROW_MIN]; below that it keeps [ROW_MIN] and the
+ * screen scrolls. Unbounded, the cells are square.
  */
 @Composable
 fun YearGrid(year: Int, days: Map<String, String>, today: LocalDate, onOpenDay: (LocalDate) -> Unit) {
@@ -61,41 +69,47 @@ fun YearGrid(year: Int, days: Map<String, String>, today: LocalDate, onOpenDay: 
     val ring = MaterialTheme.colorScheme.onBackground
     val caption = Styles.caption
     val initials = remember { S.monthInitials() }
+    val names = remember { S.monthNames() }
     val monthDays = remember(year) {
         (1..12).map { m -> LocalDate(year, m, 1).plus(1, DateTimeUnit.MONTH).minus(1, DateTimeUnit.DAY).day }
     }
 
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         val cell = min(CELL_MAX.value, (maxWidth.value - LEFT.value - 11 * GAP.value) / 12).dp
-        val head = 20.dp
+        val row = if (constraints.hasBoundedHeight) {
+            ((maxHeight - HEAD - GAP * (ROWS - 1)) / ROWS).coerceIn(minOf(ROW_MIN, cell), cell)
+        } else {
+            cell
+        }
         val step = cell + GAP
+        val rowStep = row + GAP
+        val height = HEAD + row * ROWS + GAP * (ROWS - 1)
         // On a wide phone the cells hit CELL_MAX before the width runs out: center the block
         // (day numbers included) instead of leaving the spare width on the right.
         val inset = ((maxWidth - LEFT - step * 12 + GAP) / 2).coerceAtLeast(0.dp)
         fun x(month: Int) = inset + LEFT + step * (month - 1)
-        fun y(day: Int) = head + step * (day - 1)
+        fun y(day: Int) = HEAD + rowStep * (day - 1)
 
         // Font scale fixed to 1: the grid geometry is fixed dp, so labels that grew with the
         // system font size would overflow their cells. The cells themselves are unaffected,
         // since dp-to-px conversion depends on density, not on this fontScale override.
         CompositionLocalProvider(LocalDensity provides Density(LocalDensity.current.density, 1f)) {
             val measurer = rememberTextMeasurer()
-            Canvas(Modifier.fillMaxWidth().height(head + cell * ROWS + GAP * (ROWS - 1))) {
-                val side = cell.toPx()
+            Canvas(Modifier.fillMaxWidth().height(height)) {
+                val box = Size(cell.toPx(), row.toPx())
                 val radius = CornerRadius(3.dp.toPx())
                 initials.forEachIndexed { i, label ->
                     val laid = measurer.measure(label, caption)
-                    drawText(laid, topLeft = Offset(x(i + 1).toPx() + (side - laid.size.width) / 2, head.toPx() - laid.size.height - 4.dp.toPx()))
+                    drawText(laid, topLeft = Offset(x(i + 1).toPx() + (box.width - laid.size.width) / 2, HEAD.toPx() - laid.size.height - 4.dp.toPx()))
                 }
                 listOf(1, 10, 20, 30).forEach { day ->
                     val laid = measurer.measure(day.toString(), caption)
-                    drawText(laid, topLeft = Offset((inset + LEFT).toPx() - 4.dp.toPx() - laid.size.width, y(day).toPx() + (side - laid.size.height) / 2))
+                    drawText(laid, topLeft = Offset((inset + LEFT).toPx() - 4.dp.toPx() - laid.size.width, y(day).toPx() + (box.height - laid.size.height) / 2))
                 }
                 for (month in 1..12) {
                     for (day in 1..monthDays[month - 1]) {
                         val date = LocalDate(year, month, day)
                         val at = Offset(x(month).toPx(), y(day).toPx())
-                        val box = Size(side, side)
                         val hex = days[date.isoKey()]
                         when {
                             hex != null -> {
@@ -110,24 +124,37 @@ fun YearGrid(year: Int, days: Map<String, String>, today: LocalDate, onOpenDay: 
                         }
                         if (date == today) {
                             val out = 2.dp.toPx()
-                            drawRoundRect(ring, Offset(at.x - out, at.y - out), Size(side + out * 2, side + out * 2), CornerRadius(5.dp.toPx()), Stroke(1.5.dp.toPx()))
+                            drawRoundRect(ring, Offset(at.x - out, at.y - out), Size(box.width + out * 2, box.height + out * 2), CornerRadius(5.dp.toPx()), Stroke(1.5.dp.toPx()))
                         }
                     }
                 }
             }
         }
 
-        // Only days with a color open anything, so only they are nodes; sorted by ISO key so
-        // screen readers walk the year in date order rather than map insertion order.
-        for ((key, hex) in days.entries.sortedBy { it.key }) {
-            val date = LocalDate.parse(key)
-            if (date.year != year) continue
+        // Only days with a color open anything, so only they are nodes. Each takes its cell and half
+        // the gap around it, so the grid has no dead spots between days. A month is a traversal group
+        // headed by its name: a screen reader walks the year month by month, down each column, and can
+        // jump from month to month by heading.
+        val byMonth = days.keys.filter { it.startsWith("$year-") }.sorted().map(LocalDate::parse).groupBy { it.month.ordinal + 1 }
+        for ((month, dates) in byMonth) {
             Box(
-                Modifier.offset { IntOffset(x(date.month.ordinal + 1).roundToPx(), y(date.day).roundToPx()) }
-                    .size(cell)
-                    .clickable(role = Role.Button) { onOpenDay(date) }
-                    .semantics { contentDescription = S.a11yDay(date, nearestName(hex).key) },
-            )
+                Modifier.offset { IntOffset((x(month) - GAP / 2).roundToPx(), 0) }
+                    .size(step, height + GAP)
+                    .semantics { isTraversalGroup = true },
+            ) {
+                Box(Modifier.size(step, HEAD).semantics { heading(); contentDescription = names[month - 1] })
+                for (date in dates) {
+                    val hex = days.getValue(date.isoKey())
+                    Box(
+                        Modifier.offset { IntOffset(0, (y(date.day) - GAP / 2).roundToPx()) }
+                            .size(step, rowStep)
+                            .clickable(role = Role.Button) { onOpenDay(date) }
+                            .semantics {
+                                contentDescription = S.a11yDay(date, nearestName(hex).key) + if (date == today) ", ${S.navToday}" else ""
+                            },
+                    )
+                }
+            }
         }
     }
 }

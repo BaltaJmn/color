@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +44,9 @@ import kotlinx.coroutines.launch
  */
 object Paywall {
     var open by mutableStateOf(false)
+
+    /** What the user was reaching for when the paywall opened: done as soon as Pro arrives. */
+    var onPro: (() -> Unit)? = null
 }
 
 @Composable
@@ -51,13 +55,24 @@ fun ProDialog(onDismiss: () -> Unit) {
     var pack by remember { mutableStateOf<Package?>(null) }
     var busy by remember { mutableStateOf(false) }
     var pending by remember { mutableStateOf(false) }
+    var loading by remember { mutableStateOf(true) }
+    fun unlocked() {
+        Paywall.onPro?.let {
+            Paywall.onPro = null
+            it()
+        }
+        onDismiss()
+    }
     // Pro arriving while this is open (a pending payment approved, a restore elsewhere) closes it.
     val pro = ChromaRepository.settings.pro
-    LaunchedEffect(pro) { if (pro) onDismiss() }
+    LaunchedEffect(pro) { if (pro) unlocked() }
+    // Closed without buying, the wish goes with it: a purchase made later from elsewhere opens nothing.
+    DisposableEffect(Unit) { onDispose { Paywall.onPro = null } }
     var note by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         pack = Billing.proPackage()
+        loading = false
         if (pack == null) note = S.storeUnavailable
     }
 
@@ -103,6 +118,11 @@ fun ProDialog(onDismiss: () -> Unit) {
                 Text(it, style = Styles.caption.copy(color = colors.onBackground))
             }
             Spacer(Modifier.height(20.dp))
+            // While the store answers, the button's place is kept: the dialog does not jump when the price arrives.
+            if (loading) {
+                PrimaryAction(S.working, {}, Modifier.fillMaxWidth(), enabled = false)
+                Spacer(Modifier.height(4.dp))
+            }
             // With no store there is no price, and a button that cannot say what it costs is not an
             // offer: the note explains it instead.
             if (target != null && price != null) {
@@ -118,7 +138,7 @@ fun ProDialog(onDismiss: () -> Unit) {
                             val outcome = Billing.purchase(target)
                             busy = false
                             when (outcome) {
-                                PurchaseOutcome.Success -> onDismiss()
+                                PurchaseOutcome.Success -> unlocked()
                                 // Changing your mind says nothing and shows nothing.
                                 PurchaseOutcome.Cancelled -> Unit
                                 PurchaseOutcome.Pending -> {
@@ -145,7 +165,7 @@ fun ProDialog(onDismiss: () -> Unit) {
                             val outcome = Billing.restore()
                             busy = false
                             when (outcome) {
-                                RestoreOutcome.Found -> onDismiss()
+                                RestoreOutcome.Found -> unlocked()
                                 RestoreOutcome.Nothing -> note = S.restoreNothing
                                 RestoreOutcome.Unreachable -> note = S.storeUnavailable
                             }
