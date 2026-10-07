@@ -141,8 +141,8 @@ fun YearScreen(today: LocalDate, onOpenDay: (LocalDate) -> Unit, onPoster: (Int)
 
 private val BOTTOM = 16.dp
 
-// The grid card at its flattest rows (YearGrid): below this the screen scrolls instead.
-private val GRID_MIN = 520.dp
+// The grid card at its flattest rows and tightest gaps (YearGrid): below this the screen scrolls instead.
+private val GRID_MIN = 430.dp
 
 /**
  * [top] at its own height, then [rest] measured within what is left of [height], or within

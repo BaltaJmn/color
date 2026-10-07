@@ -63,7 +63,7 @@ en una línea a su tamaño; si no (letra grande), uno encima del otro a todo el 
 Rejilla de 4. Márgenes laterales 20. Radio de tarjeta 28, de hoja 28 arriba, de botón 24 (píldora),
 de tarjeta de ajustes y de tesela 20, de miniatura 14, de tesela de icono 11 (36 de lado, glifo de 18). Tocables de 48 como mínimo, sin excepción de estilo: el botón principal mide 52, el
 de borde, el de texto y cada opción de un segmentado, 48. La única excepción es la celda de la
-rejilla del año (unos 24 de ancho y de 12 a 24 de alto), porque el año entero tiene que caber de un
+rejilla del año (unos 24 de ancho y de 10 a 24 de alto), porque el año entero tiene que caber de un
 vistazo. Cada día se toca en su celda más la mitad del hueco que la rodea, sin zonas muertas entre
 días, y se puede abrir igual con el lector de pantalla.
 
@@ -174,7 +174,9 @@ Tras la foto, en la misma pantalla:
 
 ### Con entrada
 
-- La tarjeta (sección 6) ocupa el ancho, proporción 4:5.
+- La tarjeta (sección 6) ocupa el ancho, proporción 4:5, también en un móvil bajo: no se acorta como
+  la ficha en blanco, porque es la protagonista y se comparte a 4:5. En un 16:9 los candidatos y
+  Compartir quedan a un desplazamiento, y asoman bajo la tarjeta para decirlo.
 - Debajo, la fila de candidatos, más pequeña (círculos de 40), para cambiar de color durante el día.
 - Debajo, `addWord` como botón de texto; tocarlo abre un campo de una línea con tope visible (`n/24`)
   y el teclado a la vez: un toque, no dos. El campo entero sube por encima del teclado, no solo la
@@ -206,8 +208,9 @@ entero de un vistazo. Antes la rejilla medía unos 800 y se veía del 1 al 17.
   del borde de abajo.
 - **Rejilla**: una columna por mes y una fila por día (12 x 31), como Purl; girada saldrían celdas de
   10. De ancho, cada celda mide lo que da la pantalla (24 como mucho); de alto, lo que cabe para que
-  entren las 31 filas: más planas que anchas, como las fichas de una carta de pintura, nunca por
-  debajo de 12 (en una pantalla aún más baja, la rejilla se desplaza). Sin un alto que llenar (el año
+  entren las 31 filas: más planas que anchas, como las fichas de una carta de pintura. Si las filas
+  bajarían de 14, los huecos entre días pasan de 3 a 2, y las filas llegan hasta 10: así cabe el año
+  en un móvil 16:9 (411x731). En una pantalla aún más baja, la rejilla se desplaza. Sin un alto que llenar (el año
   de un amigo), cuadradas. 3 de separación y radio 3;
   inicial del mes arriba y los días 1, 10, 20 y 30 a la izquierda, en `caption`. Días sin color en
   `surfaceVariant` (los futuros, más claros); días que no existen (31 de febrero), vacíos. Un día cuyo

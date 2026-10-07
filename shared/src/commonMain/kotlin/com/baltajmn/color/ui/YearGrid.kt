@@ -29,6 +29,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.color.blendsInto
@@ -47,7 +48,10 @@ import kotlinx.datetime.plus
 private val LEFT = 20.dp
 private val GAP = 3.dp
 private val CELL_MAX = 24.dp
-private val ROW_MIN = 12.dp
+private val ROW_MIN = 10.dp
+// Rows flatter than this close the gaps between days first: a 16:9 phone (411x731 dp) fits the year.
+private val ROW_TIGHT = 14.dp
+private val GAP_TIGHT = 2.dp
 private val HEAD = 20.dp
 private const val ROWS = 31
 
@@ -76,14 +80,13 @@ fun YearGrid(year: Int, days: Map<String, String>, today: LocalDate, onOpenDay: 
 
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         val cell = min(CELL_MAX.value, (maxWidth.value - LEFT.value - 11 * GAP.value) / 12).dp
-        val row = if (constraints.hasBoundedHeight) {
-            ((maxHeight - HEAD - GAP * (ROWS - 1)) / ROWS).coerceIn(minOf(ROW_MIN, cell), cell)
-        } else {
-            cell
-        }
+        val bounded = constraints.hasBoundedHeight
+        fun fit(gap: Dp) = (maxHeight - HEAD - gap * (ROWS - 1)) / ROWS
+        val gapY = if (bounded && fit(GAP) < ROW_TIGHT) GAP_TIGHT else GAP
+        val row = if (bounded) fit(gapY).coerceIn(minOf(ROW_MIN, cell), cell) else cell
         val step = cell + GAP
-        val rowStep = row + GAP
-        val height = HEAD + row * ROWS + GAP * (ROWS - 1)
+        val rowStep = row + gapY
+        val height = HEAD + row * ROWS + gapY * (ROWS - 1)
         // On a wide phone the cells hit CELL_MAX before the width runs out: center the block
         // (day numbers included) instead of leaving the spare width on the right.
         val inset = ((maxWidth - LEFT - step * 12 + GAP) / 2).coerceAtLeast(0.dp)
@@ -139,14 +142,14 @@ fun YearGrid(year: Int, days: Map<String, String>, today: LocalDate, onOpenDay: 
         for ((month, dates) in byMonth) {
             Box(
                 Modifier.offset { IntOffset((x(month) - GAP / 2).roundToPx(), 0) }
-                    .size(step, height + GAP)
+                    .size(step, height + gapY)
                     .semantics { isTraversalGroup = true },
             ) {
                 Box(Modifier.size(step, HEAD).semantics { heading(); contentDescription = names[month - 1] })
                 for (date in dates) {
                     val hex = days.getValue(date.isoKey())
                     Box(
-                        Modifier.offset { IntOffset(0, (y(date.day) - GAP / 2).roundToPx()) }
+                        Modifier.offset { IntOffset(0, (y(date.day) - gapY / 2).roundToPx()) }
                             .size(step, rowStep)
                             .clickable(role = Role.Button) { onOpenDay(date) }
                             .semantics {
