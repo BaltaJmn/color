@@ -85,15 +85,41 @@ dijo (sin nombre) y qué se hizo.
   ficha en blanco se acorta en pantallas bajas para que los dos botones quepan sin desplazarse
   (`pantallas.md` 3); comprobado a 1080x1920 con navegación por gestos y con tres botones.
 
-## Para la solicitud de acceso a producción
+## Solicitud de acceso a producción
 
-Borrador de las respuestas, que se termina al pedir el acceso con lo que haya arriba.
+Enviada el 13-10-2026 a las 16:06 desde *Panel de control > Solicitar acceso a producción*. Play
+avisa por correo al propietario; suele tardar 7 días o menos. Al pedirla: 0 fallos y 0 ANR en Android
+vitals (28 días) y un comentario privado en Play (09-10-2026, Galaxy A15 5G, 1.0.7, cinco estrellas:
+"la aplicación cumple su función").
 
-- **Cómo se reclutó a los testers:** intercambio de pruebas con otros desarrolladores, en grupos de
-  Google y por correo. Cada tester entra en el grupo `chroma-testers` y acepta la prueba desde el
-  enlace de Play.
-- **Qué cambió a raíz de la prueba:** las filas de la tabla desde el `versionCode` 4, en una frase cada
-  una.
-- **Por qué está lista:** los fallos y ANR de Android vitals durante la prueba (comprobarlos al pedir
-  el acceso), los tests comunes en verde en cada versión, y cada fallo arreglado reproducido antes en
-  el emulador y comprobado después con la versión nueva.
+Respuestas enviadas, en inglés y con el tope de 300 caracteres de cada campo:
+
+1. Prueba cerrada
+   - Cómo se reclutó: "Test-for-test exchanges with other indie Android developers, run in Google
+     Groups and by email, plus a few friends. Each tester joined our Google Group and accepted the
+     test from the Play opt-in link; at least 12 stayed opted in for the full 14 days."
+   - Facilidad: *Difícil*.
+   - Interacciones: "Testers used it on real phones and emulators (Android 11 to 16, several screen
+     sizes): taking or picking the day's photo, choosing its color, My Year in grid and strip view,
+     the poster, the reminder and widgets. Use was steady but light, as the app is one photo a day by
+     design."
+   - Comentarios: "Collected from the test-exchange threads, email and Play private feedback (one
+     5-star note). Points raised: PRO label wrapping on the poster, a one-day strip looking like a
+     solid block, the gallery picker losing the photo on Android 11, buttons below the fold on short
+     screens. All fixed."
+2. La aplicación
+   - Audiencia: "Teens (13+) and adults who want a light, private daily journal without writing:
+     people into photography and color, and fans of 'year in pixels' and mood-tracker bullet
+     journals. No sign-up is needed and everything stays on the phone."
+   - Valor: "Once a day you take or pick a photo and the app offers colors taken from it; you choose
+     the one that sums up your day. Over the year the colors fill a 365-day grid you can browse, turn
+     into a poster or wallpaper, and back up. Ten seconds a day, no writing, no ads, no tracking."
+   - Descargas el primer año: *Entre 0 y 10.000*.
+3. Preparación
+   - Cambios: "13 updates (1.0.1 to 1.0.13). From testers: poster buttons stack when they do not fit,
+     short-history strip view, gallery photo kept on Android 11, compact Today on short screens. From
+     our own testing: camera photo loss, app lock, reminders, backups, accessibility, 13 languages."
+   - Por qué está lista: "Zero crashes and ANRs in Android vitals during the test. Every reported bug
+     was reproduced on the emulator before fixing and checked again on the new build, and the shared
+     test suite passes on each release. 1.0.13 has been in the test since Oct 7 with no new issues
+     reported."
