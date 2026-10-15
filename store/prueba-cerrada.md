@@ -35,6 +35,7 @@ Cada versión que sube a la prueba añade su fila aquí en el mismo commit que s
 | 14 | 1.0.11 | 03-10-2026 | Tira: con un solo día era un bloque de un color. Ahora, con menos de 30 días, cada día ocupa 1/30 del ancho y el resto queda vacío, en Mi año y en el póster. Entran también los arreglos de Amigos (#52), que sigue apagado hasta producción. | Un tester el 02-10-2026 |
 | 15 | 1.0.12 | 05-10-2026 | Idiomas: de cinco a trece, con italiano, neerlandés, polaco, ruso, turco, indonesio, japonés y coreano, en la app, los widgets y las fichas. El fondo de la ventana y las vistas previas de los widgets de Android, y los widgets de iOS, seguían con los grises de antes de la 1.0.10. Para iOS, los enlaces que no abrían en iOS 18 y la hoja de compartir del iPad. Primera subida desde la 1.0.9: lleva también la 1.0.10 y la 1.0.11. | Decisión propia: salir en App Store con los idiomas de las fichas de Play; el resto, del repaso para App Store del 05-10-2026 |
 | 16 | 1.0.13 | 07-10-2026 | Mi año cabe entero en la pantalla, sin desplazar: las celdas pasan a ser más planas que anchas, Póster y En palabras son botones y la Tira se elige con un icono de la cabecera. Al elegir color, la instrucción se lee a tamaño normal, los candidatos ya no se quedan fuera de la pantalla en móviles bajos y mantener pulsado uno dice su nombre sin elegirlo. Compartir, a la vista bajo la tarjeta y con la foto apagada de entrada. Las ofertas ya no salen encima del color recién elegido. Con lector de pantalla, los avisos y "Copiado" se oyen, la rejilla se recorre mes a mes y dice cuál es hoy. "Reducir movimiento" de iOS, conectado de verdad. La revelación ya no enseña el nombre junto a una esquina sin pintar. Tras comprar desde En palabras, se abre solo. Y la foto de galería que se perdía en Android 11, con la ficha en blanco que tapaba los botones. | Crítica de diseño propia del 07-10-2026; Android 11 y la ficha en blanco, un tester el 07-10-2026 |
+| 17 | 1.0.14 | 15-10-2026 | No pasa por la prueba: va directa a producción. Mi año también cabe entero en un móvil 16:9 (1080x1920): antes la rejilla se cortaba en la fila 27. | Revisión propia de la 1.0.13 en 16:9, 07-10-2026 |
 
 ## Comentarios de los testers
 
@@ -123,3 +124,15 @@ Respuestas enviadas, en inglés y con el tope de 300 caracteres de cada campo:
      was reproduced on the emulator before fixing and checked again on the new build, and the shared
      test suite passes on each release. 1.0.13 has been in the test since Oct 7 with no new issues
      reported."
+
+## Producción
+
+Acceso concedido; producción abierta el 15-10-2026, en este orden:
+
+1. *Producción > Países/Territorios*: todos (177 y el resto del mundo, como el canal Alpha).
+2. `gh workflow run release.yml -f stores=play -f track=production`: la 1.0.14 (17), lanzamiento
+   completo, con las notas de `store/whatsnew/`. Al confirmar la edición, la API la envía a revisión
+   junto con los países que esperaban en *Resumen de publicación*.
+
+Publicación gestionada desactivada: sale sola cuando Play la aprueba. La prueba cerrada sigue con la
+1.0.13 (16), y sus testers reciben la 17 de producción por tener un `versionCode` mayor.

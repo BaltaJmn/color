@@ -18,7 +18,9 @@ La primera subida a Play fue un borrador por CI (24-09-2026, `-f stores=play -f 
 1. Subir el `versionCode` (y `versionName` si toca). Un `versionCode` no se reutiliza nunca.
 2. Si cambia algo visible, reescribir `store/whatsnew/whatsnew-<idioma>` en todos los idiomas (tope 500).
 3. Commit, y `git tag vX.Y && git push origin vX.Y`: Play `alpha` y TestFlight, la misma versión.
-4. Producción en Play y el envío a revisión de Apple, a mano en cada consola.
+4. Producción en Play: `gh workflow run release.yml -f stores=play -f track=production`, que la envía
+   a revisión al confirmar la edición (la primera, 1.0.14, el 15-10-2026). El envío a revisión de
+   Apple, a mano en App Store Connect.
 
 Otro canal o una sola tienda: `gh workflow run release.yml -f stores=play -f track=internal`
 (`-f status=draft` mientras la app no haya publicado nada en Play).
