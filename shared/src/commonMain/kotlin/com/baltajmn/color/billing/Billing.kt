@@ -1,5 +1,8 @@
 package com.baltajmn.color.billing
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.baltajmn.color.data.ChromaRepository
 import com.revenuecat.purchases.kmp.LogLevel
 import com.revenuecat.purchases.kmp.Purchases
@@ -24,15 +27,27 @@ import com.revenuecat.purchases.kmp.models.StoreTransaction
 expect val revenueCatApiKey: String?
 
 /**
- * The single paid product: a non-consumable that grants [ENTITLEMENT] forever. The product id and
- * the price live in the RevenueCat dashboard and never here, so changing the price is not an app
- * update (docs/tecnico.md 6.8).
+ * Two ways to the same [ENTITLEMENT]: the lifetime purchase (the one that is pushed) and a monthly
+ * subscription (mostly the anchor beside it). Product ids and prices live in the RevenueCat
+ * dashboard and never here, so changing a price is not an app update (docs/tecnico.md 6.8).
  */
 object Billing {
 
     const val ENTITLEMENT = "pro"
 
     private var configured = false
+
+    /** What the user holds, for the Settings line and the "your plan ended" note on the paywall. */
+    var state by mutableStateOf(ProState.Free)
+        private set
+
+    private fun apply(info: CustomerInfo): Boolean {
+        val e = info.entitlements[ENTITLEMENT]
+        val next = proState(e?.isActive == true, e != null, e?.expirationDateMillis)
+        state = next
+        ChromaRepository.updatePro(next.isPro)
+        return next.isPro
+    }
 
     /** Called once at startup. With no key it does nothing at all. */
     fun configure() {
@@ -45,7 +60,7 @@ object Billing {
         // or on its next start, without waiting for anyone to ask.
         Purchases.sharedInstance.delegate = object : PurchasesDelegate {
             override fun onCustomerInfoUpdated(customerInfo: CustomerInfo) {
-                ChromaRepository.updatePro(customerInfo.entitlements[ENTITLEMENT]?.isActive == true)
+                apply(customerInfo)
             }
 
             override fun onPurchasePromoProduct(
@@ -65,21 +80,20 @@ object Billing {
     suspend fun refresh() {
         if (!configured) return
         runCatching { Purchases.sharedInstance.awaitCustomerInfo() }
-            .onSuccess { ChromaRepository.updatePro(it.entitlements[ENTITLEMENT]?.isActive == true) }
+            .onSuccess { apply(it) }
     }
 
     /** What to sell, or null while offline or before the dashboard is filled in. */
-    suspend fun proPackage(): Package? {
+    suspend fun proOffer(): ProOffer? {
         if (!configured) return null
-        return runCatching {
-            Purchases.sharedInstance.awaitOfferings().current?.availablePackages?.firstOrNull()
-        }.getOrNull()
+        val offering = runCatching { Purchases.sharedInstance.awaitOfferings().current }.getOrNull() ?: return null
+        val lifetime = offering.lifetime ?: offering.availablePackages.firstOrNull { it != offering.monthly }
+        return if (lifetime == null && offering.monthly == null) null else ProOffer(lifetime, offering.monthly)
     }
 
     suspend fun purchase(pack: Package): PurchaseOutcome = try {
         val purchase = Purchases.sharedInstance.awaitPurchase(packageToPurchase = pack)
-        val active = purchase.customerInfo.entitlements[ENTITLEMENT]?.isActive == true
-        ChromaRepository.updatePro(active)
+        val active = apply(purchase.customerInfo)
         // The store took it and the entitlement did not move: a dashboard mistake, not a purchase.
         if (active) PurchaseOutcome.Success else PurchaseOutcome.Failed
     } catch (e: PurchasesTransactionException) {
@@ -114,13 +128,28 @@ object Billing {
         } catch (e: Exception) {
             return RestoreOutcome.Unreachable
         }
-        val active = info.entitlements[ENTITLEMENT]?.isActive == true
-        ChromaRepository.updatePro(active)
+        val active = apply(info)
         return if (active) RestoreOutcome.Found else RestoreOutcome.Nothing
     }
 
     private val PurchasesErrorCode.offline: Boolean
         get() = this == PurchasesErrorCode.NetworkError || this == PurchasesErrorCode.OfflineConnectionError
+}
+
+/** The two packages of the current offering; either can be missing while the dashboard is half filled. */
+class ProOffer(val lifetime: Package?, val monthly: Package?)
+
+enum class ProState(val isPro: Boolean) { Free(false), Monthly(true), Lifetime(true), Ended(false) }
+
+/**
+ * Lifetime or an active monthly plan is Pro; a monthly plan that lapsed is [ProState.Ended], which
+ * is Free plus a note on the paywall. A lifetime purchase has no expiration date.
+ */
+internal fun proState(active: Boolean, everHad: Boolean, expiresAtMillis: Long?): ProState = when {
+    active && expiresAtMillis == null -> ProState.Lifetime
+    active -> ProState.Monthly
+    everHad -> ProState.Ended
+    else -> ProState.Free
 }
 
 enum class PurchaseOutcome { Success, Pending, Cancelled, Offline, Unreachable, Failed }
