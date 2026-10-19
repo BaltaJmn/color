@@ -45,7 +45,7 @@ toca en el mismo commit, y se sigue**.
   plataformas.
 - **Importar nunca borra**: fusiona, gana el teléfono, y lo importado llega como privado.
 - Lo que nunca se cobra: la foto y el color, Mi año, compartir, la copia, el recordatorio, el widget de
-  hoy y todo lo de Amigos.
+  hoy y todo lo de Amigos y sus grupos.
 - La seguridad del servidor vive en RLS y funciones `security definer`, no en la app.
 - `Strings.kt` obliga a los trece idiomas (en, es, pt, de, fr, it, nl, pl, ru, tr, id, ja, ko) por firma de función y es la
   fuente única de los textos.

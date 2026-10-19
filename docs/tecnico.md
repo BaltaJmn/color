@@ -25,7 +25,7 @@ La plantilla es **Purl** (`../line`): casi todo lo que no es color ni amigos sal
 | App Group | `group.com.baltajmn.color` |
 | Kinds de WidgetKit | `ChromaTodayWidget`, `ChromaYearWidget` |
 | Esquema de URL | `com.baltajmn.color` (`://today`, `://year`, `://pro`, `://friends`) |
-| Enlaces universales | `https://color.baltajmn.dev/i/<code>` |
+| Enlaces universales | `https://color.baltajmn.dev/i/<code>` (amigo) y `https://color.baltajmn.dev/i/g<code>` (grupo, v1.3) |
 | Canal de notificación Android | `color-daily` |
 | Entitlement RevenueCat | `pro` (productos `pro_lifetime` y `pro_monthly`, offering `default` con `$rc_lifetime` y `$rc_monthly`) |
 | Política de privacidad | `https://color.baltajmn.dev/` |
@@ -93,6 +93,8 @@ Nada más. No hay librería de imágenes: las fotos se decodifican con el sistem
 | `color/Week.kt`, `color/Stats.kt` | Color de la semana y estadísticas | Nuevo (v1.2) |
 | `ui/StatsScreen.kt` | El año en frases | Nuevo (v1.2) |
 | `ui/FriendYear.kt` | Lista de amigos, el año de uno, uno de sus días, y su menú (reportar, bloquear, quitar) | Nuevo (v1.1) |
+| `social/Groups.kt` | Grupos: lista, feed, crear, unirse, salir, sacar, enlace | Nuevo (v1.3) |
+| `ui/GroupScreen.kt` | El selector de grupos, el feed de un grupo, crear, unirse, miembros y salir | Nuevo (v1.3) |
 | `ui/FriendsBlocked.kt` | El diálogo de Ajustes > Amigos > Bloqueados: quién bloqueé y cómo deshacerlo | Nuevo (v1.1) |
 | `ui/Card.kt` | La tarjeta | Nuevo |
 | `ui/TodayScreen.kt`, `ui/YearScreen.kt`, `ui/SettingsScreen.kt`, `ui/FriendsScreen.kt` | Pantallas | Purl y nuevo |
@@ -238,6 +240,9 @@ Al mes del primer día, si nunca se hizo copia, Hoy lo ofrece una vez (`noticeBa
 | `SYNC_DELTA_E` | 5.0 | `Friends.kt` |
 | `WEEK_DELTA_E` | 15.0 | `Week.kt` |
 | `MAX_FRIENDS` | 50 | Servidor (trigger) y cliente (mensaje) |
+| `MAX_GROUPS` | 5 | Servidor (trigger `group_limits`, escrito en el valor): grupos de una persona |
+| `MAX_GROUP_MEMBERS` | 20 | Servidor (trigger `group_limits`, escrito en el valor) |
+| `GROUP_DAYS` | 2 | Servidor (`entries_read` y `photos_read`): un miembro que no es amigo lee `day >= current_date - 2`, hoy y ayer de cualquier huso |
 | `PHOTO_TTL_DAYS` | 2 | Servidor (`purge-photos`; el límite duro, 3 días de fichero, en `orphan_photos`) y app (`PHOTO_DAYS`). Hoy y ayer, lo que enseña el feed |
 | `PHOTO_DAYS` | 7 | `Outbox.kt` (un día de más de esos días sube sin foto) |
 | `MAX_PENDING_REQUESTS` | 100 | Servidor (`request_friend`, escrito en el valor): solicitudes pendientes que puede tener una persona |
@@ -523,8 +528,9 @@ fichero nuevo, porque una base que aplicó las anteriores tiene que recibirlo ta
 | `20261001120000_review.sql` | La revisión antes del lanzamiento: lo que cambia en 8.2 a 8.4 |
 | `20261019120000_photos_two_days.sql` | Las fotos pasan de 7 a 2 días: `entry_day` y `orphan_photos` con los límites nuevos |
 | `20261019120100_shared_auth.sql` | `used_by_other_app`, porque Auth se comparte con FlowTime |
+| `20261020120000_groups.sql` | Grupos (v1.3): sus tres tablas, sus funciones y `shares_group` en las políticas de días, reportes y fotos (8.5) |
 
-El esquema que dejan las seis:
+El esquema que dejan las seis primeras (los grupos, en 8.5):
 
 ```sql
 create table profiles (
@@ -594,7 +600,7 @@ Supabase da `execute` sobre cada función nueva de `public` a `anon` y a `authen
 cada migración dice de la suya quién la ejecuta. `anon` no ejecuta ninguna. `authenticated` ejecuta
 solo estas doce: `is_friend`, `has_open_request`, `request_friend`, `accept_friend`,
 `decline_friend`, `remove_friend`, `block_user`, `unblock_user`, `regenerate_code`, `my_profile`,
-`my_friendships` y `my_blocks`. `orphan_photos` es de `service_role`, y nadie con sesión ejecuta el
+`my_friendships` y `my_blocks`, y desde v1.3 las ocho de grupos (8.5). `orphan_photos` es de `service_role`, y nadie con sesión ejecuta el
 resto (`is_blocked`, `accepted_count`, los triggers y `notify_report`). `supabase/tests` comprueba el
 conjunto entero.
 
@@ -724,6 +730,100 @@ Los secretos viven en Supabase, nunca en el repositorio. En el Vault: `project_u
 `service_role_key` (la purga) y `report_webhook_secret` (el mismo valor que `REPORT_WEBHOOK_SECRET`
 de la función), a mano una vez (`store/servidor.md` 2). La app solo lleva la URL del proyecto y la
 clave pública (`anon`), que ya viajan en el binario, en `social/SupabaseConfig.kt`.
+
+### 8.5 Grupos (v1.3)
+
+`20261020120000_groups.sql`. Ninguna tabla de fotos ni de días nueva: un grupo ve las mismas filas de
+`shared_entries` y los mismos ficheros del bucket que ya ven los amigos. Lo que cambia es quién puede
+leerlas.
+
+```sql
+create table groups (
+  id uuid primary key default gen_random_uuid(),
+  name text not null check (char_length(btrim(name)) between 1 and 30),
+  invite_code text not null unique default encode(extensions.gen_random_bytes(5), 'hex'),
+  created_at timestamptz not null default now()
+);
+
+create table group_members (
+  group_id uuid not null references groups on delete cascade,
+  member uuid not null references profiles on delete cascade,
+  joined_at timestamptz not null default clock_timestamp(),   -- el orden decide quién manda
+  primary key (group_id, member)
+);
+
+create table group_bans (                      -- quien fue sacado no vuelve a entrar con el enlace
+  group_id uuid not null references groups on delete cascade,
+  member uuid not null references profiles on delete cascade,
+  primary key (group_id, member)
+);
+```
+
+Las tres con RLS y sin ningún permiso de tabla para `anon` ni `authenticated`: todo pasa por
+funciones `security definer`, como las amistades.
+
+**Quién manda.** No hay columna de dueño: el administrador es el miembro con el `joined_at` más
+antiguo (empate, el uuid menor), `group_admin(g)`. Al principio es quien creó el grupo; si sale o
+borra la cuenta, pasa solo al siguiente, sin una fila que actualizar ni un grupo que se quede sin
+nadie que pueda sacar a otro.
+
+**Visibilidad.** `shares_group(y uuid) returns boolean`: `auth.uid()` e `y` son miembros de un mismo
+grupo, `y` no soy yo, y no hay bloqueo en ningún sentido. La ejecuta `authenticated` porque las
+políticas la llaman con sus permisos; un `false` no dice cuál de las tres cosas falló, igual que
+`is_friend`. Las políticas que cambian:
+
+| Política | Antes | Con grupos |
+|---|---|---|
+| `entries_read` | `author = auth.uid() or is_friend(author)` | `... or (day >= current_date - 2 and shares_group(author))` |
+| `photos_read` | fila visible de un amigo con ese `photo_path` | `... or` fila de alguien de un grupo común con ese `photo_path` y `day >= current_date - 2` |
+| `reports_insert` | `reporter = auth.uid() and is_friend(author)` | `... and (is_friend(author) or shares_group(author))` |
+
+`current_date - 2` y no `- 1`: la fecha del servidor es UTC y el día de la tarjeta es el del autor, así
+que el ayer de quien mira, en cualquier huso, cae dentro. Un miembro que no es amigo nunca lee el año:
+`Friends.year` sobre él devuelve como mucho tres días. `profiles_read` no cambia: los nombres de los
+miembros salen ya unidos de `group_people`.
+
+**Funciones** (las ejecuta `authenticated` salvo que se diga):
+
+- `create_group(name text) returns uuid`: hace falta perfil (`no_profile` si no). Crea el grupo y mete
+  dentro a quien lo crea. Con 5 grupos lanza `group_limit` (el trigger).
+- `join_group(code text) returns text`: `'joined'`, `'already'`, `'not_found'`, `'limit'`,
+  `'too_many'`. El código va sin la `g` del enlace.
+  - `'not_found'`: un código que no existe o un grupo del que me sacaron. Se contestan igual y cuentan
+    igual como intento fallido en `invite_attempts`, el mismo freno de 20 por hora que los amigos: un
+    código de grupo también son 40 bits.
+  - `'limit'`: yo en 5 grupos o el grupo en 20 miembros, sin decir cuál.
+  - Un bloqueo con alguien de dentro no impide entrar: el bloqueo ya hace que no os veáis.
+- `leave_group(g uuid)`: sale. Sin aviso.
+- `remove_member(g uuid, other uuid)`: solo si soy `group_admin(g)` y `other` no soy yo. Lo saca y lo
+  apunta en `group_bans`. Sin aviso. No hay forma de deshacerlo: si fue un error, se crea otro grupo.
+- `regenerate_group_code(g uuid) returns text`: solo el administrador; a cualquier otro le devuelve
+  null. El enlace viejo deja de valer; nadie sale del grupo por eso.
+- `my_groups() returns table (id, name, invite_code, admin boolean)`: mis grupos, por orden de entrada.
+  Cualquier miembro lee el código: cualquiera puede invitar.
+- `group_people(g uuid) returns table (id, display_name, admin boolean)`: los miembros, por orden de
+  entrada, sin los bloqueados en ningún sentido. Vacía si no soy miembro.
+- `group_admin(g uuid) returns uuid`: no la ejecuta nadie con sesión; la usan las de arriba.
+
+Triggers:
+
+| Trigger | En | Qué |
+|---|---|---|
+| `group_limits` | `group_members`, antes de insertar | Bloquea la fila del grupo (`for update`) para que dos entradas a la vez no pasen del tope, y lanza `group_full` con 20 miembros o `group_limit` si la persona ya está en 5 grupos |
+| `group_empty` | `group_members`, después de borrar | Si el grupo se queda sin nadie, se borra: también cuando el último miembro borra la cuenta |
+
+**Borrar la cuenta** no cambia `delete-account`: el perfil cae en cascada sobre `group_members` y
+`group_bans`, y `group_empty` borra los grupos que se quedan vacíos.
+
+**Coste en Free.** Los grupos no suben nada nuevo: las fotos son las mismas de 720 px que ya suben para
+los amigos, y una fila de `groups` o `group_members` son unos pocos bytes. Lo que crece es la descarga.
+Con unos 100 KB por foto y la caché en disco que baja cada foto una vez por persona que mira, el peor
+caso es alguien con 50 amigos y 5 grupos llenos de desconocidos con foto todos los días: 50 + 5 x 19
+= 145 fotos al día, unos 15 MB. Lo normal, un círculo de 10 a 20 personas que en parte se repite entre
+amigos y grupos, son 1 a 2 MB al día. Los 5 GB de salida al mes del plan Free (unos 170 MB al día) dan
+para una decena de personas activas cada día con el peor uso, o para unas 100 con el normal, contando
+también el feed de amigos, que ya gastaba lo mismo; la perilla, si hace
+falta, es la misma de siempre: bajar `UPLOAD_SIDE` o la calidad, nunca cobrar.
 
 ---
 
@@ -874,6 +974,42 @@ cualquier ruta) lee el código y enseña los botones de las tiendas.
 - Los marcadores de `assetlinks.json`, `apple-app-site-association` y `404.html` se rellenan como
   dice `store/servidor.md` 5.
 
+### 9.5 Grupos (v1.3)
+
+`social/Groups.kt`, al lado de `Friends`, con el mismo estilo de estado y llamadas.
+
+- **Enlace**: `https://color.baltajmn.dev/i/g<code>`, con el código de 10 hexadecimales detrás de la
+  `g`. Va bajo `/i/` a propósito: el `pathPrefix` de Android, el `/i/*` de
+  `apple-app-site-association` y `assetlinks.json` ya lo cubren sin tocar nada. `groupCodeOf(url)`
+  solo acepta ese host y esa forma, e `inviteCodeOf` sigue sin aceptarla (exige 10 hexadecimales
+  justos tras `/i/`). La web (`404.html` de `chroma-privacy`, #56) reconoce las dos formas.
+- **Abrir un enlace** guarda el código en memoria (`Groups.pendingCode`, como `Friends.pendingCode`) y
+  lleva a Amigos. Allí, con cuenta y nombre, sale la confirmación (`groupJoinTitle`, `groupJoinText`):
+  entrar en un grupo enseña tus días a gente que quizá no es tu amiga, y eso no pasa sin un sí. Si se
+  cancela, el código se olvida.
+- `join` devuelve lo que contestó el `rpc` y después pide la lista de grupos; el grupo recién entrado
+  queda elegido (se reconoce por su código en `my_groups`). Como en `Friends.request`, un refresco que
+  falla después no convierte la respuesta en "sin conexión".
+- **Lista**: `rpc my_groups()`. **Miembros**: `rpc group_people(g)`, al abrir un grupo.
+- **Feed** de un grupo: `select * from shared_entries where author in (miembros sin mí) and day in
+  (hoy, ayer) order by updated_at desc`. Mismo `FeedRow`, mismo `readable()`, mismas tarjetas ocultas
+  por reporte (`hiddenCards`). Se pide al abrir el grupo y al tirar hacia abajo; sin sondeo.
+- **Fotos**: las mismas de `Friends.photo`, con la misma caché `friends/<author>-<day>-<updated_at>.jpg`.
+  Una foto de alguien que es amigo y está en el grupo se baja una vez. La limpieza de la caché guarda
+  la unión de los dos feeds (`Friends.feed` y `Groups.feed`): con dos listas, cada carga borraría las
+  fotos de la otra.
+- El feed de Amigos no cambia: ya filtra por la lista de amigos, así que las filas de un miembro que
+  no es amigo, que la RLS ahora deja llegar, no se enseñan allí. La tira del widget tampoco: son los
+  colores de los amigos.
+- **Bloquear** desde una tarjeta del grupo usa `block_user`, que vale para cualquiera; la persona sale
+  al momento del feed del grupo y de su lista de miembros. Reportar inserta en `reports` igual que con
+  un amigo. El menú de una tarjeta de grupo enseña `removeFriend` solo si la persona es amiga.
+- **Salir** quita el grupo de la lista y vacía su feed. **Sacar** a alguien lo quita de la lista de
+  miembros y del feed.
+- La primera vez que se entra en un grupo o se crea uno, si nunca se preguntó, sale la pregunta del
+  valor por defecto (`askDefaultShare`), igual que con el primer amigo.
+- `Social.forget` llama a `Groups.forget()`: al cerrar sesión no queda ni la lista ni el feed.
+
 ---
 
 ## 10. Tests
@@ -914,6 +1050,7 @@ Comunes (`commonTest`) salvo que se diga.
     (también el fichero viejo al que sí apunta una tarjeta), que `anon` no ejecuta ni toca nada, el
     conjunto exacto de funciones que ejecuta `authenticated`, y que el trigger y las tres tareas de
     `pg_cron` existen.
+    Los grupos tienen su propio fichero (test 20).
     `.github/workflows/db.yml` lo ejecuta (`supabase start` y `supabase test db`) en cada cambio de
     `supabase/`.
 18. Estadísticas: calidez ordenada, mes más cálido y más frío, color repetido, estación más gris, pocos
@@ -924,6 +1061,21 @@ Comunes (`commonTest`) salvo que se diga.
     sube solo con el color; otra cuenta empieza sin nada compartido ni en cola; el dueño de la cola
     sobrevive al fichero y los ficheros viejos no lo tienen; la sesión que el cliente suelta
     (`sessionLost`) se distingue del `NotAuthenticated` con el que arranca un teléfono sin cuenta.
+20. Grupos, servidor (`supabase/tests/database/groups.test.sql`, pgTAP): crear exige perfil y mete a
+    quien crea como administrador; un miembro lee los días de hoy y ayer de otro y su foto, pero no un
+    día viejo ni el año; un extraño no lee nada; un bloqueo dentro del grupo corta los días, la foto y
+    la lista de miembros en los dos sentidos; unirse con un código que no existe cuenta como intento y
+    el freno de 20 vale también aquí; tope de 20 miembros y de 5 grupos; solo el administrador saca y
+    regenera; el sacado no vuelve con el enlace y recibe `not_found`; el administrador pasa al
+    siguiente al salir; el último en salir borra el grupo; un miembro puede reportar una tarjeta del
+    grupo y un extraño no; nadie toca las tablas de grupos sin funciones; y el conjunto de funciones
+    que ejecuta `authenticated` (en `friends.test.sql`) crece justo con las siete de grupos y
+    `shares_group`.
+21. Grupos, cliente (`GroupsLogicTest`): `groupCodeOf` acepta `/i/g<10 hex>` con o sin barra y
+    parámetros, rechaza otro host y otra longitud, e `inviteCodeOf` no se confunde con él; cada
+    respuesta de `join_group` tiene su resultado; el feed de un grupo es solo de sus miembros, sin mí y
+    sin tarjetas ocultas.
+
 
 `ExtractPreview` (`androidHostTest`) no es un test: con `CHROMA_PHOTOS=<carpeta>` escribe
 `shared/build/extract-preview.png`, una hoja con cada foto y sus candidatos, para juzgar la extracción a ojo.
@@ -966,3 +1118,8 @@ entonces corre solo; Robolectric y sus dependencias no entran en el binario.
 | #39 Sintonía | 6.11; test 14 |
 | #40 Color de la semana | 6.12; test 16 |
 | #41 Estadísticas | 6.13; test 18 |
+| #44 Grupos | `SPEC.md` 5 Grupos |
+| #53 Grupos, servidor | 5, 8.5; test 20 |
+| #54 Grupos, cliente | 9.5; test 21 |
+| #55 Grupos, pantallas y textos | `pantallas.md` 8.7 |
+| #56 Web de invitación | 9.5 |

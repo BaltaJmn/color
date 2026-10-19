@@ -454,6 +454,53 @@ los dos está en el límite de amigos, o la otra persona en el de solicitudes en
 cuál) o `inviteTooMany` (demasiados enlaces que no valen en una hora). Aceptar una solicitud estando
 uno de los dos en 50 amigos dice `friendLimit`.
 
+### 8.7 Grupos (v1.3)
+
+**El selector.** Con cuenta y nombre, bajo el título de Amigos, una fila de cápsulas que se desplaza en
+horizontal: `navFriends` (el feed de siempre), una por grupo con su nombre, por orden de entrada, y al
+final `groupNew` con un más. La elegida va rellena de tinta, como la cápsula de navegación; las demás,
+con borde `outline`. Sin número de miembros ni marca de "hay algo nuevo". Sin grupos, la fila solo
+tiene `navFriends` y `groupNew`: así se descubre que existen sin ocupar más.
+
+**Crear.** `groupNew` abre un diálogo: título `groupNewTitle`, el campo de nombre (el mismo de la
+cuenta, con su `n/30`) y `groupCreate`. Con 5 grupos dice `groupLimit` y no crea. Al crearlo queda
+elegido y se abre su invitación: un grupo de uno no sirve de nada.
+
+**El feed de un grupo.** El título de la pantalla pasa a ser el nombre del grupo. A su derecha,
+`groupInvite` (abre la invitación) y los tres puntos (`a11yMore`), que abren el menú del grupo.
+
+- Arriba, la paleta de hoy del grupo, como la del círculo (24 de alto, radio 12, un segmento por
+  miembro con color hoy, por hora, sin nombres; el lector la anuncia como `a11yFriendsToday`).
+- Después, `feedToday` y `feedYesterday` con las tarjetas **a tamaño completo** (no `compact`), una
+  debajo de otra con 16 entre ellas: el nombre del autor y su fecha, la foto pequeña abajo a la derecha
+  que se toca para verla entera. Es el Instagram de los primeros: una cosa cada vez, grande, en orden.
+  Tocar el nombre no abre un año: solo los amigos tienen año.
+- La sintonía y el color de la semana salen igual que en el feed de amigos.
+- Tres puntos en cada tarjeta (o mantenerla pulsada) abren el mismo diálogo que con un amigo:
+  `report`, `block` y, solo si es tu amigo, `removeFriend`.
+- Al final, `caughtUp`. Sin nada en hoy ni en ayer, `groupEmpty` y, debajo, `groupInvite`.
+- Tirar hacia abajo refresca.
+
+**El menú del grupo.** Un diálogo con el nombre del grupo y dos filas: `groupMembers` y `groupLeave`.
+
+- `groupMembers` abre otro diálogo con los nombres, por orden de entrada, sin número. El primero lleva
+  debajo `groupAdmin` en `caption`. Al administrador, cada uno de los demás le enseña `groupRemove`
+  debajo de su nombre, a la derecha, como `unblock` en Bloqueados ("`groupRemove`, nombre" para el
+  lector), con confirmación `groupRemoveText` en `error`. Cierra con `a11yClose`.
+- `groupLeave` pide confirmación (`groupLeaveText`, en `error`). Al salir, el selector vuelve a
+  `navFriends`.
+
+**Invitar a un grupo.** La misma capa que la invitación de un amigo (8.6), con `groupInvite` de título,
+`groupInviteText`, el QR y el enlace del grupo, y `shareLink` (`groupInviteMessage`). `regenerateLink`
+solo sale al administrador, con la misma confirmación `regenerateText`.
+
+**Entrar por enlace.** Abrir el enlace de un grupo lleva a Amigos. Con cuenta y nombre sale un diálogo
+`groupJoinTitle` con `groupJoinText` (los miembros verán lo que compartes, solo de hoy y ayer, y tú lo
+suyo; entrar no os hace amigos), `groupJoin` y `cancel`. Sin cuenta, el enlace espera en memoria a que
+la haya, como el de un amigo. La respuesta es un aviso tranquilo: entrar elige el grupo sin aviso;
+`groupAlready` (ya estabas, y también lo elige), `inviteInvalid` (no existe, o te sacaron: no se dice
+cuál), `groupFull` (el grupo está lleno o tú en 5 grupos) o `inviteTooMany`.
+
 ---
 
 ## 9. Paywall
