@@ -69,6 +69,7 @@ import com.baltajmn.color.i18n.S
 import com.baltajmn.color.social.Acting
 import com.baltajmn.color.social.FeedRow
 import com.baltajmn.color.social.Friends
+import com.baltajmn.color.social.Groups
 import com.baltajmn.color.social.InviteResult
 import com.baltajmn.color.social.Outbox
 import com.baltajmn.color.social.Social
@@ -128,9 +129,13 @@ private fun Page(content: @Composable ColumnScope.() -> Unit) {
 }
 
 @Composable
-private fun Header(action: (@Composable () -> Unit)? = null) {
+private fun Header(action: (@Composable () -> Unit)? = null) = FriendsHeader(S.navFriends, action)
+
+/** The title of the tab, or of the group on screen, with what can be done there beside it. */
+@Composable
+internal fun FriendsHeader(title: String, action: (@Composable () -> Unit)? = null) {
     Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(S.navFriends, style = Styles.title, modifier = Modifier.weight(1f))
+        Text(title, style = Styles.title, modifier = Modifier.weight(1f), maxLines = 2, overflow = TextOverflow.Ellipsis)
         action?.invoke()
     }
 }
@@ -141,7 +146,7 @@ private fun Header(action: (@Composable () -> Unit)? = null) {
  * (like the intro's made-up example) silent for a screen reader.
  */
 @Composable
-private fun PaletteStrip(colors: List<String>, description: String? = null) {
+internal fun PaletteStrip(colors: List<String>, description: String? = null) {
     val base = Modifier.fillMaxWidth().height(24.dp).clip(RoundedCornerShape(12.dp))
     Row(if (description != null) base.semantics { contentDescription = description } else base.clearAndSetSemantics {}) {
         colors.forEach { Box(Modifier.weight(1f).height(24.dp).background(colorOf(it))) }
@@ -182,7 +187,7 @@ private fun SignedIn(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
     when {
         offline -> Page { Notice(S.friendsOffline, S.retry to { attempt++ }) }
         Social.needsName -> Page { NameAndAge() }
-        Social.me != null -> FriendsHome(today, onPhoto)
+        Social.me != null -> SocialHome(today, onPhoto)
         else -> Page { Text(S.working, style = Styles.caption) }
     }
 }
@@ -262,6 +267,39 @@ fun NameField(value: String, onChange: (String) -> Unit) {
     }
 }
 
+/**
+ * The friends' feed or a group's, and what waits over either: the question of the default share
+ * when the first friend or group arrives, naming a group, and joining one from a link.
+ */
+@Composable
+private fun SocialHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
+    var askShare by remember { mutableStateOf(false) }
+    // Not part of the feeds' loads: a group list that fails must not call the friends' feed offline.
+    LaunchedEffect(Unit) { runCatching { Groups.refresh() } }
+    // The default is asked when the first friend or group arrives, on whichever side of the link.
+    val someone = Friends.friends.isNotEmpty() || Groups.groups.isNotEmpty()
+    LaunchedEffect(someone) {
+        if (someone && !ChromaRepository.settings.shareAsked) askShare = true
+    }
+    when (val group = Groups.current) {
+        null -> FriendsHome(today, onPhoto)
+        else -> GroupHome(group, today, onPhoto)
+    }
+    GroupDialogs()
+    if (askShare) {
+        ShareChoiceDialog(
+            S.askDefaultShareTitle,
+            S.askDefaultShareText,
+            ChromaRepository.settings.defaultShare,
+            onPick = { share -> ChromaRepository.updateSettings { it.copy(defaultShare = share, shareAsked = true) } },
+            onDismiss = {
+                ChromaRepository.updateSettings { it.copy(shareAsked = true) }
+                askShare = false
+            },
+        )
+    }
+}
+
 /** docs/pantallas.md 8.3: the circle's palette, requests, today, yesterday, and an end. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -272,7 +310,6 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
     var failed by remember { mutableStateOf(false) }
     var attempt by remember { mutableStateOf(0) }
     var refreshing by remember { mutableStateOf(false) }
-    var askShare by remember { mutableStateOf(false) }
     val code = Friends.pendingCode
 
     suspend fun load() {
@@ -281,15 +318,12 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
             // A link opened before there was an account goes out now, once.
             code?.let { message = inviteResultText(Friends.request(it)) }
             Friends.refreshFeed(today)
+            runCatching { Groups.refresh() }
             // The request spends the code this effect is keyed on, which restarts it: a cancelled run
             // is not a failed one, or "no connection" would flash before the restart.
         }.onFailure { if (it is CancellationException) throw it }.isFailure
     }
     LaunchedEffect(code, attempt, today) { load() }
-    // The default is asked when the first friend arrives, on whichever side of the request.
-    LaunchedEffect(Friends.friends.isNotEmpty()) {
-        if (Friends.friends.isNotEmpty() && !ChromaRepository.settings.shareAsked) askShare = true
-    }
     fun act(block: suspend () -> Unit) {
         scope.launch { if (runCatching { block() }.isFailure) failed = true }
     }
@@ -316,27 +350,29 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(bottom = 32.dp),
         ) {
-            block {
+            friendsBlock {
                 Header(
                     if (names.isEmpty()) null else ({ TextAction(S.inviteFriend, { Friends.inviteOpen = true }) }),
                 )
+                GroupBar()
             }
             // One notice at a time (docs/pantallas.md 1): a failed refresh explains why nothing
             // else updates, so it outranks the message.
             if (failed) {
-                block { Notice(S.friendsOffline, S.retry to { attempt++ }) }
+                friendsBlock { Notice(S.friendsOffline, S.retry to { attempt++ }) }
             } else {
-                message?.let { text -> block { Notice(text, S.ok to { message = null }) } }
+                message?.let { text -> friendsBlock { Notice(text, S.ok to { message = null }) } }
+                    ?: Groups.notice?.let { text -> friendsBlock { Notice(text, S.ok to { Groups.notice = null }) } }
             }
             // In order of the hour, earliest first, like the day itself went.
             if (todays.isNotEmpty()) {
-                block {
+                friendsBlock {
                     PaletteStrip(todays.asReversed().map { it.color }, S.a11yFriendsToday)
                     Spacer(Modifier.height(8.dp))
                 }
             }
             if (Friends.requests.isNotEmpty()) {
-                block {
+                friendsBlock {
                     Spacer(Modifier.height(8.dp))
                     Text(S.requestsTitle, style = Styles.label)
                     Friends.requests.forEach { person ->
@@ -356,7 +392,7 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
                 }
             }
             if (names.isEmpty()) {
-                block {
+                friendsBlock {
                     Column(
                         Modifier.fillMaxWidth().padding(vertical = 24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -370,7 +406,7 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
                 feedSection(S.feedToday, todays, names, onPhoto)
                 feedSection(S.feedYesterday, yesterdays, names, onPhoto)
                 // The end is an end: nothing loads below it.
-                block {
+                friendsBlock {
                     Text(
                         S.caughtUp,
                         style = Styles.muted,
@@ -380,19 +416,6 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
                 }
             }
         }
-    }
-
-    if (askShare) {
-        ShareChoiceDialog(
-            S.askDefaultShareTitle,
-            S.askDefaultShareText,
-            ChromaRepository.settings.defaultShare,
-            onPick = { share -> ChromaRepository.updateSettings { it.copy(defaultShare = share, shareAsked = true) } },
-            onDismiss = {
-                ChromaRepository.updateSettings { it.copy(shareAsked = true) }
-                askShare = false
-            },
-        )
     }
 }
 
@@ -419,7 +442,7 @@ private fun RequestRow(name: String, onBlock: () -> Unit, onIgnore: () -> Unit, 
     }
 }
 
-private fun LazyListScope.block(content: @Composable ColumnScope.() -> Unit) = item {
+internal fun LazyListScope.friendsBlock(content: @Composable ColumnScope.() -> Unit) = item {
     Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER), content = content)
 }
 
@@ -430,7 +453,7 @@ private fun LazyListScope.feedSection(
     onPhoto: (ImageBitmap) -> Unit,
 ) {
     if (rows.isEmpty()) return
-    block { Text(title, style = Styles.label, modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)) }
+    friendsBlock { Text(title, style = Styles.label, modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)) }
     items(rows, key = { it.author + it.day }) { row ->
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER, vertical = 8.dp)) {
             FeedCard(row, names.getValue(row.author), onPhoto)
@@ -485,7 +508,7 @@ private fun inviteResultText(result: InviteResult): String = when (result) {
 
 /** Two overlapping rings, 10 across: nothing to press, nothing to count (docs/pantallas.md 6). */
 @Composable
-private fun InTuneMark(ink: Color) {
+internal fun InTuneMark(ink: Color) {
     val label = S.inTune
     Canvas(Modifier.size(width = 16.dp, height = 10.dp).semantics { contentDescription = label }) {
         val r = size.height / 2

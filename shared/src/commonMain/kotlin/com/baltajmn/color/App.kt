@@ -60,6 +60,7 @@ import com.baltajmn.color.data.Route
 import com.baltajmn.color.data.today
 import com.baltajmn.color.i18n.S
 import com.baltajmn.color.social.Friends
+import com.baltajmn.color.social.Groups
 import com.baltajmn.color.social.Outbox
 import com.baltajmn.color.social.Social
 import com.baltajmn.color.ui.DaySheet
@@ -69,6 +70,7 @@ import com.baltajmn.color.ui.FriendList
 import com.baltajmn.color.ui.FriendYear
 import com.baltajmn.color.ui.FriendsScreen
 import com.baltajmn.color.ui.Glyph
+import com.baltajmn.color.ui.GroupInviteScreen
 import com.baltajmn.color.ui.GlyphIcon
 import com.baltajmn.color.ui.InviteScreen
 import com.baltajmn.color.ui.LocalLocked
@@ -189,6 +191,7 @@ fun App() {
             poster = null
             stats = null
             Friends.inviteOpen = false
+            Groups.inviteOpen = false
             Friends.listOpen = false
             Friends.viewing = null
             Friends.viewingDay = null
@@ -216,7 +219,7 @@ fun App() {
                     // drawn but are not read aloud: a screen reader would otherwise walk from the top layer
                     // straight into what it covers (a day under its photo, a friend's year under one day).
                     val layers = listOf(
-                        openDay != null, sharing != null, poster != null, stats != null, Friends.inviteOpen, Friends.listOpen,
+                        openDay != null, sharing != null, poster != null, stats != null, Friends.inviteOpen || Groups.inviteOpen, Friends.listOpen,
                         Friends.viewing != null, Friends.viewing != null && Friends.viewingDay != null, photo != null,
                     )
                     fun quietUnder(above: Int) = if (layers.drop(above).any { it }) Modifier.clearAndSetSemantics {} else Modifier
@@ -250,7 +253,13 @@ fun App() {
                     Box(quietUnder(2)) { sharing?.let { ShareScreen(it, onClose = { sharing = null }) } }
                     Box(quietUnder(3)) { poster?.let { PosterScreen(it, onClose = { poster = null }) } }
                     Box(quietUnder(4)) { stats?.let { StatsScreen(it, onClose = { stats = null }) } }
-                    Box(quietUnder(5)) { if (Friends.inviteOpen) InviteScreen { Friends.inviteOpen = false } }
+                    Box(quietUnder(5)) {
+                        val group = Groups.current
+                        when {
+                            Friends.inviteOpen -> InviteScreen { Friends.inviteOpen = false }
+                            Groups.inviteOpen && group != null -> GroupInviteScreen(group) { Groups.inviteOpen = false }
+                        }
+                    }
                     Box(quietUnder(6)) { if (Friends.listOpen) FriendList { Friends.listOpen = false } }
                     Box(quietUnder(7)) { Friends.viewing?.let { FriendYear(it, day, onClose = { Friends.viewing = null }) } }
                     Box(quietUnder(8)) {
@@ -270,7 +279,7 @@ fun App() {
             BackHandler(
                 !locked && (
                     Paywall.open || photo != null || sharing != null || poster != null || stats != null ||
-                        Friends.inviteOpen || Friends.listOpen || Friends.viewing != null || Friends.viewingDay != null ||
+                        Friends.inviteOpen || Groups.inviteOpen || Friends.listOpen || Friends.viewing != null || Friends.viewingDay != null ||
                         openDay != null || screen != Screen.Today
                     ),
             ) {
@@ -281,6 +290,7 @@ fun App() {
                     poster != null -> poster = null
                     stats != null -> stats = null
                     Friends.inviteOpen -> Friends.inviteOpen = false
+                    Groups.inviteOpen -> Groups.inviteOpen = false
                     Friends.viewingDay != null -> Friends.viewingDay = null
                     Friends.viewing != null -> Friends.viewing = null
                     Friends.listOpen -> Friends.listOpen = false

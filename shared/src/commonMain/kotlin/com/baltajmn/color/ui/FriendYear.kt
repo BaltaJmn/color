@@ -197,7 +197,8 @@ fun FriendActions(acting: Acting, onDone: () -> Unit) {
                 Column {
                     if (day != null) MenuRow(S.report) { step = Step.Report }
                     MenuRow(S.block) { step = Step.Block }
-                    MenuRow(S.removeFriend) { step = Step.Remove }
+                    // A card of a group can be someone who is not a friend: nothing to remove then.
+                    if (Friends.friends.any { it.id == person.id }) MenuRow(S.removeFriend) { step = Step.Remove }
                 }
             },
             confirmButton = { TextAction(S.cancel, onDone) },
@@ -229,7 +230,7 @@ fun FriendActions(acting: Acting, onDone: () -> Unit) {
 }
 
 @Composable
-private fun MenuRow(label: String, onClick: () -> Unit) {
+internal fun MenuRow(label: String, onClick: () -> Unit) {
     Text(
         label,
         style = Styles.body,

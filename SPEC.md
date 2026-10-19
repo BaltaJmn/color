@@ -100,6 +100,15 @@ métricas.
 - [ ] Paleta de amigos en el widget de hoy.
 - [ ] Bloqueo con biometría.
 
+### v1.3: Grupos (#44)
+
+- [ ] Crear un grupo con nombre e invitar por enlace o QR, a gente del círculo o nueva. Tope de 5
+      grupos por persona y 20 miembros por grupo.
+- [ ] Dentro, un feed vertical de tarjetas grandes con los días de hoy y ayer de sus miembros, por
+      hora, sin algoritmo, que se acaba.
+- [ ] Salir cuando quieras; quien lleva más tiempo dentro puede sacar a alguien y regenerar el enlace.
+- [ ] Bloquear y reportar, igual que con un amigo.
+
 ### Descartado a propósito
 
 | Qué | Por qué no |
@@ -117,7 +126,8 @@ métricas.
 | Cuentagotas libre sobre la foto | Más lento y peor: acaba en colores que no representan nada |
 | Rellenar días pasados | El color de un día que no miraste no significa nada |
 | Hora impuesta y cuenta atrás (estilo BeReal) | Presión por diseño |
-| Mosaicos de grupo | Complejidad (grupos, permisos, fechas) que nadie ha pedido. Se reabre si sale en reseñas (#44) |
+| Mosaicos de grupo | Los grupos (v1.3) son un feed de hoy y ayer, no un álbum: un mosaico común guardaría para siempre los días de gente que no es tu amiga |
+| Chat o avisos de grupo | Igual que con los amigos: el grupo ya tiene su chat fuera de Chroma, y un aviso abre la app por ansiedad |
 | Push de resumen diario | El widget informa sin interrumpir (#42) |
 
 ### Explícitamente fuera de alcance
@@ -141,6 +151,8 @@ analítica e informes de fallos de terceros.
 | Vida de la foto en el servidor | **2 días** | El feed solo enseña hoy y ayer: una foto no tiene por qué durar más que ellos. Acota coste y exposición |
 | Vida del color en el servidor | Mientras exista la cuenta | Son bytes, y sostienen el mosaico de cada amigo |
 | Tope de amigos | **50** (`MAX_FRIENDS`) | Un círculo, no una audiencia |
+| Grupos | **5** por persona, **20** miembros cada uno (`MAX_GROUPS`, `MAX_GROUP_MEMBERS`) | Una pandilla, un piso, la familia: gente que se conoce. Más ya es un canal |
+| Qué ve un grupo | Los días que compartes, **solo hoy y ayer** | Lo mismo que el feed. Quien no es tu amigo no ve tu año: el servidor no le deja leer nada más viejo |
 | Umbral de sintonía | deltaE < **5** (`SYNC_DELTA_E`) | Tiene que parecer casualidad, no pasar cada día |
 | Compartir por defecto | Privado; se pregunta una vez al aceptar el primer amigo | Nada sale sin una decisión consciente |
 | Edad mínima de Amigos | **16** años declarados | La edad de consentimiento digital más alta de la UE: vale en todos los países |
@@ -224,6 +236,29 @@ Bloquear (deja de verte y no puede volver a invitarte, hasta que lo desbloquees 
 Bloqueados) y reportar una tarjeta (se te oculta al momento y el autor de la app recibe un correo para
 actuar en menos de 24 horas). Están en un menú discreto, y bloquear también en cada solicitud recibida.
 No son reacciones: Apple y Google los exigen y protegen a quien lo necesita.
+
+### Grupos (v1.3)
+
+Un grupo es un feed compartido, no una red: la misma regla de "ver, nunca que te midan", con más gente.
+
+- **Se entra por enlace o QR** (`color.baltajmn.dev/i/g<code>`), como a un amigo, pero sin solicitud:
+  el enlace es la invitación. Antes de entrar, la app dice qué pasa: los miembros verán lo que
+  compartes, solo de hoy y ayer, y tú lo suyo. Entrar no hace amigos a nadie.
+- **Lo que ves**: tarjetas grandes, una debajo de otra, con los días de hoy y ayer de los miembros, la
+  última cambiada arriba, y al final "Ya estás al día". Como un Instagram de los primeros: lo de tu
+  gente, en orden, y se acaba.
+- **Lo que compartes ya es lo que compartes.** No hay un interruptor por grupo: un día privado no sale,
+  uno con solo color sale sin foto, y uno con foto sale con ella, para amigos y grupos a la vez. Elegir
+  público por día y por grupo sería un formulario cada mañana.
+- **Nada viejo en el servidor**: un miembro que no es tu amigo solo puede leer tus días de hoy y ayer,
+  y las fotos se borran a los 2 días como siempre. Lo antiguo vive en el móvil de cada uno.
+- **Quien manda** es quien lleva más tiempo dentro: al principio, quien lo creó; si se va, el
+  siguiente. Puede sacar a alguien (no vuelve a entrar con el enlace, y nadie recibe aviso) y
+  regenerar el enlace. Cualquiera puede invitar y cualquiera puede salir; el último que sale lo borra.
+- **Bloquear** dentro de un grupo corta en los dos sentidos, como siempre: ninguno ve los días del
+  otro ni su nombre en la lista de miembros, aunque sigan los dos dentro. **Reportar** oculta la
+  tarjeta y avisa por correo, igual que con un amigo.
+- Sin contadores de miembros, sin "visto por", sin avisos de publicación ni de quién entra o sale.
 
 ---
 
@@ -430,12 +465,16 @@ friendships     (a, b, status, requested_by, created_at)   a < b, status pending
 shared_entries  (author, day, color, name, word, photo_path, updated_at)   clave (author, day)
 blocks          (blocker, blocked)
 reports         (id, reporter, author, day, created_at, notified_at)   único (reporter, author, day)
+groups          (id, name, invite_code, created_at)                            v1.3
+group_members   (group_id, member, joined_at)                                  v1.3
+group_bans      (group_id, member)                                             v1.3
 ```
 
 El esquema vigente, con sus restricciones, está en `supabase/migrations/` y en `docs/tecnico.md` 8.1.
 
 - Una fila de `shared_entries` la leen su autor y sus amigos aceptados, salvo que haya un bloqueo en
-  cualquier sentido.
+  cualquier sentido. Desde v1.3, también quien comparte un grupo con el autor, pero solo los días de
+  hoy y ayer.
 - Un trigger aplica el tope de 50 al aceptar.
 - El bucket de fotos es privado y usa la misma regla. Las fotos se descargan con la sesión de quien
   mira, y las políticas del bucket deciden; la única URL firmada es la de 24 h del correo de reporte.
@@ -493,6 +532,10 @@ Servidor (#28), esquema (#30), cuentas (#29), subida (#31), invitaciones (#32), 
 
 **v1.2**
 Color de la semana (#40), estadísticas (#41), paleta de amigos en el widget (#42), biometría (#43).
+
+**v1.3**
+Grupos (#44): servidor (#53), cliente (#54), pantallas y textos (#55), página de invitación (#56).
+Formularios y política, a mano por el usuario: dicen quién ve lo que compartes.
 
 ---
 
