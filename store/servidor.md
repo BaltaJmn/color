@@ -137,6 +137,13 @@ Y a mano, con dos móviles: invitar, aceptar, compartir un color, verlo en el fe
 bloquear y ver que desaparece, y desbloquear desde Ajustes > Amigos > Bloqueados. Con un reporte: que
 llega el correo (uno solo) y que `notified_at` se rellena.
 
+Hecho el 19-10-2026 con dos emuladores Android (build debug, cuentas de Google distintas): alta con
+nombre y 16 años, invitación por enlace, aceptar, compartir con foto, la tarjeta en el feed del otro,
+reportar (la tarjeta se oculta y queda la fila en `reports`), bloquear y desbloquear. Todo pasó. Falta
+el correo del reporte: sin `RESEND_API_KEY`, `notified_at` sigue a null hasta que exista y el reintento
+de cada hora lo mande. Visto de paso: una solicitud nueva no aparece en Amigos hasta salir y volver a la
+pestaña.
+
 ## 7. Actuar sobre un reporte
 
 El correo trae lo necesario para juzgar (autor, quién reporta, día, color, palabra y una URL de la foto
