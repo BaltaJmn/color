@@ -327,13 +327,13 @@ object ChromaRepository {
     }
 
     /**
-     * Once ever, a week of colors in, called on coming back to the app with today's already picked: a
+     * A week of colors in and 120 days since the last ask, called on coming back to the app with today's already picked: a
      * calm moment, never on top of a pick, an import or a save that runs with the app stopped. Marked
      * only once the store was asked, so an attempt with nothing to show it in is not spent.
      */
     fun maybeRequestReview() {
-        if (!reachedReviewDayCount(journal.size, settings.reviewRequested) || today().isoKey() !in journal) return
-        Review.request { updateSettings { it.copy(reviewRequested = true) } }
+        if (!reachedReviewDayCount(journal.size, settings.reviewAskedAt, nowMillis()) || today().isoKey() !in journal) return
+        Review.request { updateSettings { it.copy(reviewAskedAt = nowMillis()) } }
     }
 
     /**
@@ -365,6 +365,10 @@ object ChromaRepository {
     private fun Map<String, ChromaEntry>.toSortedMap() = entries.sortedBy { it.key }.associate { it.toPair() }
 }
 
-/** Whether a just-persisted journal should trigger the once-ever review prompt. */
-internal fun reachedReviewDayCount(totalDays: Int, alreadyRequested: Boolean): Boolean =
-    !alreadyRequested && totalDays >= 7
+/**
+ * Whether the journal earns an in-app rating request: a week of colors (so also a week installed),
+ * and 120 days since the last request ([askedAt], 0 = never). Never after an error or the paywall:
+ * the caller only asks from a calm Today screen.
+ */
+internal fun reachedReviewDayCount(totalDays: Int, askedAt: Long, now: Long): Boolean =
+    totalDays >= 7 && (askedAt == 0L || now - askedAt >= 120L * 86_400_000L)

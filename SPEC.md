@@ -509,3 +509,13 @@ Color de la semana (#40), estadísticas (#41), paleta de amigos en el widget (#4
    estadísticas en v1.2.
 7. **Fecha de las fotos de galería.** Algunas vías de importar borran el EXIF. Por eso una foto sin
    fecha se acepta.
+
+## Petición de reseña
+
+Dentro de la app, con el diálogo del sistema (Play In-App Review en Android, `SKStoreReviewController` en iOS); la tienda decide si lo enseña.
+
+- Momento: al volver a la app con el color de hoy ya elegido, en la pantalla de hoy y sin nada encima.
+- Regla: 7 días de colores en el diario (implica una semana de uso) y 120 días desde la última petición (`reachedReviewDayCount`). Antes era una sola vez en la vida.
+- Nunca tras un error, en el paywall ni sobre otra capa; se marca como pedida aunque la tienda no la enseñe.
+- Código: `review/` (Review.kt y sus actual) y la función de la condición, con test.
+
