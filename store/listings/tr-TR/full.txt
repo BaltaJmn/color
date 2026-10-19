@@ -19,14 +19,17 @@ Bugünün widget'ı rengini, adıyla birlikte kenardan kenara gösterir. Fotoğr
 TEK BİR HATIRLATICI, NE ZAMAN DURACAĞINI BİLİR
 Seçtiğin saatte günde bir kez, günün rengi ne olduğunu soran nazik bir hatırlatma. Bugüne rengi verildiğinde sessizleşir.
 
-HER ŞEY TELEFONUNDA KALIR
-Hesap yok, kayıt yok, bize ait bir bulut yok. Fotoğraflar konum bilgisi olmadan saklanır. İstediğin an tüm günlerini, fotoğraflar dahil, tek bir dosya olarak dışa aktar ve başka bir telefona aktar: içe aktarma sadece ekler, asla silmez.
+ARKADAŞLAR, İSTERSEN
+Arkadaşlarını bir bağlantıyla davet et ve birbirinizin günün rengini görün; fotoğraf yalnızca sen paylaşırsan görünür. Yalnızca kabul ettiğin arkadaşlar görür ve paylaşılan fotoğraflar 2 gün sonra silinir. Beğeni yok, yorum yok, sayaç yok. İstediğin kişiyi istediğin zaman şikayet et ya da engelle.
+
+GÜNLÜĞÜN TELEFONUNDA KALIR
+Zorunlu hesap yok, bize ait bir bulut yok: yalnızca Arkadaşlar senden Apple veya Google ile giriş yapmanı ister ve telefondan yalnızca paylaştıkların çıkar. Fotoğraflar konum bilgisi olmadan saklanır. İstediğin an tüm günlerini, fotoğraflar dahil, tek bir dosya olarak dışa aktar ve başka bir telefona aktar: içe aktarma sadece ekler, asla silmez.
 
 SÜRESİ İŞLEMEYEN ÜCRETSİZ SÜRÜM
-Fotoğraflar ve renkler, Benim Yılım, paylaşım kartları, hatırlatıcı, bugünün widget'ı, haftanın rengi, yüzünle veya parmak izinle kilit, verilerini dışa ve içe aktarma: renk günlüğün, kalıcı olarak ücretsiz.
+Fotoğraflar ve renkler, Benim Yılım, paylaşım kartları, hatırlatıcı, bugünün widget'ı, Arkadaşlar'daki her şey, haftanın rengi, yüzünle veya parmak izinle kilit, verilerini dışa ve içe aktarma: renk günlüğün, kalıcı olarak ücretsiz.
 
-PRO, TEK ÖDEME
-Renk günlüğünün yıl sonu hali: yazdırmak ya da duvar kağıdı olarak kullanmak için üç farklı stilde yıl posteri, yıl widget'ı ve yılının kısa cümlelerle anlatımı. Tek seferlik bir ödeme, asla abonelik değil.
+PRO, SANA GÖRE
+Renk günlüğünün yıl sonu hali: yazdırmak ya da duvar kağıdı olarak kullanmak için üç farklı stilde yıl posteri, yıl widget'ı ve yılının kısa cümlelerle anlatımı. Bir kez ödeyip sonsuza kadar kullan ya da istersen aylık öde.
 
 BURADA BULAMAYACAKLARIN
 Seri yok, filtre yok, beğeni yok, reklam yok, analitik yok.

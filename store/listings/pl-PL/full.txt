@@ -19,14 +19,17 @@ Widget koloru dnia to Twój kolor, od krawędzi do krawędzi, z jego nazwą. Nig
 JEDNO PRZYPOMNIENIE, KTÓRE WIE, KIEDY PRZESTAĆ
 Jedno codzienne przypomnienie o wybranej przez Ciebie porze, pytające, jaki kolor ma dzisiejszy dzień. Milczy, gdy dzisiejszy dzień ma już swój kolor.
 
-WSZYSTKO ZOSTAJE W TWOIM TELEFONIE
-Bez konta, bez rejestracji, bez naszej chmury. Zdjęcia są przechowywane bez informacji o lokalizacji. Wyeksportuj wszystkie swoje dni razem ze zdjęciami jako jeden plik, kiedy chcesz, i zaimportuj go na innym telefonie: import dodaje, nigdy nie usuwa.
+ZNAJOMI, JEŚLI CHCESZ
+Zaproś znajomych linkiem i zobaczcie nawzajem swój kolor dnia, ze zdjęciem tylko wtedy, gdy je udostępnisz. Widzą go tylko znajomi, których zaakceptujesz, a udostępnione zdjęcia są usuwane po 2 dniach. Bez polubień, bez komentarzy, bez liczników. Zgłoś lub zablokuj każdego, kiedy chcesz.
+
+TWÓJ DZIENNIK ZOSTAJE W TWOIM TELEFONIE
+Konto nie jest obowiązkowe i nie ma naszej chmury: tylko Znajomi proszą o zalogowanie przez Apple lub Google, a z telefonu wychodzi tylko to, co udostępnisz. Zdjęcia są przechowywane bez informacji o lokalizacji. Wyeksportuj wszystkie swoje dni razem ze zdjęciami jako jeden plik, kiedy chcesz, i zaimportuj go na innym telefonie: import dodaje, nigdy nie usuwa.
 
 DARMOWE, BEZ ODLICZANEGO CZASU
-Zdjęcia i kolory, Mój rok, karty do udostępniania, przypomnienie, widget koloru dnia, kolor tygodnia, blokada Twoją twarzą lub odciskiem palca oraz eksport i import Twoich danych: Twój dziennik kolorów, darmowy, na zawsze.
+Zdjęcia i kolory, Mój rok, karty do udostępniania, przypomnienie, widget koloru dnia, wszystko w Znajomych, kolor tygodnia, blokada Twoją twarzą lub odciskiem palca oraz eksport i import Twoich danych: Twój dziennik kolorów, darmowy, na zawsze.
 
-PRO, JEDNA PŁATNOŚĆ
-Plakat roku w trzech stylach do druku lub jako tapeta, widget roku i Twój rok opowiedziany w krótkich zdaniach. Jedna płatność, raz na zawsze, nigdy subskrypcja.
+PRO, JAK WOLISZ
+Plakat roku w trzech stylach do druku lub jako tapeta, widget roku i Twój rok opowiedziany w krótkich zdaniach. Jedna płatność na zawsze albo miesięcznie, jeśli wolisz.
 
 CZEGO TU NIE ZNAJDZIESZ
 Żadnych serii, żadnych filtrów, żadnych polubień, żadnych reklam, żadnej analityki.
