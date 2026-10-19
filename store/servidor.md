@@ -64,7 +64,10 @@ supabase secrets set RESEND_API_KEY=<clave> REPORT_TO=baltajmn@gmail.com \
 ```
 
 `REPORT_FROM` tiene que ser de un dominio verificado en Resend (`baltajmn.dev`, registros en
-Cloudflare).
+Cloudflare). Hecho el 19-10-2026: dominio `baltajmn.dev` en Resend, región eu-west-1, con sus cuatro
+registros (`resend._domainkey` TXT, `send` MX y TXT, `rsend` CNAME, todos sin proxy) puestos por la API
+de Cloudflare. La clave es de acceso completo y vive en el Llavero (`dev.baltajmn.resend`) y en el
+secreto `RESEND_API_KEY` del proyecto. Si se rota, se cambia en los dos sitios.
 
 `REPORT_WEBHOOK_SECRET` tiene que existir y valer lo mismo que `report_webhook_secret` en el Vault
 (sección 2): `report-notify` contesta 401 a todo si la variable falta o si la cabecera `x-webhook-secret`
@@ -143,9 +146,8 @@ llega el correo (uno solo) y que `notified_at` se rellena.
 
 Hecho el 19-10-2026 con dos emuladores Android (build debug, cuentas de Google distintas): alta con
 nombre y 16 años, invitación por enlace, aceptar, compartir con foto, la tarjeta en el feed del otro,
-reportar (la tarjeta se oculta y queda la fila en `reports`), bloquear y desbloquear. Todo pasó. Falta
-el correo del reporte: sin `RESEND_API_KEY`, `notified_at` sigue a null hasta que exista y el reintento
-de cada hora lo mande. Visto de paso: una solicitud nueva no aparece en Amigos hasta salir y volver a la
+reportar (la tarjeta se oculta y queda la fila en `reports`), bloquear y desbloquear. Todo pasó, y el
+correo de ese reporte salió en cuanto existió la clave de Resend (`notified_at` relleno). Visto de paso: una solicitud nueva no aparece en Amigos hasta salir y volver a la
 pestaña.
 
 ## 7. Actuar sobre un reporte
