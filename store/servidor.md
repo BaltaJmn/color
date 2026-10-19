@@ -78,7 +78,7 @@ sobre `reports`, con `pg_net`, y lo reintenta `report-retry`. Si de una versión
 
 *Authentication > Sign In / Providers*. Correo, teléfono y anónimo, apagados.
 
-Hecho el 19-10-2026, menos el secreto de Apple (abajo).
+Hecho el 19-10-2026.
 
 - **Apple**: un Services ID (`com.baltajmn.color.signin`) con *Sign in with Apple* y la vuelta
   `https://<ref>.supabase.co/auth/v1/callback`; una clave de Sign in with Apple para generar el
@@ -86,7 +86,11 @@ Hecho el 19-10-2026, menos el secreto de Apple (abajo).
   con el bundle). El target de iOS necesita la capacidad *Sign in with Apple*. El App ID tiene *Sign
   in with Apple* y *Associated Domains* (puestas por la API el 19-10-2026). El nativo de iOS no necesita
   secreto; el flujo web (Apple en Android) sí, y ese secreto es una JWT firmada con la clave `.p8` que
-  caduca a los 6 meses: hay que regenerarlo antes.
+  caduca a los 6 meses: hay que regenerarlo antes. Clave `Y275S5BQZ8`, en `~/keys/chroma-siwa.p8`; el
+  secreto puesto el 19-10-2026 caduca el **17-04-2027**. Para rehacerlo, `tools/apple-secret.sh` y su
+  salida, por tubería y sin imprimirla, a `PATCH /v1/projects/<ref>/config/auth` con
+  `external_apple_secret` (Management API). Prueba: `POST https://appleid.apple.com/auth/token` con un
+  código falso contesta `invalid_grant` si el secreto vale e `invalid_client` si no.
 - **Google**: en Google Cloud, un cliente OAuth web (su ID y secreto van a Supabase), uno Android con
   el SHA-1 de la firma de Play y el de depuración, y uno iOS. En *Client IDs* de Supabase, los tres
   separados por comas. El ID del cliente web va también en `SupabaseConfig.kt` (`googleServerClientId`).

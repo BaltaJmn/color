@@ -323,6 +323,24 @@ Lo que cambia al publicar la v1.1 (los datos que salen, en #38):
 | App Store | Borrar la cuenta desde la app (5.1.1(v)): Ajustes > Amigos > Borrar cuenta |
 | Términos | `https://color.baltajmn.dev/terms.html` (`terms.html` de `chroma-privacy`). Se aceptan al crear el nombre, antes de ver nada de nadie, y están en Ajustes > Privacidad |
 
+Estado el 19-10-2026, con Amigos ya en `main`:
+
+- Play, *Seguridad de los datos*: guardada con la tabla de 1b (cuenta por OAuth, URL de borrado de la
+  cuenta y borrado parcial: sí). Está en *Resumen de publicación*, sin enviar a revisión: se envía con la
+  primera versión con Amigos.
+- Play, *Público objetivo*: 16-17 y 18 y más, guardado igual, sin enviar.
+- Play, IARC: cuestionario nuevo rellenado y sin guardar (guardarlo pide clasificación nueva). Respuestas:
+  "Todos los demás tipos"; contenido descargado sujeto a clasificación: no; interactúan o intercambian
+  contenido: **sí**; el contenido de usuarios es el origen principal: no; desnudos o violencia gráfica en
+  público: no; bloquear: sí; reportar: sí; moderación de chat: no; limitado a amigos invitados: sí;
+  contenido en línea: no; productos con restricción de edad: no; ubicación con otros: no; compras
+  digitales: sí; cajas de botín, recompensas en metálico, navegador, informativa: no.
+- Play, *Datos de inicio de sesión*: falta una cuenta de Google de prueba, con su contraseña, que ya tenga
+  nombre y un amigo aceptado. Google no crea cuentas ni usa las personales.
+- App Store, *Privacidad de la app*: se rellena (tabla de 5b) al enviar la v1.1, no antes. Los cambios se
+  publican al momento y Apple pide que reflejen la versión que está a la venta, que hoy no tiene Amigos.
+  La clasificación por edad y las notas al revisor van también con esa versión.
+
 Apple 1.2 pide los cuatro a la vez: términos aceptados, filtro o reporte de contenido, bloquear, y
 actuar en 24 horas. Los reportes llegan por correo (`report-notify`, `store/servidor.md` 3), lanzado desde
 la base y reintentado cada hora hasta que sale, y cómo actuar sobre uno está en `store/servidor.md` 7.
