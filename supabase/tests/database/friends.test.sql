@@ -467,8 +467,10 @@ select is(
    from pg_proc p join pg_namespace n on n.oid = p.pronamespace
    where n.nspname = 'public' and has_function_privilege('authenticated', p.oid, 'execute')
      and not exists (select 1 from pg_depend d where d.objid = p.oid and d.deptype = 'e')),
-  array['accept_friend/1', 'block_user/1', 'decline_friend/1', 'has_open_request/1', 'is_friend/1', 'my_blocks/0',
-        'my_friendships/0', 'my_profile/0', 'regenerate_code/0', 'remove_friend/1', 'request_friend/1', 'unblock_user/1'],
+  array['accept_friend/1', 'block_user/1', 'create_group/1', 'decline_friend/1', 'group_people/1', 'has_open_request/1',
+        'is_friend/1', 'join_group/1', 'leave_group/1', 'my_blocks/0', 'my_friendships/0', 'my_groups/0', 'my_profile/0',
+        'regenerate_code/0', 'regenerate_group_code/1', 'remove_friend/1', 'remove_member/2', 'request_friend/1',
+        'shares_group/1', 'unblock_user/1'],
   'signed in, exactly the functions the app and the policies call'
 );
 select is(
