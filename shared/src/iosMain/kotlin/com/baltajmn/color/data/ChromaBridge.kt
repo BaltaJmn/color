@@ -1,9 +1,11 @@
 package com.baltajmn.color.data
 
 import com.baltajmn.color.social.Friends
+import com.baltajmn.color.social.Groups
 import com.baltajmn.color.social.LOGIN_HOST
 import com.baltajmn.color.social.LOGIN_SCHEME
 import com.baltajmn.color.social.Social
+import com.baltajmn.color.social.groupCodeOf
 import com.baltajmn.color.social.inviteCodeOf
 import io.github.jan.supabase.auth.handleDeeplinks
 import platform.Foundation.NSURL
@@ -23,6 +25,10 @@ object ChromaBridge {
     fun open(url: String) {
         if (url.startsWith("$LOGIN_SCHEME://$LOGIN_HOST")) {
             if (Social.available) NSURL.URLWithString(url)?.let { Social.client.handleDeeplinks(it) }
+            return
+        }
+        groupCodeOf(url)?.let {
+            if (Social.available) Groups.opened(it)
             return
         }
         inviteCodeOf(url)?.let {

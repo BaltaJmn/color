@@ -187,7 +187,7 @@ object Friends {
             }
             order("updated_at", Order.DESCENDING)
         }.decodeList<FeedRow>().readable()
-        withContext(Dispatchers.IO) { Storage.keepCached(feed.map { it.cacheName }.toSet()) }
+        Groups.keepPhotos()
         syncWidgetStrip(today.toString())
     }
 
@@ -310,6 +310,7 @@ object Friends {
      * widget or call the whole thing an error.
      */
     private suspend fun forgetPerson(id: String) {
+        Groups.forgetPerson(id)
         feed = feed.filter { it.author != id }
         friends = friends.filter { it.id != id }
         requests = requests.filter { it.id != id }

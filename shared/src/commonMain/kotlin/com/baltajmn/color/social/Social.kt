@@ -158,6 +158,7 @@ object Social {
         me = null
         needsName = false
         Friends.forget()
+        Groups.forget()
         // Without an account nothing is shared, so a day saved now must not be marked as if it were:
         // it would go up, unseen, the day anyone signs in. The question is asked again with the first friend.
         ChromaRepository.updateSettings { it.copy(defaultShare = Share.Private, shareAsked = false) }
