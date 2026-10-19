@@ -10,7 +10,7 @@ Este fichero lo carga Claude Code solo en cualquier sesión abierta sobre este r
 contexto permanente del proyecto: si algo hay que saber siempre, va aquí, no en el chat.
 
 Hermana de Quilt (`../HabitTracker`), MoodTraker (`../MoodTraker`) y Purl (`../line`): misma
-arquitectura y pago único. Casi todos los ficheros de plataforma salen de Purl; `docs/tecnico.md` 3
+arquitectura. Pro se compra de dos formas con el mismo derecho `pro`: vitalicio a 1,99 EUR (el destacado) o suscripción mensual a 0,99 EUR (sobre todo ancla). Casi todos los ficheros de plataforma salen de Purl; `docs/tecnico.md` 3
 dice de cuál sale cada uno.
 
 ## Antes de escribir código

@@ -9,7 +9,7 @@ Igual en las cuatro apps de la familia: el proceso, los workflows y los scripts 
 | Clave de subida | `~/keys/chroma-upload.jks`, alias `upload`, `CN=BaltaJmn` (el `signer-cn` de `release.yml`) |
 | Versión de las dos tiendas | `versionName` y `versionCode` de `androidApp/build.gradle.kts` |
 | Web: contacto de Play, soporte y privacidad de Apple | https://color.baltajmn.dev/ |
-| Pro | `pro_lifetime` en Play, `com.baltajmn.color.pro_lifetime` en Apple; 1,99 EUR en las dos |
+| Pro | `pro_lifetime` en Play, `com.baltajmn.color.pro_lifetime` en Apple; 1,99 EUR en las dos. Mensual: suscripcion `pro_monthly` (plan base `monthly`) y `com.baltajmn.color.pro_monthly`, 0,99 EUR; creadas con `ci/tienda/compra.py --suscripcion` |
 
 La primera subida a Play fue un borrador por CI (24-09-2026, `-f stores=play -f track=internal -f status=draft`, `versionCode` 2): Play acepta la primera subida por API y aplica solo su firma de apps.
 

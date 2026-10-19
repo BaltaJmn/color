@@ -27,7 +27,7 @@ La plantilla es **Purl** (`../line`): casi todo lo que no es color ni amigos sal
 | Esquema de URL | `com.baltajmn.color` (`://today`, `://year`, `://pro`, `://friends`) |
 | Enlaces universales | `https://color.baltajmn.dev/i/<code>` |
 | Canal de notificación Android | `color-daily` |
-| Entitlement RevenueCat | `pro` (producto `pro_lifetime`, offering `default`) |
+| Entitlement RevenueCat | `pro` (productos `pro_lifetime` y `pro_monthly`, offering `default` con `$rc_lifetime` y `$rc_monthly`) |
 | Política de privacidad | `https://color.baltajmn.dev/` |
 | Borrado de cuenta (web) | `https://color.baltajmn.dev/delete` |
 | Nombre del zip de copia | `chroma-AAAA-MM-DD.zip` |
@@ -345,7 +345,7 @@ la rejilla del año son un gris translúcido que vale sobre los dos fondos.
 
 ### 6.8 Compras
 
-Purl 6.15: RevenueCat KMP, `pro_lifetime`, derecho `pro`. Sin clave, la app funciona como gratis. Un
+Purl 6.15: RevenueCat KMP, `pro_lifetime` y `pro_monthly`, mismo derecho `pro`. Sin clave, la app funciona como gratis. Un
 fallo de red no quita el Pro guardado. Paywall al chocar: exportar el póster, tocar el widget del año
 bloqueado, o la fila de Ajustes.
 

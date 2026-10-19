@@ -273,7 +273,7 @@ The app works the same in every region. It is available in every App Store count
 Not applicable: Chroma is not in a regulated industry and includes no protected third-party material. The photos are the user's own and never leave the device.
 
 7. In-App Purchase
-One non-consumable product, Chroma Pro (com.baltajmn.color.pro_lifetime): a one-time payment, no subscription. It unlocks the year poster in three styles, the year widget, and your year told in short sentences; everything else is free forever. The purchase dialog opens from Settings > Chroma Pro, from My year > Poster, and from the locked year widget. Restore purchase is in Settings and in the purchase dialog.
+Two ways to buy Chroma Pro, both unlocking the same: a non-consumable lifetime purchase (com.baltajmn.color.pro_lifetime, 1.99 EUR, the highlighted option) and an auto-renewing monthly subscription (com.baltajmn.color.pro_monthly, 0.99 EUR per month, cancel any time in the App Store settings). The purchase dialog shows both prices, the renewal and cancellation terms, and links to the terms of use and privacy policy; Restore purchase is in the dialog. Pro unlocks the year poster in three styles, the year widget, and your year told in short sentences; everything else is free forever. The purchase dialog opens from Settings > Chroma Pro, from My year > Poster, and from the locked year widget. Restore purchase is in Settings and in the purchase dialog.
 ```
 
 ### Compra integrada

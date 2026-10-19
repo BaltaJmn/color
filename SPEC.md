@@ -7,7 +7,7 @@ el suyo.
 
 Cuarta de la familia. Hermana de **Quilt** (`../HabitTracker`, `com.baltajmn.habit`), de
 **MoodTraker** (`../MoodTraker`, `com.baltajmn.mood`) y de **Purl** (`../line`, `com.baltajmn.line`):
-misma arquitectura, mismo almacén local, pago único. Nombre de tienda **Chroma: diario de color**,
+misma arquitectura, mismo almacén local, Pro vitalicio o mensual. Nombre de tienda **Chroma: diario de color**,
 nombre bajo el icono **Chroma**. Identificador en las dos tiendas: `com.baltajmn.color`. El
 repositorio y el código se llaman `color`.
 
@@ -56,7 +56,7 @@ métricas.
 3. **Sin hora impuesta ni cuenta atrás.** Tienes todo el día para encontrar tu color.
 4. **Funciona entera sin cuenta.** Amigos es una capa opcional; quien no la quiere tiene la app
    completa.
-5. **Pago único y lo social gratis.** Nunca se cobra por ver a tus amigos.
+5. **Pro vitalicio (o mensual) y lo social gratis.** Nunca se cobra por ver a tus amigos.
 6. **Las fotos compartidas se borran del servidor a los 2 días.** Solo quedan los colores.
 
 ---
@@ -267,8 +267,10 @@ Las hermanas cuestan 0 EUR al mes por usuario. Chroma no: Amigos tiene servidor.
   de fotos vivas y unos 10 GB al mes de tráfico. Cabe en el plan Free de Supabase hasta unos
   200-500 activos (entre las dos apps del proyecto), y en el Pro (25 USD al mes) con mucho margen después.
 
-Un coste fijo y pequeño no justifica suscripción. **Decisión: pago único, como toda la familia, y lo
-social gratis.**
+Un coste fijo y pequeño no justifica cobrar lo social. **Decisión (19-10-2026): lo social siempre gratis. Pro
+sigue siendo el pago único de 1,99 EUR, y se añade una suscripción mensual de 0,99 EUR (`pro_monthly`) que da el
+mismo derecho. El vitalicio es la opción destacada ("dos meses y es para siempre"); el mes es sobre todo
+ancla.** Con solo 3 ventas en la familia, la prueba es si un precio bajo por mes empuja a comprar el vitalicio.
 
 ### Qué es Pro
 
@@ -511,3 +513,13 @@ Color de la semana (#40), estadísticas (#41), paleta de amigos en el widget (#4
    estadísticas en v1.2.
 7. **Fecha de las fotos de galería.** Algunas vías de importar borran el EXIF. Por eso una foto sin
    fecha se acepta.
+
+## Petición de reseña
+
+Dentro de la app, con el diálogo del sistema (Play In-App Review en Android, `SKStoreReviewController` en iOS); la tienda decide si lo enseña.
+
+- Momento: al volver a la app con el color de hoy ya elegido, en la pantalla de hoy y sin nada encima.
+- Regla: 7 días de colores en el diario (implica una semana de uso) y 120 días desde la última petición (`reachedReviewDayCount`). Antes era una sola vez en la vida.
+- Nunca tras un error, en el paywall ni sobre otra capa; se marca como pedida aunque la tienda no la enseñe.
+- Código: `review/` (Review.kt y sus actual) y la función de la condición, con test.
+
