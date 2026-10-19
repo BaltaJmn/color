@@ -341,6 +341,31 @@ Estado el 19-10-2026, con Amigos ya en `main`:
   publican al momento y Apple pide que reflejen la versión que está a la venta, que hoy no tiene Amigos.
   La clasificación por edad y las notas al revisor van también con esa versión.
 
+Estado el 19-10-2026 por la noche, con la 1.1 (18) subida a Play alpha y TestFlight (`v1.1`):
+
+- App Store, versión 1.1 creada por la API (`AFTER_APPROVAL`), con la build 18, las novedades de
+  `store/whatsnew`, la ficha nueva de los trece idiomas (`appstore.py ficha`) y el vídeo de la 1.0 como
+  adjunto de la revisión.
+- App Store, edad (por la API, en la ficha de la 1.1): contenido generado por usuarios **sí**, red social
+  **sí** (Amigos es un feed de lo que comparten otros; Apple lo pide desde septiembre de 2026 y da 13+),
+  restringida por edad **no** (eso exige la API de rango de edad declarado), mensajería **no**. El resto,
+  como en 6.
+- App Store, notas al revisor: las de 6 reescritas para la 1.1 (Amigos, cuenta de prueba, reportar,
+  bloquear, borrar la cuenta, Supabase y Resend como servicios), 3918 caracteres, en la ficha de la 1.1.
+  Falta la cuenta de prueba en *Información de inicio de sesión*.
+- App Store, suscripción `pro_monthly`: tenía `MISSING_METADATA` por la captura para la revisión. Nueva
+  `revision-compra.png` (el diálogo de la 1.1 con vitalicio y mensual, precios puestos a mano solo en esa
+  build) subida el 19-10-2026; en la web queda *En preparación para el envío*. Es la primera suscripción:
+  va en el mismo envío que la 1.1 (*Añadir a revisión* en la suscripción, del titular).
+- App Store, *Privacidad de la app*: *Tipos de datos > Editar > Siguiente*, marcar Nombre, Correo
+  electrónico, Fotos o vídeos, Otro contenido del usuario e ID de usuario, además de Compras. Ese diálogo
+  solo tiene *Publicar*, que es del titular (se marcaron, pero la pestaña se cerró sin publicar). Después, cada tipo nuevo pide su configuración: finalidad
+  **Funcionalidad de la app**, **vinculado** a la identidad, **sin** rastreo. Compras sigue como estaba.
+- Play, IARC: las respuestas de arriba se perdieron al reutilizar la pestaña del navegador sin guardar;
+  hay que volver a rellenarlo (respuestas arriba) y pulsar *Guardar*, *Siguiente* y *Enviar*.
+- Play, ficha (`store/listings`): actualizada en el repositorio, sin subir. Sale a Play con la 1.1 a
+  producción, no antes: la ficha de producción describe la 1.0.14, que no tiene Amigos.
+
 Apple 1.2 pide los cuatro a la vez: términos aceptados, filtro o reporte de contenido, bloquear, y
 actuar en 24 horas. Los reportes llegan por correo (`report-notify`, `store/servidor.md` 3), lanzado desde
 la base y reintentado cada hora hasta que sale, y cómo actuar sobre uno está en `store/servidor.md` 7.
