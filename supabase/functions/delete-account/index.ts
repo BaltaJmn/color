@@ -1,6 +1,7 @@
 // Deleting an account from the app (Apple 5.1.1(v), Google Play). Everything shared goes: the
-// photos in the bucket by hand, and the rest in cascade from auth.users. The journal on the phone
-// is not the server's to touch.
+// photos in the bucket by hand, and the rest in cascade from the profile. The journal on the phone
+// is not the server's to touch. auth.users is shared with FlowTime, so the auth user goes only when
+// no other app still uses it (used_by_other_app, migrations/20261019120100_shared_auth.sql).
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 Deno.serve(async (req) => {
@@ -33,7 +34,16 @@ Deno.serve(async (req) => {
 
   // A photo that another device uploads between the last listing and this call has no row and no
   // owner left; the orphan sweep of purge-photos removes it.
-  const deleted = await admin.auth.admin.deleteUser(id);
-  if (deleted.error) return new Response(deleted.error.message, { status: 500 });
+  const profile = await admin.from("profiles").delete().eq("id", id);
+  if (profile.error) return new Response(profile.error.message, { status: 500 });
+  const attempts = await admin.from("invite_attempts").delete().eq("user_id", id);
+  if (attempts.error) return new Response(attempts.error.message, { status: 500 });
+
+  const used = await admin.rpc("used_by_other_app", { uid: id });
+  if (used.error) return new Response(used.error.message, { status: 500 });
+  if (!used.data) {
+    const deleted = await admin.auth.admin.deleteUser(id);
+    if (deleted.error) return new Response(deleted.error.message, { status: 500 });
+  }
   return new Response(null, { status: 204 });
 });

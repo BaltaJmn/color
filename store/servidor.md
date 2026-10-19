@@ -10,7 +10,9 @@ pública (`anon`), en `social/SupabaseConfig.kt`.
 
 ## 1. El proyecto
 
-1. Crear el proyecto `chroma` en la región **eu-central-1** (Frankfurt), plan Free.
+1. Proyecto `baltajmn-social`, ref `djfbmvagflfptqhabdln`, región **eu-central-1** (Frankfurt), plan
+   Free, creado el 19-10-2026. Lo comparte FlowTime, en su propio esquema (`docs/tecnico.md` 8). Para
+   hacerle sitio se pausó ApTracker: Free solo deja dos proyectos activos.
 2. Instalar la CLI (`brew install supabase/tap/supabase`), `supabase login` y enlazar:
 
    ```bash
@@ -91,7 +93,7 @@ que el sistema confíe en el dominio, la web lleva tres datos de las cuentas:
 - `.well-known/apple-app-site-association`: el Team ID `BR5ZH8XYP6`, **ya puesto** el 05-10-2026.
   El App ID necesita la capacidad *Associated Domains*. En v1.0 se quitaron de `iosApp.entitlements`
   `associated-domains` (`applinks:color.baltajmn.dev`) y `applesignin` (`Default`): un equipo
-  personal de Xcode no firma con ellas. Volver a ponerlas al activar Amigos.
+  personal de Xcode no firma con ellas. Vueltas a poner el 19-10-2026, al activar Amigos.
 - `404.html`: el identificador de la app en App Store Connect, `6819301462`, **ya puesto** el
   05-10-2026. Enseña la App Store junto a Google Play.
 
@@ -129,5 +131,5 @@ que vale 24 h) y Apple da 24 h para actuar. Quitar el contenido es, desde el pan
    ajena). `delete-account` sigue esos mismos pasos, pero solo la propia persona puede lanzarla.
 
 Un fichero que quede en Storage sin su fila no lo lee nadie más que su dueño, y la purga de esa noche
-lo borra (pasado un día sin fila, o a los 8 días en cualquier caso). Pero la foto reportada no tiene
+lo borra (pasado un día sin fila, o a los 3 días en cualquier caso). Pero la foto reportada no tiene
 por qué esperar: se borra en el momento.

@@ -156,7 +156,7 @@ cuenta como compartir. Se añade a la tabla de 1:
 | ¿Se pueden borrar los datos sin borrar la cuenta? | Sí: cualquier día se hace privado y su fila y su foto se borran |
 
 Hechos del código que lo sostienen: el esquema de `supabase/migrations`, la subida de `Outbox.kt`
-(foto a 720, recodificada), el borrado de fotos (`purge-photos`: a los 7 días y, además, el barrido de
+(foto a 720, recodificada), el borrado de fotos (`purge-photos`: a los 2 días y, además, el barrido de
 los ficheros que ninguna tarjeta señala, para que ninguna se quede atrás) y el de la cuenta
 (`delete-account`).
 
@@ -182,7 +182,7 @@ rastreo:
 |---|---|
 | Información de contacto > Nombre | El nombre visible |
 | Información de contacto > Correo electrónico | El de Apple o Google, solo para encontrar la cuenta al borrarla |
-| Contenido del usuario > Fotos o vídeos | Las fotos compartidas, 7 días |
+| Contenido del usuario > Fotos o vídeos | Las fotos compartidas, 2 días |
 | Contenido del usuario > Otro contenido del usuario | Colores, nombres de color, palabras, amistades y reportes |
 | Identificadores > ID de usuario | Pasa a **vinculado**: el de la cuenta de Amigos |
 

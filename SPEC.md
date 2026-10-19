@@ -57,7 +57,7 @@ métricas.
 4. **Funciona entera sin cuenta.** Amigos es una capa opcional; quien no la quiere tiene la app
    completa.
 5. **Pago único y lo social gratis.** Nunca se cobra por ver a tus amigos.
-6. **Las fotos compartidas se borran del servidor a los 7 días.** Solo quedan los colores.
+6. **Las fotos compartidas se borran del servidor a los 2 días.** Solo quedan los colores.
 
 ---
 
@@ -138,7 +138,7 @@ analítica e informes de fallos de terceros.
 | Palabra opcional | Hasta **24** puntos de código | Una palabra o dos, no un diario: para eso está Purl |
 | Foto local | JPEG de **1080 px** de lado largo | La tarjeta exportada es de 1080x1350 |
 | Foto subida | JPEG de **720 px**, calidad 80, sin metadatos | La miniatura de la tarjeta y la vista completa de un móvil no piden más |
-| Vida de la foto en el servidor | **7 días** | El feed solo enseña hoy y ayer. Acota coste y exposición |
+| Vida de la foto en el servidor | **2 días** | El feed solo enseña hoy y ayer: una foto no tiene por qué durar más que ellos. Acota coste y exposición |
 | Vida del color en el servidor | Mientras exista la cuenta | Son bytes, y sostienen el mosaico de cada amigo |
 | Tope de amigos | **50** (`MAX_FRIENDS`) | Un círculo, no una audiencia |
 | Umbral de sintonía | deltaE < **5** (`SYNC_DELTA_E`) | Tiene que parecer casualidad, no pasar cada día |
@@ -262,10 +262,10 @@ Las hermanas cuestan 0 EUR al mes por usuario. Chroma no: Amigos tiene servidor.
 **acotado por diseño**:
 
 - Solo sube lo compartido.
-- Las fotos se borran a los 7 días; los colores pesan bytes.
-- Estimación con 1.000 activos diarios, la mitad compartiendo foto y 8 amigos de media: unos 280 MB
+- Las fotos se borran a los 2 días; los colores pesan bytes.
+- Estimación con 1.000 activos diarios, la mitad compartiendo foto y 8 amigos de media: unos 80 MB
   de fotos vivas y unos 10 GB al mes de tráfico. Cabe en el plan Free de Supabase hasta unos
-  200-500 activos, y en el Pro (25 USD al mes) con mucho margen después.
+  200-500 activos (entre las dos apps del proyecto), y en el Pro (25 USD al mes) con mucho margen después.
 
 Un coste fijo y pequeño no justifica suscripción. **Decisión: pago único, como toda la familia, y lo
 social gratis.**
@@ -418,7 +418,9 @@ idiomas. Se asigna el más cercano. La tabla vive solo en `Names.kt`: dos copias
 
 ### Servidor (v1.1)
 
-Supabase en Frankfurt. La seguridad está en las reglas RLS, no en la app.
+Supabase en Frankfurt. La seguridad está en las reglas RLS, no en la app. Un solo proyecto,
+`baltajmn-social`, para Chroma y FlowTime (el plan Free solo deja dos activos): Chroma en `public`,
+FlowTime en su propio esquema, y el inicio de sesión compartido (`docs/tecnico.md` 8).
 
 ```
 profiles        (id, display_name, invite_code, created_at)
@@ -437,7 +439,7 @@ El esquema vigente, con sus restricciones, está en `supabase/migrations/` y en 
   mira, y las políticas del bucket deciden; la única URL firmada es la de 24 h del correo de reporte.
 - Un fichero del bucket solo se lee con una tarjeta que lo señale, o si es de uno. Y solo se escribe
   con un nombre fijo por día (`<uid>/<día>.jpg`), de modo que nadie puede llenarlo.
-- Una Edge Function diaria borra las fotos con más de 7 días y pone `photo_path` a null, y barre los
+- Una Edge Function diaria borra las fotos con más de 2 días y pone `photo_path` a null, y barre los
   ficheros que ninguna tarjeta señala.
 - Otra Edge Function avisa por correo (Resend) de cada reporte. Sale de la base, no de un ajuste del
   panel, y se reintenta cada hora hasta que el correo ha salido.
@@ -501,7 +503,7 @@ Color de la semana (#40), estadísticas (#41), paleta de amigos en el widget (#4
    pantallas.
 3. **Arranque en frío de lo social.** Un feed vacío no engancha. Mitigación: la app es completa sin
    amigos, y el enlace de invitación funciona aunque el otro no tenga la app.
-4. **Coste si crece.** Acotado por los 7 días de las fotos y la subida a 720 px. Si aun así se
+4. **Coste si crece.** Acotado por los 2 días de las fotos y la subida a 720 px. Si aun así se
    dispara, la perilla es bajar la retención o el tamaño, nunca cobrar por lo social.
 5. **Revisión de Apple con contenido de usuarios.** Si falta reportar, bloquear o los términos, se
    rechaza. Por eso #36 y #38 son v1.1 entera y no un añadido posterior.

@@ -34,7 +34,7 @@ toca en el mismo commit, y se sigue**.
   cambio la política (`index.html` de `chroma-privacy`), `store/formularios.md` y `PrivacyInfo.xcprivacy`.
 - **Social sin métricas.** Ni likes, ni comentarios, ni contadores, ni "visto por", ni avisos de
   publicación, ni rachas. Una función que meta cualquiera de esas cosas no entra.
-- **Las fotos compartidas viven 7 días en el servidor.** Los colores, mientras exista la cuenta.
+- **Las fotos compartidas viven 2 días en el servidor (hoy y ayer).** Los colores, mientras exista la cuenta.
 - **El móvil manda.** `entries.json` es la verdad; el servidor es una copia de lo compartido.
 - `entries.json` vive en almacenamiento privado, **nunca** en el App Group. Escritura atómica con
   `.bak`, y un fichero ilegible va a cuarentena, no se sobrescribe.

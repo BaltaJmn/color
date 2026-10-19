@@ -30,7 +30,7 @@ const val UPLOAD_SIDE = 720
 const val UPLOAD_QUALITY = 80
 
 /** How long the server keeps a photo; for an older day only the color is sent. */
-const val PHOTO_DAYS = 7
+const val PHOTO_DAYS = 2
 
 /** The server refuses a shared day before this one (its trigger, supabase/migrations). */
 val FIRST_SHARED_DAY = LocalDate(2026, 1, 1)

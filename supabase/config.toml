@@ -1,5 +1,6 @@
-# Only what differs from the defaults of the Supabase CLI. The hosted project is "chroma" in
-# eu-central-1 (docs/tecnico.md 1); secrets never live here, only in the project (store/servidor.md).
+# Only what differs from the defaults of the Supabase CLI. The hosted project is "baltajmn-social" in
+# eu-central-1, shared with FlowTime (docs/tecnico.md 8); secrets never live here, only in the project
+# (store/servidor.md).
 project_id = "chroma"
 
 [db]

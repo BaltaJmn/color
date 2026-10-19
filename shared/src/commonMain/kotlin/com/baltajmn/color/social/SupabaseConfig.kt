@@ -7,10 +7,11 @@ package com.baltajmn.color.social
  */
 object SupabaseConfig {
     /** "https://<ref>.supabase.co". */
-    val url: String? = null
+    val url: String? = "https://djfbmvagflfptqhabdln.supabase.co"
 
     /** The anon key. Public by design: RLS is what protects the data. */
-    val anonKey: String? = null
+    val anonKey: String? =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqZmJtdmFnZmxmcHRxaGFiZGxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0MDEyMzQsImV4cCI6MjEwNzk3NzIzNH0.1Ybi39q6bcAnPfR9AKulFgdacx8NhtpWF-VF3vzGL98"
 
     /** The web OAuth client of Google, which native sign-in on Android asks for. */
     val googleServerClientId: String? = null

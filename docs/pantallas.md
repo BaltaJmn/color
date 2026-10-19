@@ -419,8 +419,8 @@ La rejilla de Mi año con los días que compartió. Título: su nombre. Menú: `
 Sin contadores. Con más de un año, flechas de año bajo el título, desde el primer año en que compartió
 algo hasta el actual; cada año se pide al servidor aparte. Un año sin nada dice `friendYearEmpty`.
 
-Tocar un día abre su tarjeta a tamaño completo, con su nombre y su fecha. Pasada la semana de la
-foto en el servidor, la tarjeta es solo el color.
+Tocar un día abre su tarjeta a tamaño completo, con su nombre y su fecha. Pasados los dos días de
+la foto en el servidor, la tarjeta es solo el color.
 
 Se llega tocando el nombre en una tarjeta del feed, o desde `friendsRow` en Ajustes > Amigos: la
 lista de nombres, por orden alfabético y sin número. Es la forma de llegar a un amigo que no ha
@@ -434,7 +434,7 @@ amigo, un diálogo pregunta el valor por defecto (`askDefaultShare`). Al cerrar 
 cuenta, el valor por defecto vuelve a `sharePrivate` y esa pregunta, a hacerse: sin cuenta, un día
 guardado no queda marcado como compartido.
 
-Un día que llega al servidor con más de 7 días (un teléfono que estuvo sin red) sube solo su color,
+Un día que llega al servidor con más de 2 días (un teléfono que estuvo sin red) sube solo su color,
 aunque esté en `sharePhoto`: el servidor no guarda fotos tan viejas.
 
 ### 8.6 Invitar

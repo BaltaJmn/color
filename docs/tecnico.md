@@ -31,7 +31,7 @@ La plantilla es **Purl** (`../line`): casi todo lo que no es color ni amigos sal
 | Política de privacidad | `https://color.baltajmn.dev/` |
 | Borrado de cuenta (web) | `https://color.baltajmn.dev/delete` |
 | Nombre del zip de copia | `chroma-AAAA-MM-DD.zip` |
-| Proyecto de Supabase | `chroma`, región `eu-central-1` |
+| Proyecto de Supabase | `baltajmn-social` (ref `djfbmvagflfptqhabdln`), región `eu-central-1`, compartido con FlowTime (8) |
 | `versionCode` / `versionName` inicial | `1` / `1.0`; iOS `MARKETING_VERSION = 1.0`, `CURRENT_PROJECT_VERSION = 1` |
 
 ---
@@ -238,7 +238,7 @@ Al mes del primer día, si nunca se hizo copia, Hoy lo ofrece una vez (`noticeBa
 | `SYNC_DELTA_E` | 5.0 | `Friends.kt` |
 | `WEEK_DELTA_E` | 15.0 | `Week.kt` |
 | `MAX_FRIENDS` | 50 | Servidor (trigger) y cliente (mensaje) |
-| `PHOTO_TTL_DAYS` | 7 | Servidor (`purge-photos`; el límite duro, 8 días de fichero, en `orphan_photos`) |
+| `PHOTO_TTL_DAYS` | 2 | Servidor (`purge-photos`; el límite duro, 3 días de fichero, en `orphan_photos`) y app (`PHOTO_DAYS`). Hoy y ayer, lo que enseña el feed |
 | `PHOTO_DAYS` | 7 | `Outbox.kt` (un día de más de esos días sube sin foto) |
 | `MAX_PENDING_REQUESTS` | 100 | Servidor (`request_friend`, escrito en el valor): solicitudes pendientes que puede tener una persona |
 | `INVITE_MISSES_PER_HOUR` | 20 | Servidor (`request_friend`, escrito en el valor): enlaces que no valen antes de `too_many` |
@@ -494,6 +494,22 @@ Todo en `supabase/migrations/` y `supabase/functions/`. La seguridad está en RL
 `security definer`; el cliente no tiene permisos directos sobre amistades ni bloqueos. Nada depende de
 que la app se porte bien: un cliente modificado recibe lo mismo que el oficial.
 
+**Un proyecto para dos apps.** El plan Free solo deja dos proyectos activos, así que `baltajmn-social`
+(19-10-2026) sirve a Chroma y a FlowTime. Chroma vive en el esquema `public`; FlowTime, en un esquema
+propio del mismo proyecto, y ninguna de las dos toca el de la otra. Lo que sí se comparte:
+
+- **Auth** (`auth.users`): un mismo inicio de sesión con Apple o Google puede ser la cuenta de las dos
+  apps. Nada de Chroma asume que todo usuario de Auth tiene perfil de Chroma: el perfil lo crea la app
+  al poner nombre (`profiles_insert`), y un usuario sin fila en `profiles` es, para Chroma, alguien que
+  aún no ha empezado Amigos. Ningún trigger sobre `auth.users`.
+- **Borrar la cuenta** borra lo de Chroma (fotos, reportes sobre la persona, el perfil con todo lo que
+  cuelga de él, `invite_attempts`) y el usuario de Auth solo si `used_by_other_app(uid)` dice que
+  ninguna otra app lo usa. Cada app que entra en el proyecto redefine esa función con su comprobación.
+- **Storage, `pg_cron`, Vault y secretos de funciones** son del proyecto: los nombres de Chroma
+  (`photos`, `purge-photos`, `project_url`, `REPORT_*`...) no se reutilizan para otra cosa.
+- **URL Configuration**: hay un solo `Site URL` (el de Chroma); cada app añade su esquema de vuelta en
+  *Redirect URLs*.
+
 ### 8.1 Tablas
 
 Las migraciones son la fuente, en este orden. Una ya aplicada no se edita nunca: un cambio es un
@@ -505,8 +521,10 @@ fichero nuevo, porque una base que aplicó las anteriores tiene que recibirlo ta
 | `20260923120100_purge.sql` | `pg_cron` y `pg_net`, y la purga de cada noche |
 | `20260923130000_hardening.sql` | El código de invitación solo lo lee su dueño (`my_profile`), y `photo_path` solo puede ser un fichero propio |
 | `20261001120000_review.sql` | La revisión antes del lanzamiento: lo que cambia en 8.2 a 8.4 |
+| `20261019120000_photos_two_days.sql` | Las fotos pasan de 7 a 2 días: `entry_day` y `orphan_photos` con los límites nuevos |
+| `20261019120100_shared_auth.sql` | `used_by_other_app`, porque Auth se comparte con FlowTime |
 
-El esquema que dejan las cuatro:
+El esquema que dejan las seis:
 
 ```sql
 create table profiles (
@@ -618,8 +636,11 @@ conjunto entero.
 - `my_blocks() returns table (id, display_name)`: las personas que yo bloqueé, con su nombre, que
   `profiles_read` no deja leer.
 - `orphan_photos() returns setof text`: los nombres del bucket `photos` que hay que borrar, de más de
-  1 día y sin fila en `shared_entries` con ese `photo_path`, o de más de 8 días en cualquier caso. Como
+  1 día y sin fila en `shared_entries` con ese `photo_path`, o de más de 3 días en cualquier caso. Como
   mucho 1000 por llamada. La ejecuta solo `service_role` (la purga, 8.4).
+- `used_by_other_app(uid) returns boolean`: si otra app del proyecto aún usa ese usuario de Auth. En
+  Chroma devuelve `false`; cada app que entra la redefine. La ejecuta solo `service_role`
+  (`delete-account`).
 
 Triggers:
 
@@ -627,7 +648,7 @@ Triggers:
 |---|---|---|
 | `friend_limit` | `friendships` | Al pasar a `accepted`, si cualquiera de los dos ya tiene `MAX_FRIENDS` aceptados, lanza `friend_limit` |
 | `touch` | `shared_entries` | Mueve `updated_at` en cada cambio |
-| `entry_day` | `shared_entries` | Un `day` fuera de `[2026-01-01, current_date + 2]` se rechaza (`day_out_of_range`), pero solo al insertar o al cambiar el `day`: una fila anterior al trigger y fuera de rango deja que la purga le ponga `photo_path` a null. Con `day < current_date - 8`, `photo_path` se guarda a null, siempre: la foto de un día así no se conserva. El margen de una noche sobre los 7 días es porque `current_date` es UTC y la app, al oeste de UTC, sigue en su séptimo día |
+| `entry_day` | `shared_entries` | Un `day` fuera de `[2026-01-01, current_date + 2]` se rechaza (`day_out_of_range`), pero solo al insertar o al cambiar el `day`: una fila anterior al trigger y fuera de rango deja que la purga le ponga `photo_path` a null. Con `day < current_date - 3`, `photo_path` se guarda a null, siempre: la foto de un día así no se conserva. El margen de una noche sobre los 2 días es porque `current_date` es UTC y la app, al oeste de UTC, sigue en su segundo día |
 | `report_cap` | `reports` | Más de 20 reportes del mismo reportero en 24 h lanza `report_limit` |
 | `report_notify` | `reports` | Después de insertar, `notify_report(id)`: avisa por `pg_net` a `report-notify` (8.4) |
 
@@ -661,14 +682,14 @@ Bucket `photos`, privado, 1 MB, solo `image/jpeg`.
 
 | Función | Cuándo | Qué |
 |---|---|---|
-| `purge-photos` | Cada noche, por `pg_cron` y `pg_net` (con dos minutos para contestar) | Primero por filas: borra del bucket las fotos con `day < current_date - 7` y pone `photo_path` a null. Después el barrido de huérfanos: pide los nombres a `orphan_photos()` y los borra por la API de Storage, en lotes de 100. Las dos fases son independientes: un error en una (guarda el primero) no impide que corra la otra, y contesta 500 al final si alguna falló. Cada fase tiene un tope de 100 rondas por noche; si un lote no borra nada, esa fase falla en vez de girar. Responde `{purged, orphans}`, y con un fallo, 500 con `{purged, orphans, error}` |
+| `purge-photos` | Cada noche, por `pg_cron` y `pg_net` (con dos minutos para contestar) | Primero por filas: borra del bucket las fotos con `day < current_date - 2` y pone `photo_path` a null. Después el barrido de huérfanos: pide los nombres a `orphan_photos()` y los borra por la API de Storage, en lotes de 100. Las dos fases son independientes: un error en una (guarda el primero) no impide que corra la otra, y contesta 500 al final si alguna falló. Cada fase tiene un tope de 100 rondas por noche; si un lote no borra nada, esa fase falla en vez de girar. Responde `{purged, orphans}`, y con un fallo, 500 con `{purged, orphans, error}` |
 | `report-notify` | La base la llama al insertar en `reports` (trigger y `pg_net`) y cada hora para reintentar | Correo al autor de la app por Resend (`RESEND_API_KEY`, `REPORT_TO`, `REPORT_FROM`), con una URL firmada de 24 h para ver la foto. Al enviarlo rellena `reports.notified_at` |
-| `delete-account` | Desde la app y desde la web | Con la clave de servicio: vacía la carpeta del bucket, borra los reportes sobre esa persona y el usuario (el resto cae en cascada) |
+| `delete-account` | Desde la app y desde la web | Con la clave de servicio: vacía la carpeta del bucket, borra los reportes sobre esa persona, su perfil (el resto cae en cascada) y sus `invite_attempts`, y el usuario de Auth si `used_by_other_app` dice que no lo usa otra app |
 
 - **`purge-photos`**: la fecha de corte es UTC y el día de la foto es el local del autor, así que una
-  foto vive entre unos 6,5 y 8,7 días según el huso. El límite duro lo pone `orphan_photos`: ninguna
-  pasa de 8 días de fichero más la noche en que se barre. La app no sube foto de un día de más de 7
-  días (9.2) y el trigger `entry_day` no deja guardar su ruta con `day < current_date - 8` (una noche
+  foto vive entre unos 1,5 y 3,7 días según el huso. El límite duro lo pone `orphan_photos`: ninguna
+  pasa de 3 días de fichero más la noche en que se barre. La app no sube foto de un día de más de 2
+  días (9.2) y el trigger `entry_day` no deja guardar su ruta con `day < current_date - 3` (una noche
   de margen por el huso), así que una foto que entra es una que este corte alcanza. Si una fila no se
   puede actualizar tras borrar el fichero, esa fase se detiene y la respuesta final es 500. El barrido
   de huérfanos corre igualmente: es el único límite duro, y una fila que no se deja purgar no puede
@@ -782,12 +803,12 @@ política del bucket (8.3). Con `Color`, la foto del servidor se borra.
 
 Lo que el servidor no admite no se manda, o la cola se atascaría para siempre:
 
-- Un día de más de `PHOTO_DAYS` (7) días sube solo el color, aunque esté en `Photo` (una cola que
+- Un día de más de `PHOTO_DAYS` (2) días sube solo el color, aunque esté en `Photo` (una cola que
   tarda en salir): el servidor dejaría su `photo_path` a null y el fichero quedaría huérfano. El
   servidor guarda una noche más de margen que la app para los husos (su disparador anula la foto con
-  `day < current_date - 8`, y su fecha es UTC mientras el día es el local del autor). `photoFits`
-  sigue en 7: la app no gasta ese margen, que es para que un teléfono al oeste de UTC no vea anulada
-  una foto que, para él, aún está dentro de su semana.
+  `day < current_date - 3`, y su fecha es UTC mientras el día es el local del autor). `photoFits`
+  sigue en 2: la app no gasta ese margen, que es para que un teléfono al oeste de UTC no vea anulada
+  una foto que, para él, aún está dentro de sus dos días.
 - Un día fuera de `[2026-01-01, hoy + 2]` (`inServerRange`) no se manda y sale de la cola.
 
 El interruptor de cada día (privado, solo el color, con la foto) está en Hoy bajo la palabra, solo
@@ -899,7 +920,7 @@ Comunes (`commonTest`) salvo que se diga.
     días no dicen nada, y la comparación con el año anterior en los tres sentidos.
 19. Amigos, lógica del cliente (`FriendsLogicTest`): amigos por nombre sin distinguir mayúsculas y solo
     las solicitudes que me hicieron a mí; cada respuesta de `request_friend` tiene su resultado; un día
-    que no parsea se descarta; el servidor admite de 2026-01-01 a hoy + 2; una foto de más de 7 días
+    que no parsea se descarta; el servidor admite de 2026-01-01 a hoy + 2; una foto de más de 2 días
     sube solo con el color; otra cuenta empieza sin nada compartido ni en cola; el dueño de la cola
     sobrevive al fichero y los ficheros viejos no lo tienen; la sesión que el cliente suelta
     (`sessionLost`) se distingue del `NotAuthenticated` con el que arranca un teléfono sin cuenta.

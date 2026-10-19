@@ -1,8 +1,8 @@
-// Every night, from pg_cron (migrations/20260923120100_purge.sql): shared photos live seven days.
+// Every night, from pg_cron (migrations/20260923120100_purge.sql): shared photos live two days.
 // The colors stay; the feed only ever shows today and yesterday, and a friend's mosaic is colors.
 import { createClient, type SupabaseClient } from "jsr:@supabase/supabase-js@2";
 
-const PHOTO_TTL_DAYS = 7;
+const PHOTO_TTL_DAYS = 2;
 const BATCH = 100;
 // One night's work has a ceiling: whatever a pass leaves, the next night finds again.
 const MAX_ROUNDS = 100;
@@ -38,9 +38,9 @@ async function phase(run: () => Promise<Phase>): Promise<Phase> {
   }
 }
 
-// The trigger of shared_entries refuses a path only for a day older than current_date - 8, one night
+// The trigger of shared_entries refuses a path only for a day older than current_date - 3, one night
 // past this cut, so a photo that gets in is one this cut will reach. The author's day is local and
-// this one is UTC, so a photo lives between about 6.5 and 8.7 days; the hard limit by age of the file
+// this one is UTC, so a photo lives between about 1.5 and 3.7 days; the hard limit by age of the file
 // is the sweep below.
 async function purgeRows(db: SupabaseClient): Promise<Phase> {
   const cutoff = new Date(Date.now() - PHOTO_TTL_DAYS * 86_400_000).toISOString().slice(0, 10);

@@ -6,7 +6,7 @@
 -- Run with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(90);
+select plan(93);
 
 -- Four people. auth.users is the only table the test writes as its owner.
 insert into auth.users (id, email) values
@@ -237,19 +237,19 @@ select lives_ok(
 );
 select lives_ok(
   $$ insert into public.shared_entries (author, day, color, name, photo_path) values ('00000000-0000-0000-0000-00000000000c', current_date - 9, '#7A8B3C', 'moss', '00000000-0000-0000-0000-00000000000c/2026-01-05.jpg') $$,
-  'a day older than a week is accepted'
+  'a day older than the life of a photo is accepted'
 );
 select is(
   (select photo_path from public.shared_entries where author = '00000000-0000-0000-0000-00000000000c' and day = current_date - 9),
   null::text, 'but only its color: the photo is dropped'
 );
--- One night of slack: current_date is UTC, and west of it the app is still on the seventh day.
+-- One night of slack: current_date is UTC, and west of it the app is still on the second day.
 select lives_ok(
-  $$ insert into public.shared_entries (author, day, color, name, photo_path) values ('00000000-0000-0000-0000-00000000000c', current_date - 8, '#7A8B3C', 'moss', '00000000-0000-0000-0000-00000000000c/2026-01-06.jpg') $$,
-  'a day eight days ago is accepted too'
+  $$ insert into public.shared_entries (author, day, color, name, photo_path) values ('00000000-0000-0000-0000-00000000000c', current_date - 3, '#7A8B3C', 'moss', '00000000-0000-0000-0000-00000000000c/2026-01-06.jpg') $$,
+  'a day three days ago is accepted too'
 );
 select is(
-  (select photo_path from public.shared_entries where author = '00000000-0000-0000-0000-00000000000c' and day = current_date - 8),
+  (select photo_path from public.shared_entries where author = '00000000-0000-0000-0000-00000000000c' and day = current_date - 3),
   '00000000-0000-0000-0000-00000000000c/2026-01-06.jpg', 'and keeps its photo for the night'
 );
 -- The photo rule holds on every write, not only when the day is written: an update that leaves the
@@ -264,7 +264,7 @@ select is(
 );
 -- The range is for a day that is written: moving a card out of it is refused.
 select throws_ok(
-  $$ update public.shared_entries set day = '2025-12-31' where author = '00000000-0000-0000-0000-00000000000c' and day = current_date - 8 $$,
+  $$ update public.shared_entries set day = '2025-12-31' where author = '00000000-0000-0000-0000-00000000000c' and day = current_date - 3 $$,
   'P0001', 'day_out_of_range', 'a card cannot be moved to a day before the app'
 );
 -- A card for today that points at the old file, so that only its age is what sweeps it.
@@ -384,16 +384,16 @@ select is(
   null::text, 'and the path is gone'
 );
 
--- The sweep sees what no card points at after a day, and what is older than eight days whatever points at it.
--- A third file, three days old, with a card of its author pointing at it: neither clause takes it.
+-- The sweep sees what no card points at after a day, and what is older than three days whatever points at it.
+-- A third file, two days old, with a card of its author pointing at it: neither clause takes it.
 insert into storage.objects (bucket_id, name, created_at) values
-  ('photos', '00000000-0000-0000-0000-00000000000a/2026-01-06.jpg', now() - interval '3 days');
+  ('photos', '00000000-0000-0000-0000-00000000000a/2026-01-06.jpg', now() - interval '2 days');
 insert into public.shared_entries (author, day, color, name, photo_path) values
-  ('00000000-0000-0000-0000-00000000000a', current_date - 3, '#3A6EA5', 'storm_blue', '00000000-0000-0000-0000-00000000000a/2026-01-06.jpg');
+  ('00000000-0000-0000-0000-00000000000a', current_date - 2, '#3A6EA5', 'storm_blue', '00000000-0000-0000-0000-00000000000a/2026-01-06.jpg');
 select is(
   (select array_agg(x order by x) from public.orphan_photos() as t(x)),
   array['00000000-0000-0000-0000-00000000000a/2026-01-02.jpg', '00000000-0000-0000-0000-00000000000c/2026-01-04.jpg'],
-  'the sweep finds the old file with no card and the file past eight days'
+  'the sweep finds the old file with no card and the file past three days'
 );
 select is(
   (select count(*) from public.orphan_photos() as t(x) where x = '00000000-0000-0000-0000-00000000000a/2026-01-06.jpg')::int,
@@ -403,6 +403,12 @@ select is(has_function_privilege('service_role', 'public.orphan_photos()', 'exec
 set local role authenticated;
 set local request.jwt.claims to '{"sub": "00000000-0000-0000-0000-00000000000a", "role": "authenticated"}';
 select throws_ok($$ select * from public.orphan_photos() $$, '42501', null, 'and nobody signed in does');
+
+-- Auth is shared with FlowTime: delete-account asks before deleting the auth user.
+reset role;
+select is(public.used_by_other_app('00000000-0000-0000-0000-00000000000a'), false, 'no other app uses a Chroma user yet');
+select is(has_function_privilege('service_role', 'public.used_by_other_app(uuid)', 'execute'), true, 'the service role asks');
+select is(has_function_privilege('authenticated', 'public.used_by_other_app(uuid)', 'execute'), false, 'and nobody signed in can');
 
 -- The guards of a block, with the row of the friendship still there. block_user deletes it, so the
 -- tests above never reach them; a request that raced a block leaves exactly this, and so does anything
