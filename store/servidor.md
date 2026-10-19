@@ -36,6 +36,14 @@ select vault.create_secret('<service role key>', 'service_role_key');
 select vault.create_secret('<el mismo valor que REPORT_WEBHOOK_SECRET, sección 3>', 'report_webhook_secret');
 ```
 
+Ojo con `service_role_key`: tiene que ser el mismo valor que la variable `SUPABASE_SERVICE_ROLE_KEY` que
+ven las funciones, porque `purge-photos` compara con ella. En `baltajmn-social` esa variable es la clave
+secreta nueva (`sb_secret_...`), no la JWT `service_role` antigua: con la antigua la purga contesta 401.
+Puesto el 19-10-2026 por la Management API (`/api-keys?reveal=true` y `/database/query`, con el token de
+la CLI del Llavero, sin imprimir valores), igual que `report_webhook_secret`, que se generó dentro de la
+base con `gen_random_bytes(32)` y se copió de ahí a `REPORT_WEBHOOK_SECRET`. Prueba: la orden de la
+tarea `purge-photos` lanzada a mano contesta 200 con `{"purged":0,"orphans":0}`.
+
 `project_url` y `service_role_key` son para la purga; `project_url` y `report_webhook_secret`, para el
 aviso de un reporte. Mejor ponerlos antes de que nadie pueda reportar: si falta alguno, el reporte se
 guarda igual y la base solo escribe un aviso en su registro, y el reintento de cada hora lo manda
@@ -70,13 +78,23 @@ sobre `reports`, con `pg_net`, y lo reintenta `report-retry`. Si de una versión
 
 *Authentication > Sign In / Providers*. Correo, teléfono y anónimo, apagados.
 
+Hecho el 19-10-2026, menos el secreto de Apple (abajo).
+
 - **Apple**: un Services ID (`com.baltajmn.color.signin`) con *Sign in with Apple* y la vuelta
   `https://<ref>.supabase.co/auth/v1/callback`; una clave de Sign in with Apple para generar el
   secreto. En *Client IDs*, el Services ID y el bundle `com.baltajmn.color` (el nativo de iOS entra
-  con el bundle). El target de iOS necesita la capacidad *Sign in with Apple*.
+  con el bundle). El target de iOS necesita la capacidad *Sign in with Apple*. El App ID tiene *Sign
+  in with Apple* y *Associated Domains* (puestas por la API el 19-10-2026). El nativo de iOS no necesita
+  secreto; el flujo web (Apple en Android) sí, y ese secreto es una JWT firmada con la clave `.p8` que
+  caduca a los 6 meses: hay que regenerarlo antes.
 - **Google**: en Google Cloud, un cliente OAuth web (su ID y secreto van a Supabase), uno Android con
   el SHA-1 de la firma de Play y el de depuración, y uno iOS. En *Client IDs* de Supabase, los tres
   separados por comas. El ID del cliente web va también en `SupabaseConfig.kt` (`googleServerClientId`).
+  Proyecto de Google Cloud `chroma-baltajmn`; la pantalla de consentimiento se llama "Chroma diario de
+  color" (Google rechazó "Chroma" a secas) y está en producción. Clientes: web `...dk993o86`, Android
+  Play `...irtem8cp` (SHA-1 `31:34:...:C1:A2`), Android subida `...8bhn59qh`, Android depuración
+  `...ub10ipqq` e iOS `...rffe5t5e`, todos `416801056544-`. Si FlowTime necesita Google, le toca su
+  propia pantalla de consentimiento en su proyecto de Google Cloud: esta enseña el nombre de Chroma.
 - *URL Configuration*: `Site URL` `https://color.baltajmn.dev` y, en *Redirect URLs*,
   `com.baltajmn.color://login`.
 
