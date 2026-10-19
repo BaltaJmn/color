@@ -155,6 +155,11 @@ cuenta como compartir. Se añade a la tabla de 1:
 | URL para borrar la cuenta | `https://color.baltajmn.dev/delete` |
 | ¿Se pueden borrar los datos sin borrar la cuenta? | Sí: cualquier día se hace privado y su fila y su foto se borran |
 
+Con grupos (v1.1, `20261020120000_groups.sql`) esta tabla **no cambia**: el nombre del grupo, quién
+está dentro y desde cuándo, y los expulsados son contenido y IDs de usuario ya declarados, y los
+miembros de un grupo ven lo que el usuario comparte a propósito (hoy y ayer), igual que los amigos, así
+que sigue sin contar como compartir. Al guardar, no hay que marcar nada nuevo.
+
 Hechos del código que lo sostienen: el esquema de `supabase/migrations`, la subida de `Outbox.kt`
 (foto a 720, recodificada), el borrado de fotos (`purge-photos`: a los 2 días y, además, el barrido de
 los ficheros que ninguna tarjeta señala, para que ninguna se quede atrás) y el de la cuenta
@@ -190,6 +195,10 @@ El servidor guarda además, de uno a dos días, el ID de usuario y la hora de ca
 que no valía (`invite_attempts`), solo para frenar a quien prueba códigos al azar. Cae en lo ya
 declarado: ID de usuario, para la funcionalidad de la app (Apple incluye ahí la seguridad y evitar el
 fraude), y no añade ningún tipo.
+
+Grupos no añaden ningún tipo: el nombre del grupo y la pertenencia caen en *Otro contenido del
+usuario* (y en *ID de usuario* para quién está dentro). Al describir *Otro contenido del usuario* no hace
+falta texto libre en la consola, pero si se pide, decir "colores, palabras, amistades, grupos y reportes".
 
 `PrivacyInfo.xcprivacy` ya declara esto. Si se publica una versión sin servidor (`SupabaseConfig`
 vacío), el formulario correcto es el de 5 y el manifiesto declara de más, cosa que Apple no rechaza; lo
@@ -322,6 +331,13 @@ Lo que cambia al publicar la v1.1 (los datos que salen, en #38):
 | Play, seguridad de los datos | "¿Los usuarios pueden pedir que se borren sus datos?": **sí**. URL de borrado de la cuenta: `https://color.baltajmn.dev/delete` (`delete.html` de `chroma-privacy`) |
 | App Store | Borrar la cuenta desde la app (5.1.1(v)): Ajustes > Amigos > Borrar cuenta |
 | Términos | `https://color.baltajmn.dev/terms.html` (`terms.html` de `chroma-privacy`). Se aceptan al crear el nombre, antes de ver nada de nadie, y están en Ajustes > Privacidad |
+
+Grupos (20-10-2026): la política, los términos y la página de borrado de `chroma-privacy` ya dicen que
+los miembros de un grupo ven hoy y ayer, que se guarda nombre, pertenencia y expulsados, y que borrar la
+cuenta quita de los grupos (commit `533fd2c`, publicado por Pages). `PrivacyInfo.xcprivacy` cubre grupos
+sin cambios. Para la consola no hay nada nuevo que marcar en Seguridad de los datos ni en Privacidad de la
+app. La ficha de las tiendas no menciona grupos y no se ha tocado: se decide si se añaden a los 13
+idiomas al publicar la 1.1 en producción.
 
 Estado el 19-10-2026, con Amigos ya en `main`:
 

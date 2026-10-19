@@ -54,7 +54,7 @@
             <key>NSPrivacyCollectedDataTypePurposes</key>
             <array><string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string></array>
         </dict>
-        <!-- Shared photos, 720 px, no metadata, deleted after 7 days. -->
+        <!-- Shared photos, 720 px, no metadata, deleted after 2 days. -->
         <dict>
             <key>NSPrivacyCollectedDataType</key>
             <string>NSPrivacyCollectedDataTypePhotosorVideos</string>
@@ -65,7 +65,7 @@
             <key>NSPrivacyCollectedDataTypePurposes</key>
             <array><string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string></array>
         </dict>
-        <!-- Shared colors, color names and words, friendships and reports. -->
+        <!-- Shared colors, color names and words, friendships, groups and reports. -->
         <dict>
             <key>NSPrivacyCollectedDataType</key>
             <string>NSPrivacyCollectedDataTypeOtherUserContent</string>
