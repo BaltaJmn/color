@@ -40,18 +40,33 @@ import kotlin.math.floor
 @Composable
 fun InviteScreen(onClose: () -> Unit) {
     val code = Social.me?.inviteCode.orEmpty()
-    val link = inviteLink(code)
-    val qr = remember(link) { qrEncode(link) }
+    InviteLayer(S.inviteFriend, S.inviteText, code.ifEmpty { null }?.let(::inviteLink), S::inviteMessage, { Friends.regenerate() }, onClose)
+}
+
+/**
+ * A link, its QR and a way to share it, for a friend or a group (docs/pantallas.md 8.6 and 8.7).
+ * [link] is null while the code is loading; without [onRegenerate] the link cannot be renewed here.
+ */
+@Composable
+internal fun InviteLayer(
+    title: String,
+    text: String,
+    link: String?,
+    message: (String) -> String,
+    onRegenerate: (suspend () -> Unit)?,
+    onClose: () -> Unit,
+) {
+    val qr = remember(link) { link?.let(::qrEncode) }
     var confirming by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
     var failed by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    Overlay(S.inviteFriend, onClose) {
+    Overlay(title, onClose) {
         Spacer(Modifier.height(8.dp))
-        Text(S.inviteText, style = Styles.muted, modifier = Modifier.fillMaxWidth())
+        Text(text, style = Styles.muted, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(24.dp))
-        if (code.isEmpty() || qr == null) {
+        if (link == null || qr == null) {
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { Text(S.working, style = Styles.caption) }
         } else {
             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { QrImage(qr) }
@@ -61,10 +76,12 @@ fun InviteScreen(onClose: () -> Unit) {
             if (failed) Notice(S.friendsOffline, S.ok to { failed = false })
             OutlinedAction(S.shareLink, {
                 Trip.start()
-                Sharing.shareText(S.inviteMessage(link))
+                Sharing.shareText(message(link))
             })
-            Spacer(Modifier.height(8.dp))
-            TextAction(if (busy) S.working else S.regenerateLink, { confirming = true }, enabled = !busy)
+            if (onRegenerate != null) {
+                Spacer(Modifier.height(8.dp))
+                TextAction(if (busy) S.working else S.regenerateLink, { confirming = true }, enabled = !busy)
+            }
         }
     }
 
@@ -77,7 +94,7 @@ fun InviteScreen(onClose: () -> Unit) {
                 confirming = false
                 busy = true
                 scope.launch {
-                    failed = runCatching { Friends.regenerate() }.isFailure
+                    failed = runCatching { onRegenerate?.invoke() }.isFailure
                     busy = false
                 }
             },

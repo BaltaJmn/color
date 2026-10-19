@@ -84,6 +84,10 @@ object Groups {
 
     var inviteOpen by mutableStateOf(false)
 
+    /** The naming dialog of a new group, and the quiet answer of the last thing done here. */
+    var creating by mutableStateOf(false)
+    var notice by mutableStateOf<String?>(null)
+
     val current: Group? get() = groups.firstOrNull { it.id == selected }
 
     fun opened(code: String) {
@@ -185,5 +189,7 @@ object Groups {
         feed = emptyList()
         pendingCode = null
         inviteOpen = false
+        creating = false
+        notice = null
     }
 }
