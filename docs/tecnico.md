@@ -514,6 +514,11 @@ propio del mismo proyecto, y ninguna de las dos toca el de la otra. Lo que sí s
   (`photos`, `purge-photos`, `project_url`, `REPORT_*`...) no se reutilizan para otra cosa.
 - **URL Configuration**: hay un solo `Site URL` (el de Chroma); cada app añade su esquema de vuelta en
   *Redirect URLs*.
+- **Cuenta de revisión** (20-10-2026): una cuenta de Google o Apple de prueba pide SMS o un segundo
+  correo en un dispositivo desconocido, y el revisor se queda fuera. El proveedor Email está activo,
+  pero el hook *Before User Created* (`hook_before_user_created`) solo deja crear por email
+  `review@baltajmn.dev`, dada de alta a mano en el panel (*Add user*, *Auto Confirm User*). Cualquier
+  otra alta por email recibe 403; Apple y Google pasan sin tocar. Sirve a las dos apps.
 
 ### 8.1 Tablas
 

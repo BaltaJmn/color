@@ -9,11 +9,16 @@ major_version = 17
 [auth]
 site_url = "https://color.baltajmn.dev"
 additional_redirect_urls = ["com.baltajmn.color://login"]
-# Apple and Google only (SPEC 4): no email, no password, no phone.
+# Apple and Google for everyone (SPEC 4). Email and password only for the App Review account: the
+# hook refuses any other email sign-up (migration review_account). No phone.
 enable_signup = true
 
 [auth.email]
-enable_signup = false
+enable_signup = true
+
+[auth.hook.before_user_created]
+enabled = true
+uri = "pg-functions://postgres/public/hook_before_user_created"
 
 [auth.external.apple]
 enabled = true
