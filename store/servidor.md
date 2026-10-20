@@ -150,6 +150,17 @@ reportar (la tarjeta se oculta y queda la fila en `reports`), bloquear y desbloq
 correo de ese reporte salió en cuanto existió la clave de Resend (`notified_at` relleno). Visto de paso: una solicitud nueva no aparece en Amigos hasta salir y volver a la
 pestaña.
 
+Grupos, el 20-10-2026 con los mismos dos emuladores (build debug de `main`, migración
+`20261020120000_groups.sql` aplicada): sin ser amigos, crear un grupo, entrar por el enlace, ver la
+tarjeta del otro con su foto, miembros con quien lo gestiona, salir, volver a entrar, sacar (el enlace
+contesta después que ya no vale y queda la fila en `group_bans`), regenerar solo para quien lo
+gestiona; ya amigos, un grupo con los dos, reportar desde el grupo (la tarjeta se oculta también en
+Amigos, y el correo salió en un segundo), bloquear (desaparece de amigos, del feed y de los miembros
+del grupo en los dos lados) y desbloquear. Todo pasó. Arreglado esa misma noche: aceptar una solicitud
+no enseñaba la tarjeta del nuevo amigo hasta refrescar, y la cápsula de un grupo del que te sacaron
+seguía hasta cambiar de pestaña. iOS no se probó con cuenta: iniciar sesión en el simulador pide
+contraseña; su código de grupos es el común, con los tests de `iosSimulatorArm64Test`.
+
 ## 7. Actuar sobre un reporte
 
 El correo trae lo necesario para juzgar (autor, quién reporta, día, color, palabra y una URL de la foto
