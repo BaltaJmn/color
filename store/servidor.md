@@ -90,7 +90,7 @@ Hecho el 19-10-2026.
   in with Apple* y *Associated Domains* (puestas por la API el 19-10-2026). El nativo de iOS no necesita
   secreto; el flujo web (Apple en Android) sí, y ese secreto es una JWT firmada con la clave `.p8` que
   caduca a los 6 meses: hay que regenerarlo antes. Clave `Y275S5BQZ8`, en `~/keys/chroma-siwa.p8`; el
-  secreto puesto el 19-10-2026 caduca el **17-04-2027**. Para rehacerlo, `tools/apple-secret.sh` y su
+  secreto puesto el 20-10-2026 caduca el **18-04-2027**. Para rehacerlo, `tools/apple-secret.sh` y su
   salida, por tubería y sin imprimirla, a `PATCH /v1/projects/<ref>/config/auth` con
   `external_apple_secret` (Management API). Prueba: `POST https://appleid.apple.com/auth/token` con un
   código falso contesta `invalid_grant` si el secreto vale e `invalid_client` si no.
