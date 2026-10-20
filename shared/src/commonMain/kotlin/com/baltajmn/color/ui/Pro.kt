@@ -226,14 +226,14 @@ fun ProDialog(onDismiss: () -> Unit) {
                 )
                 Spacer(Modifier.height(4.dp))
             }
-            // Apple 3.1.2: renewal, how to cancel and the two documents, next to the purchase.
-            if (monthly != null) {
-                Spacer(Modifier.height(8.dp))
-                Text(S.subscriptionTerms, style = Styles.caption)
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    TextAction(S.termsOfUse, quiet = true, onClick = { runCatching { uriHandler.openUri(TERMS_URL) } })
-                    TextAction(S.privacyRow, quiet = true, onClick = { runCatching { uriHandler.openUri(PRIVACY_URL) } })
-                }
+            // Apple 3.1.2: renewal and how to cancel whenever the month is on offer, and the two documents
+            // always, so a product the store did not return cannot take them away (MoodTraker 1.1 was
+            // rejected for not showing them, 20-10-2026).
+            Spacer(Modifier.height(8.dp))
+            if (monthly != null) Text(S.subscriptionTerms, style = Styles.caption)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                TextAction(S.termsOfUse, quiet = true, onClick = { runCatching { uriHandler.openUri(TERMS_URL) } })
+                TextAction(S.privacyRow, quiet = true, onClick = { runCatching { uriHandler.openUri(PRIVACY_URL) } })
             }
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 TextAction(
