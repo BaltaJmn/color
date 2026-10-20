@@ -20,7 +20,7 @@ JEDNO PRZYPOMNIENIE, KTÓRE WIE, KIEDY PRZESTAĆ
 Jedno codzienne przypomnienie o wybranej przez Ciebie porze, pytające, jaki kolor ma dzisiejszy dzień. Milczy, gdy dzisiejszy dzień ma już swój kolor.
 
 ZNAJOMI, JEŚLI CHCESZ
-Zaproś znajomych linkiem i zobaczcie nawzajem swój kolor dnia, ze zdjęciem tylko wtedy, gdy je udostępnisz. Widzą go tylko znajomi, których zaakceptujesz, a udostępnione zdjęcia są usuwane po 2 dniach. Bez polubień, bez komentarzy, bez liczników. Zgłoś lub zablokuj każdego, kiedy chcesz.
+Zaproś znajomych linkiem i zobaczcie nawzajem swój kolor dnia, ze zdjęciem tylko wtedy, gdy je udostępnisz. Albo utwórz małą grupę: jej członkowie widzą, co udostępniasz dziś i wczoraj, a dołączenie nie czyni was znajomymi. Widzą go tylko znajomi, których zaakceptujesz, i członkowie twoich grup, a udostępnione zdjęcia są usuwane po 2 dniach. Bez polubień, bez komentarzy, bez liczników. Zgłoś lub zablokuj każdego, kiedy chcesz.
 
 TWÓJ DZIENNIK ZOSTAJE W TWOIM TELEFONIE
 Konto nie jest obowiązkowe i nie ma naszej chmury: tylko Znajomi proszą o zalogowanie przez Apple lub Google, a z telefonu wychodzi tylko to, co udostępnisz. Zdjęcia są przechowywane bez informacji o lokalizacji. Wyeksportuj wszystkie swoje dni razem ze zdjęciami jako jeden plik, kiedy chcesz, i zaimportuj go na innym telefonie: import dodaje, nigdy nie usuwa.
