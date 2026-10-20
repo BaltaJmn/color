@@ -13,5 +13,5 @@ PRODUCT_BUNDLE_IDENTIFIER=$(APP_BUNDLE_ID)
 // release-ios.yml los saca de androidApp/build.gradle.kts al archivar, asi que las dos tiendas llevan
 // siempre la misma version y el mismo build, y el build no se repite porque el versionCode tampoco.
 // Los de aqui solo los usa un archivado a mano desde Xcode: se suben con cada release.
-CURRENT_PROJECT_VERSION=19
+CURRENT_PROJECT_VERSION=20
 MARKETING_VERSION=1.2
