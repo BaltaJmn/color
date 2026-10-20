@@ -178,6 +178,10 @@ no enseñaba la tarjeta del nuevo amigo hasta refrescar, y la cápsula de un gru
 seguía hasta cambiar de pestaña. iOS no se probó con cuenta: iniciar sesión en el simulador pide
 contraseña; su código de grupos es el común, con los tests de `iosSimulatorArm64Test`.
 
+iOS, el 20-10-2026 en un iPhone 16 Pro con la 1.2 (20) de TestFlight: *Sign in with email* con la
+cuenta de revisión `review@baltajmn.dev` entra, y se ven la amiga Ana, el grupo `Chroma` y sus fotos.
+Es el camino que sigue el revisor de Apple.
+
 ## 7. Actuar sobre un reporte
 
 El correo trae lo necesario para juzgar (autor, quién reporta, día, color, palabra y una URL de la foto
