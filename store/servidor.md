@@ -94,6 +94,23 @@ Hecho el 19-10-2026.
   salida, por tubería y sin imprimirla, a `PATCH /v1/projects/<ref>/config/auth` con
   `external_apple_secret` (Management API). Prueba: `POST https://appleid.apple.com/auth/token` con un
   código falso contesta `invalid_grant` si el secreto vale e `invalid_client` si no.
+  **Se renueva solo**, sin Claude: el agente de launchd `com.chroma.apple-secret`
+  (`~/Library/LaunchAgents`, el día 1 de cada mes a las 10:00; si el Mac dormía, al despertar) ejecuta
+  `tools/apple-secret-renovar.sh`. Genera el secreto, comprueba con Apple que contesta `invalid_grant` y
+  solo entonces lo carga en Supabase (token de la CLI del Llavero, servicio `Supabase CLI`, cuenta
+  `supabase`); el secreto y el token solo pasan por variables y tuberías. Después apunta la fecha de
+  arriba y hace un commit local de este fichero, sin push. Como el secreto dura 6 meses y se renueva
+  cada uno, hay unos cinco intentos de margen antes de que caduque. Si algo falla avisa por ntfy con
+  "Por que:" y "Que hacer:" y no toca Supabase si Apple rechaza el secreto. Registro:
+  `~/Library/Logs/chroma-apple-secret.log`. Probar ya: `tools/apple-secret-renovar.sh` (renovar antes de
+  tiempo es inocuo) o `launchctl kickstart -k gui/$(id -u)/com.chroma.apple-secret`. Si hay que
+  recargar el agente: `launchctl bootout gui/$(id -u)/com.chroma.apple-secret` y `launchctl bootstrap
+  gui/$(id -u) ~/Library/LaunchAgents/com.chroma.apple-secret.plist`. La Management API no devuelve el
+  secreto: `GET` da siempre el mismo valor de 64 caracteres sea cual sea el secreto (medido el
+  20-10-2026), así que la única prueba de contenido es la de Apple; tras el `PATCH` solo se comprueba que
+  Apple sigue activo y con secreto. Si la CLI cierra sesión, `supabase login` en una terminal.
+  La tarea de Claude `chroma-renovar-secreto-apple` que lo recordaba se archivó en
+  `~/.claude/scheduled-tasks-archivo/`.
 - **Google**: en Google Cloud, un cliente OAuth web (su ID y secreto van a Supabase), uno Android con
   el SHA-1 de la firma de Play y el de depuración, y uno iOS. En *Client IDs* de Supabase, los tres
   separados por comas. El ID del cliente web va también en `SupabaseConfig.kt` (`googleServerClientId`).
