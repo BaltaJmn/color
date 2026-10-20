@@ -26,6 +26,134 @@ Hechos de partida, todos de `docs/tecnico.md`:
 
 ---
 
+## 0. Para enviar por la mañana (20-10-2026)
+
+Lo dejó preparado la sesión de la noche del 19 al 20. En orden, cada paso con quién lo hace y lo que
+se pega. Estado al acabar la noche: Amigos y grupos probados de punta a punta con dos
+emuladores Android y dos cuentas (`store/servidor.md` 6), con los dos fallos que salieron ya
+arreglados; la 1.2 (19) etiquetada `v1.2`, camino de Play alfa y TestFlight.
+
+**Recomendación: no envíes la 1.1. Convierte esa misma versión de App Store Connect en la 1.2 y envía
+la 1.2.** Por qué:
+
+- Una revisión de Apple en vez de dos. Para el revisor, Amigos y grupos son una misma cosa (contenido
+  de usuarios: términos, reportar, bloquear) y piden lo mismo: cuenta de prueba, Privacidad de la app y
+  la primera suscripción. Enviar la 1.1 y luego la 1.2 es hacer eso dos veces y esperar dos revisiones.
+- Grupos no añaden ningún tipo de dato (1b y 5b): los formularios son idénticos.
+- La 1.2 está probada de punta a punta con dos dispositivos y está en Play alfa y TestFlight (build 19).
+- Las fichas del repositorio ya cuentan los grupos. Con la 1.1 habría que volver a la ficha anterior.
+
+Lo que arriesgas: si Apple pusiera pegas a algo de grupos, también retrasaría Amigos. Si prefieres no
+arriesgar, salta el paso 2 y envía la 1.1 como está; la 1.2 irá después en otra versión
+(`appstore.py nueva com.baltajmn.color 1.2`).
+
+### Paso 1. Cuenta de prueba (tú, 10 minutos)
+
+Claude no crea cuentas ni teclea contraseñas.
+
+1. Crea una cuenta de Google solo para revisiones (por ejemplo `chroma.revision@gmail.com`), **sin
+   verificación en dos pasos**: el revisor entra desde un iPhone que Google no conoce.
+2. Dile a Claude "arranca un emulador para la cuenta de prueba de Chroma": arranca uno libre (`Pixel_8`)
+   con la 1.2 de depuración. Allí, *Ajustes > Contraseñas y cuentas > Añadir cuenta > Google* con la
+   cuenta nueva (la contraseña la tecleas tú).
+3. Dile a Claude "monta la cuenta de prueba": sin contraseñas, Chroma > Amigos > Continuar con Google,
+   nombre `Alex`, 16 o más, términos; amistad con Ana (`baltax.75`, emulator-5554); un grupo `Chroma`
+   con Ana dentro; y un color con foto compartido hoy desde las dos.
+4. Mientras dure la revisión (en las dos tiendas), comparte cada día un color con foto desde las dos
+   cuentas: el feed y el grupo solo enseñan hoy y ayer, y sin tarjetas el revisor no puede probar
+   reportar ni bloquear.
+
+Ojo: la 1.1 tiene ahora en *Información de inicio de sesión* el usuario `baltajmn@gmail.com` con una
+contraseña puesta. Si es tu cuenta personal, se cambia en el paso 3.2.
+
+### Paso 2. Pasar la 1.1 a 1.2 en App Store Connect (Claude, con tu sí, 2 minutos)
+
+Dile a Claude "pasa la 1.1 de Chroma a 1.2 en App Store Connect". Lo hace por la API y lo comprueba con
+`appstore.py estado com.baltajmn.color`:
+
+1. Saca la 1.1 del borrador de envío que ya existe (dos elementos, uno es la versión; los dos en
+   `READY_FOR_REVIEW`), para que vuelva a *Preparar para el envío*: `appstore.py` no toca una versión
+   añadida a revisión. En la web es *Revisión de apps* > el borrador > *Eliminar* en cada fila.
+2. Después, desde el repositorio:
+
+```
+python3 ~/keys/appstore.py version com.baltajmn.color 1.2
+python3 ~/keys/appstore.py build com.baltajmn.color 19
+python3 ~/keys/appstore.py ficha com.baltajmn.color ~/AndroidStudioProjects/color
+python3 ~/keys/appstore.py novedades com.baltajmn.color ~/AndroidStudioProjects/color
+python3 ~/keys/appstore.py notas com.baltajmn.color ~/AndroidStudioProjects/color
+```
+
+`build` necesita la 19 ya procesada (`estado` la lista como `('19', 'VALID')`). `ficha` sube la
+descripción que cuenta los grupos; `novedades`, las de `store/whatsnew` (Amigos, grupos, fotos 2 días,
+Pro mensual: quien viene de la 1.0.14 no ha visto la 1.1); `notas`, las de la sección 6, que ya son las
+de la 1.2 (3881 caracteres, tope 4000). `novedades` y `notas` están en la copia local de
+`BaltaJmn/ci`, todavía sin commit.
+
+### Paso 3. App Store Connect en la web (tú, 10 minutos)
+
+1. **Privacidad de la app** (menú de la izquierda): *Tipos de datos > Editar*. Deja *Historial de
+   compras* como está y marca además:
+   - Información de contacto > **Nombre**
+   - Información de contacto > **Correo electrónico**
+   - Contenido del usuario > **Fotos o vídeos**
+   - Contenido del usuario > **Otro contenido del usuario**
+   - Identificadores > **ID de usuario**
+
+   *Siguiente* o *Guardar*. Cada uno de los cinco sale con su configuración pendiente; en todos, la
+   misma respuesta:
+   - Finalidad: solo **Funcionalidad de la app**.
+   - ¿Están vinculados a la identidad del usuario?: **Sí**.
+   - ¿Se usan para rastreo?: **No**.
+
+   *Historial de compras* sigue con funcionalidad y análisis, no vinculado y sin rastreo. Arriba a la
+   derecha, **Publicar**. Es la tabla de 5b; grupos no añade nada.
+2. Página de la versión, *Información para la revisión de la app* > **Información de inicio de
+   sesión**, con *Se requiere inicio de sesión* marcado. Sustituye lo que hay:
+   - Nombre de usuario: `<CORREO DE LA CUENTA DE PRUEBA DEL PASO 1>`
+   - Contraseña: `<SU CONTRASEÑA>`
+
+   *Guardar*. Las notas no llevan la cuenta: dicen "The Google account in Sign-In Information".
+3. En la misma página, comprueba: build **19** (18 si enviaste la 1.1), *Notas* empiezan por "What is
+   new in 1.2", el vídeo sigue adjunto, y *Novedades de esta versión* en inglés tiene la línea "New:
+   groups". Si no hiciste el paso 2 con Claude, pega las notas de la sección 6 y las novedades de
+   `store/whatsnew/whatsnew-<idioma>` a mano.
+4. **La suscripción** va en el mismo envío por ser la primera de la app. En la página de la versión,
+   sección *Compras dentro de la app y suscripciones* > *Seleccionar compras dentro de la app o
+   suscripciones* > marca **Chroma Pro monthly** (`com.baltajmn.color.pro_monthly`) > *Listo*. Si no
+   la deja marcar porque dice *Faltan metadatos*, ábrela en *Suscripciones > Pro*: la web marca en rojo
+   lo que falta. Por la API tiene los 13 idiomas, el grupo con sus 13, precio en 174 países, la captura
+   para la revisión y disponibilidad, y aun así la API dice `MISSING_METADATA` en las cuatro apps de la
+   familia.
+5. Arriba a la derecha, **Añadir a revisión**. En el borrador deben salir al menos la versión y la
+   suscripción. **Enviar a revisión**.
+
+### Paso 4. Google Play (tú, 5 minutos)
+
+1. *Política y programas > Contenido de la aplicación > Acceso a la aplicación > Gestionar*: "Todas o
+   algunas funciones están restringidas" > *Añadir instrucciones*. Nombre `Cuenta de prueba`, usuario y
+   contraseña de la cuenta del paso 1, y en *Otra información*:
+
+```
+Friends tab > Continue with Google with this account. It has a display name, an accepted friend and a group, and both share a color every day. Report and block: the three-dots button on any card. Unblock: Settings > Friends > Blocked.
+```
+
+   *Guardar*, y si lo pide, *Resumen de publicación > Enviar cambios a revisión*.
+2. Producción, cuando quieras (la 1.2 ya está en alfa): primero la ficha nueva, que dice grupos, con
+   `gh workflow run listings.yml -f target=play` (o dile a Claude "sube la ficha de Chroma a Play");
+   después *Prueba y publicación > Pruebas > Prueba cerrada (alfa) > Versiones > 1.2 (19) >
+   Promocionar versión > Producción*, todos los países, *Guardar* y *Enviar a revisión*. La 1.1 de
+   alfa no hace falta en producción: la 1.2 la lleva entera.
+
+### Si prefieres enviar la 1.1 ahora
+
+Pasos 1, 3 y 4.1 tal cual, sin el 2. En App Store, las notas y novedades de la 1.1 ya están puestas.
+En Play no promociones la 1.1 a producción con la ficha del repositorio: habla de grupos. Después de
+aprobada, la 1.2: `appstore.py nueva com.baltajmn.color 1.2` y los comandos del paso 2 desde
+`version`.
+
+---
+
 ## 1. Play: seguridad de los datos
 
 *Política > Contenido de la aplicación > Seguridad de los datos.*
@@ -250,39 +378,46 @@ Usos declarados en el `Info.plist`, en los trece idiomas (`<lang>.lproj/InfoPlis
 tarjeta o un póster, solo añadir).
 
 Notas para el revisor, en inglés. El 06-10-2026 Apple paró el primer envío con la 2.1 *Information
-Needed*, la que manda a las cuentas con poco historial de revisiones: pide un vídeo grabado en un
+Needed*, la que manda a las cuentas con poco historial de revisiones: pidió un vídeo grabado en un
 iPhone de verdad con la última versión de iOS, desde que se abre la app y pasando por la compra, y
-las siete respuestas de abajo, en la contestación y también en las notas para los siguientes envíos.
-El vídeo va además como archivo adjunto de la información para la revisión. El mismo texto es la
-plantilla de las otras apps de la cuenta.
+siete respuestas que desde entonces van en las notas de cada envío, con su numeración. El vídeo va
+como archivo adjunto de la información para la revisión. Estas son las de la 1.2 (Amigos con grupos y
+el Pro mensual); `appstore.py notas` sube este bloque, que Apple corta en 4000 caracteres. La cuenta
+de prueba no va aquí sino en *Información de inicio de sesión*, para que ningún hueco sin rellenar
+llegue a Apple.
 
 ```
+What is new in 1.2: Friends, an optional private social feature, now with small groups, and a monthly option for Chroma Pro.
+
 1. Screen recording
-Attached: a recording made on a physical iPhone running the latest iOS. It starts on the Home Screen, launches the app and follows the typical flow: taking the photo of the day, choosing its color and adding a word, My year, Settings, buying Chroma Pro with a sandbox account (the purchase dialog also shows Restore), and the Pro features: the year in words and the year poster in its three styles. Chroma has no account registration, login or account deletion, and in this version nothing is shared with other users (no user-generated content), so those flows do not exist.
+The attached recording (physical iPhone, latest iOS) shows the core flow and a sandbox purchase of Chroma Pro; Friends and groups are in point 3.
 
 2. Purpose and audience
-Chroma is a one-photo-a-day color diary. Once a day you take a photo, the app finds up to five colors in it and you choose one: that color is your day. My year paints every day as a grid, so after a year you have your year in colors. It is for anyone who wants a journaling habit that takes a second a day, without writing, accounts or social pressure. Everything stays on the device.
+A one-photo-a-day color diary: the app finds up to five colors in your photo and you choose one; My year paints every day as a grid. The diary needs no account and stays on the device. Friends is optional: the color of the day of friends you invite yourself, and of small groups you join.
 
 3. How to use it
-No login, no setup and no sample files are needed.
-- Today: tap "Take a photo", or "Choose from today's photos" (only photos taken today are accepted; on a simulator, which has no camera, use this with a photo taken today). Pick one of the colors offered and, if you like, add one word. The entry can be changed until the day ends at 3:00 a.m.; past days cannot be filled in.
-- My year: the grid of the year. Tap a day to open its card, and share the card as an image from there.
-- Settings: daily reminder, lock with Face ID, export and import a backup (zip file), Chroma Pro and Restore purchase.
-- Widgets: the today widget is free; the year widget is part of Chroma Pro.
+- Today: "Take a photo" or "Choose from today's photos" (only photos taken today), then pick a color.
+- Friends tab: sign in with Apple or Google, enter a display name and confirm you are 16 or older. The Terms of use (zero tolerance for objectionable content) are accepted there, before seeing anything from anyone. Invite friends with a link; nothing is visible until both sides accept. Friends see each other's shared color of the day, and the photo only if it was shared. Shared photos are deleted from the server after 2 days. No likes, comments, counters or public profiles.
+- Groups: in the Friends tab, the row of buttons under the title ("Friends", one per group, "+ New group"). Create one with a name; others join with its link (up to 20 members). A member sees only what the other members share for today and yesterday; joining does not make people friends. The three-dots button next to the group name opens Members and Leave group. The creator is the admin: in Members, Remove takes someone out, and that person cannot rejoin with the link.
+- Report: the three-dots button on any card (or long-press the card), in the friends feed or in a group, then Report. The card is hidden at once and the report reaches us by email; we act within 24 hours (remove the content and, if needed, the account).
+- Block: in the same menu, and on every incoming friend request. A blocked person disappears from your friends and from every group you share. Unblock in Settings > Friends > Blocked.
+- Delete account: Settings > Friends > Delete account. It deletes everything on the server (profile, shared days and photos, friendships, groups, sign-in account); the local diary stays on the device.
+- Terms: https://color.baltajmn.dev/terms.html, also in Settings > Privacy.
 
-4. External services
-- Apple In-App Purchase (StoreKit), for the single purchase.
-- RevenueCat (revenuecat.com), to validate that purchase and know whether Chroma Pro is active. It receives the purchase and an anonymous ID, never a name or an email.
-Nothing else: no account system, no server of our own, no analytics, no ads and no AI services. The colors are extracted on the device.
+4. Demo account
+The Google account in Sign-In Information: use "Continue with Google" in the Friends tab. It has a display name, an accepted friend and a group with another member; both share a color with a photo daily during the review, so there are cards to report and block.
 
-5. Regions
-The app works the same in every region. It is available in every App Store country except mainland China, in 13 languages, and Chroma Pro costs $1.99 (1.99 EUR in Spain), with Apple's regional pricing elsewhere. The recording was made when Pro cost 2.99, so it shows that earlier price.
+5. External services
+- Apple In-App Purchase and RevenueCat (revenuecat.com), to validate purchases. RevenueCat receives the purchase and an anonymous ID.
+- Supabase (supabase.com), our server for Friends only, in the EU (Frankfurt): account, display name, friendships, groups and what the user chooses to share.
+- Resend (resend.com), to email us content reports.
+No analytics, no ads, no AI services. Colors are extracted on the device.
 
-6. Regulated industries and third-party material
-Not applicable: Chroma is not in a regulated industry and includes no protected third-party material. The photos are the user's own and never leave the device.
+6. Regions and other
+Same everywhere; all countries but mainland China; 13 languages. No regulated industry or third-party material.
 
 7. In-App Purchase
-Two ways to buy Chroma Pro, both unlocking the same: a non-consumable lifetime purchase (com.baltajmn.color.pro_lifetime, 1.99 EUR, the highlighted option) and an auto-renewing monthly subscription (com.baltajmn.color.pro_monthly, 0.99 EUR per month, cancel any time in the App Store settings). The purchase dialog shows both prices, the renewal and cancellation terms, and links to the terms of use and privacy policy; Restore purchase is in the dialog. Pro unlocks the year poster in three styles, the year widget, and your year told in short sentences; everything else is free forever. The purchase dialog opens from Settings > Chroma Pro, from My year > Poster, and from the locked year widget. Restore purchase is in Settings and in the purchase dialog.
+Chroma Pro, two ways, same unlock: a non-consumable lifetime purchase (com.baltajmn.color.pro_lifetime, 1.99 EUR, highlighted) and an auto-renewing monthly subscription (com.baltajmn.color.pro_monthly, 0.99 EUR per month, cancel any time in App Store settings). The dialog shows both prices, renewal and cancellation terms, and links to the terms of use and privacy policy. Pro unlocks the year poster, the year widget and the year in short sentences; everything else, including all of Friends and groups, is free. It opens from Settings > Chroma Pro and My year > Poster; Restore is in Settings and in the dialog.
 ```
 
 ### Compra integrada
@@ -336,8 +471,8 @@ Grupos (20-10-2026): la política, los términos y la página de borrado de `chr
 los miembros de un grupo ven hoy y ayer, que se guarda nombre, pertenencia y expulsados, y que borrar la
 cuenta quita de los grupos (commit `533fd2c`, publicado por Pages). `PrivacyInfo.xcprivacy` cubre grupos
 sin cambios. Para la consola no hay nada nuevo que marcar en Seguridad de los datos ni en Privacidad de la
-app. La ficha de las tiendas no menciona grupos y no se ha tocado: se decide si se añaden a los 13
-idiomas al publicar la 1.1 en producción.
+app. La ficha de los 13 idiomas cuenta los grupos desde el 20-10-2026 y sale con la 1.2: ya no se
+puede subir con la 1.1, que no los tiene.
 
 Estado el 19-10-2026, con Amigos ya en `main`:
 
