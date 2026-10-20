@@ -47,24 +47,21 @@ Lo que arriesgas: si Apple pusiera pegas a algo de grupos, también retrasaría 
 arriesgar, salta el paso 2 y envía la 1.1 como está; la 1.2 irá después en otra versión
 (`appstore.py nueva com.baltajmn.color 1.2`).
 
-### Paso 1. Cuenta de prueba (tú, 10 minutos)
+### Paso 1. Cuenta de prueba (hecho el 20-10)
 
-Claude no crea cuentas ni teclea contraseñas.
+Una cuenta de Google de prueba pide SMS o un segundo correo en un iPhone que Google no conoce, así que
+el revisor entra por email: `review@baltajmn.dev`, creada a mano en Supabase (la contraseña es tuya y no
+está en el repositorio). Es la única alta por email que el servidor admite (`docs/tecnico.md` 8), y la
+build 20 trae el enlace *Sign in with email* bajo Apple y Google en Amigos. Sirve también para FlowTime.
 
-1. Crea una cuenta de Google solo para revisiones (por ejemplo `chroma.revision@gmail.com`), **sin
-   verificación en dos pasos**: el revisor entra desde un iPhone que Google no conoce.
-2. Dile a Claude "arranca un emulador para la cuenta de prueba de Chroma": arranca uno libre (`Pixel_8`)
-   con la 1.2 de depuración. Allí, *Ajustes > Contraseñas y cuentas > Añadir cuenta > Google* con la
-   cuenta nueva (la contraseña la tecleas tú).
-3. Dile a Claude "monta la cuenta de prueba": sin contraseñas, Chroma > Amigos > Continuar con Google,
-   nombre `Alex`, 16 o más, términos; amistad con Ana (`baltax.75`, emulator-5554); un grupo `Chroma`
-   con Ana dentro; y un color con foto compartido hoy desde las dos.
-4. Mientras dure la revisión (en las dos tiendas), comparte cada día un color con foto desde las dos
-   cuentas: el feed y el grupo solo enseñan hoy y ayer, y sin tarjetas el revisor no puede probar
-   reportar ni bloquear.
+Ya montada por SQL: perfil `Alex`, amistad aceptada con Ana (`baltax.75`), grupo `Chroma` con las dos
+(Alex de admin). Ana tiene fotos del 19 y el 20, y la tarea `review-demo` de `pg_cron` le comparte un
+color cada día a las 00:07 UTC para que el feed nunca se quede vacío durante una revisión (se quita con
+`select cron.unschedule('review-demo')`). Si quieres fotos además de colores, comparte una desde Ana
+en el emulador el día del envío.
 
-Ojo: la 1.1 tiene ahora en *Información de inicio de sesión* el usuario `baltajmn@gmail.com` con una
-contraseña puesta. Si es tu cuenta personal, se cambia en el paso 3.2.
+Ojo: en *Información de inicio de sesión* está todavía `baltajmn@gmail.com` con una contraseña puesta.
+Se cambia en el paso 3.2.
 
 ### Paso 2. Pasar la 1.1 a 1.2 en App Store Connect (Claude, con tu sí, 2 minutos)
 
@@ -111,11 +108,11 @@ de la 1.2 (3881 caracteres, tope 4000). `novedades` y `notas` ya están en `Balt
    derecha, **Publicar**. Es la tabla de 5b; grupos no añade nada.
 2. Página de la versión, *Información para la revisión de la app* > **Información de inicio de
    sesión**, con *Se requiere inicio de sesión* marcado. Sustituye lo que hay:
-   - Nombre de usuario: `<CORREO DE LA CUENTA DE PRUEBA DEL PASO 1>`
-   - Contraseña: `<SU CONTRASEÑA>`
+   - Nombre de usuario: `review@baltajmn.dev`
+   - Contraseña: la que pusiste en Supabase
 
-   *Guardar*. Las notas no llevan la cuenta: dicen "The Google account in Sign-In Information".
-3. En la misma página, comprueba: build **19** (18 si enviaste la 1.1), *Notas* empiezan por "What is
+   *Guardar*. Las notas no llevan la cuenta: dicen "The email account in Sign-In Information".
+3. En la misma página, comprueba: build **20** (la primera con *Sign in with email*), *Notas* empiezan por "What is
    new in 1.2", el vídeo sigue adjunto, y *Novedades de esta versión* en inglés tiene la línea "New:
    groups". Si no hiciste el paso 2 con Claude, pega las notas de la sección 6 y las novedades de
    `store/whatsnew/whatsnew-<idioma>` a mano.
@@ -134,12 +131,14 @@ de la 1.2 (3881 caracteres, tope 4000). `novedades` y `notas` ya están en `Balt
 0. **Clasificación de contenido (IARC): ya enviada.** La sesión de privacidad la vio enviada en Play el 19-10-2026 a las 18:16, en el navegador. No la repitas; si quieres comprobarlo, *Política y programas > Contenido de la aplicación > Clasificación de contenido*.
 
 1. *Política y programas > Contenido de la aplicación > Acceso a la aplicación > Gestionar*: "Todas o
-   algunas funciones están restringidas" > *Añadir instrucciones*. Nombre `Cuenta de prueba`, usuario y
-   contraseña de la cuenta del paso 1, y en *Otra información*:
+   algunas funciones están restringidas" > *Añadir instrucciones*. Nombre `Cuenta de prueba`, usuario
+   `review@baltajmn.dev` y su contraseña, y en *Otra información* (ya puesto en el diálogo el 20-10):
 
 ```
-Friends tab > Continue with Google with this account. It has a display name, an accepted friend and a group, and both share a color every day. Report and block: the three-dots button on any card. Unblock: Settings > Friends > Blocked.
+Friends tab > Sign in with email (below Continue with Google) with this email and password. The account has a display name (Alex), an accepted friend (Ana) and a group (Chroma), and Ana shares a color every day. Report and block: the three-dots button on any card. Unblock: Settings > Friends > Blocked.
 ```
+
+   Guárdalo con la build 20 ya en alfa: la 19 no tiene el enlace de email.
 
    *Guardar*, y si lo pide, *Resumen de publicación > Enviar cambios a revisión*.
 2. Producción, cuando quieras (la 1.2 ya está en alfa): primero la ficha nueva, que dice grupos, con
@@ -408,7 +407,7 @@ A one-photo-a-day color diary: the app finds up to five colors in your photo and
 - Terms: https://color.baltajmn.dev/terms.html, also in Settings > Privacy.
 
 4. Demo account
-The Google account in Sign-In Information: use "Continue with Google" in the Friends tab. It has a display name, an accepted friend and a group with another member; both share a color with a photo daily during the review, so there are cards to report and block.
+The email account in Sign-In Information: in the Friends tab, tap "Sign in with email" below the Apple and Google buttons. Email sign-in exists only for this review account; everyone else uses Apple or Google. It has a display name (Alex), an accepted friend (Ana) and a group (Chroma) with her; Ana shares a color every day, so there are cards to report and block.
 
 5. External services
 - Apple In-App Purchase and RevenueCat (revenuecat.com), to validate purchases. RevenueCat receives the purchase and an anonymous ID.
