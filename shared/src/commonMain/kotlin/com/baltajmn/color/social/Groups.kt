@@ -55,6 +55,9 @@ data class Member(
     val admin: Boolean,
 )
 
+/** group_people answers nothing to someone outside the group, and always lists me to a member. */
+internal fun isMember(people: List<Member>, me: String): Boolean = people.any { it.id == me }
+
 /** A group's cards: its members' days but mine, without the ones I reported, the last changed first. */
 internal fun groupFeed(rows: List<FeedRow>, members: List<Member>, me: String, hidden: List<String>): List<FeedRow> {
     val ids = members.map { it.id }.toSet() - me
@@ -153,6 +156,11 @@ object Groups {
         val group = selected ?: return
         val me = Social.userId() ?: return
         val people = Social.client.postgrest.rpc("group_people", buildJsonObject { put("g", group) }).decodeList<Member>()
+        // Removed from the group, or the group is gone: the capsule goes too, not just the cards.
+        if (!isMember(people, me)) {
+            refresh()
+            return
+        }
         val ids = people.map { it.id }.filter { it != me }
         val rows = if (ids.isEmpty()) {
             emptyList()

@@ -990,7 +990,10 @@ cualquier ruta) lee el código y enseña los botones de las tiendas.
 - `join` devuelve lo que contestó el `rpc` y después pide la lista de grupos; el grupo recién entrado
   queda elegido (se reconoce por su código en `my_groups`). Como en `Friends.request`, un refresco que
   falla después no convierte la respuesta en "sin conexión".
-- **Lista**: `rpc my_groups()`. **Miembros**: `rpc group_people(g)`, al abrir un grupo.
+- **Lista**: `rpc my_groups()`. **Miembros**: `rpc group_people(g)`, al abrir un grupo. A quien no es
+  miembro no le devuelve a nadie, y a un miembro siempre le incluye a él: si no sale, lo sacaron o el
+  grupo ya no existe, y en vez de un feed vacío se recarga la lista, la cápsula desaparece y vuelve el
+  feed de Amigos (visto en dos móviles: sin esto, la cápsula seguía hasta cambiar de pestaña).
 - **Feed** de un grupo: `select * from shared_entries where author in (miembros sin mí) and day in
   (hoy, ayer) order by updated_at desc`. Mismo `FeedRow`, mismo `readable()`, mismas tarjetas ocultas
   por reporte (`hiddenCards`). Se pide al abrir el grupo y al tirar hacia abajo; sin sondeo.

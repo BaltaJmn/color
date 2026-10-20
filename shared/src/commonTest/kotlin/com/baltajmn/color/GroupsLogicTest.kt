@@ -7,10 +7,13 @@ import com.baltajmn.color.social.groupCodeOf
 import com.baltajmn.color.social.groupFeed
 import com.baltajmn.color.social.groupLink
 import com.baltajmn.color.social.inviteCodeOf
+import com.baltajmn.color.social.isMember
 import com.baltajmn.color.social.joinResultOf
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 /** Test 21 (docs/tecnico.md 10). */
 class GroupsLogicTest {
@@ -42,5 +45,12 @@ class GroupsLogicTest {
         val members = listOf(Member("me", "Me", true), Member("ana", "Ana", false), Member("bea", "Bea", false))
         val rows = listOf(row("me"), row("ana"), row("bea"), row("stranger"))
         assertEquals(listOf("ana"), groupFeed(rows, members, "me", hidden = listOf("bea/2026-10-19")).map { it.author })
+    }
+
+    @Test
+    fun whoIsNotListedWasRemoved() {
+        assertTrue(isMember(listOf(Member("ana", "Ana", true), Member("me", "Me", false)), "me"))
+        assertFalse(isMember(emptyList(), "me"))
+        assertFalse(isMember(listOf(Member("ana", "Ana", true)), "me"))
     }
 }

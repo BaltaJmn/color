@@ -4,7 +4,7 @@
 -- Run with: supabase test db
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(39);
+select plan(40);
 
 -- Ana, Bea, Carla and Dani have a profile; Eva only signed in.
 insert into auth.users (id, email) values
@@ -94,6 +94,7 @@ set local request.jwt.claims to '{"sub": "00000000-0000-0000-0000-00000000000a",
 select public.remove_member(current_setting('test.g')::uuid, '00000000-0000-0000-0000-00000000000b');
 set local request.jwt.claims to '{"sub": "00000000-0000-0000-0000-00000000000b", "role": "authenticated"}';
 select is((select count(*) from public.my_groups())::int, 0, 'who is removed is out');
+select is((select count(*) from public.group_people(current_setting('test.g')::uuid))::int, 0, 'and sees nobody in it, not even themselves');
 select is(public.join_group('1111111111'), 'not_found', 'and the link answers as if it did not exist');
 
 -- Carla joins, Ana leaves: Carla is in charge, and regenerates.
