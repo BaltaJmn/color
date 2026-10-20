@@ -41,3 +41,5 @@ PRO는 원하는 방식으로
 여기서 찾을 수 없는 것
 
 연속 기록, 필터, 좋아요, 광고, 분석은 없어요.
+
+이용 약관: https://color.baltajmn.dev/terms.html
