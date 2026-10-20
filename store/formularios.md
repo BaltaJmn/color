@@ -131,7 +131,7 @@ de la 1.2 (3881 caracteres, tope 4000). `novedades` y `notas` ya están en `Balt
 
 ### Paso 4. Google Play (tú, 5 minutos)
 
-0. **Antes de nada, clasificación de contenido (IARC):** *Política y programas > Contenido de la aplicación > Clasificación de contenido*. El cuestionario de Amigos no está guardado (se perdió el 19-10): rellénalo con las respuestas de la sección 6b, *Guardar*, *Siguiente* y *Enviar*. Sin él, Play no deja publicar la 1.2 en producción.
+0. **Clasificación de contenido (IARC): ya enviada.** La sesión de privacidad la vio enviada en Play el 19-10-2026 a las 18:16, en el navegador. No la repitas; si quieres comprobarlo, *Política y programas > Contenido de la aplicación > Clasificación de contenido*.
 
 1. *Política y programas > Contenido de la aplicación > Acceso a la aplicación > Gestionar*: "Todas o
    algunas funciones están restringidas" > *Añadir instrucciones*. Nombre `Cuenta de prueba`, usuario y
@@ -515,8 +515,8 @@ Estado el 19-10-2026 por la noche, con la 1.1 (18) subida a Play alpha y TestFli
   electrónico, Fotos o vídeos, Otro contenido del usuario e ID de usuario, además de Compras. Ese diálogo
   solo tiene *Publicar*, que es del titular (se marcaron, pero la pestaña se cerró sin publicar). Después, cada tipo nuevo pide su configuración: finalidad
   **Funcionalidad de la app**, **vinculado** a la identidad, **sin** rastreo. Compras sigue como estaba.
-- Play, IARC: las respuestas de arriba se perdieron al reutilizar la pestaña del navegador sin guardar;
-  hay que volver a rellenarlo (respuestas arriba) y pulsar *Guardar*, *Siguiente* y *Enviar*.
+- Play, IARC: enviado el 19-10-2026 a las 18:16 (visto en el navegador por la sesión de privacidad). Las
+  respuestas de arriba son las que se usaron.
 - Play, ficha (`store/listings`): actualizada en el repositorio, sin subir. Sale a Play con la 1.1 a
   producción, no antes: la ficha de producción describe la 1.0.14, que no tiene Amigos.
 
