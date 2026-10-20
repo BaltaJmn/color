@@ -83,7 +83,8 @@ métricas.
 
 ### v1.1: Amigos
 
-- [ ] Cuenta opcional con Apple o Google, pedida solo al abrir Amigos.
+- [ ] Cuenta opcional con Apple o Google, pedida solo al abrir Amigos. El correo con contraseña existe
+  solo para la cuenta de revisión de las tiendas: el servidor no deja otras altas por correo.
 - [ ] Añadir amigos por enlace o QR. Amistad mutua, tope de 50.
 - [ ] Compartir cada día como privado, solo color, o color y foto.
 - [ ] Feed de hoy y ayer, en orden de hora, que se acaba.

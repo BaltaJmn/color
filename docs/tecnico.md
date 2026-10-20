@@ -845,6 +845,12 @@ Apple y Google con `compose-auth`: nativos en su plataforma, y el otro por el fl
 Android, Google en iOS). Al crear la cuenta: nombre visible de 1 a 30 caracteres y casilla de 16
 años o más, obligatoria. Sin proyecto (`SupabaseConfig.url` nulo), la pestaña Amigos no existe.
 
+Correo y contraseña existen solo para la cuenta de revisión de las tiendas (8, *Cuenta de revisión*):
+un enlace discreto bajo Apple y Google (`signInEmail`) abre un formulario que llama a
+`auth.signInWith(Email)`. Solo entra, nunca da de alta: el servidor rechaza cualquier otro correo. Un
+fallo enseña `signInEmailFailed` en una línea; un éxito sigue igual que Apple o Google, porque la
+pantalla sigue el estado de la sesión.
+
 La sesión tiene cuatro estados y la pantalla Amigos los reparte uno a uno. `NotAuthenticated` enseña la
 presentación. `Initializing` (el cliente lee la sesión guardada en otra corrutina al crearse) enseña
 `working`. `RefreshFailure` (sesión guardada que no se renueva sin red) enseña `friendsOffline` sin

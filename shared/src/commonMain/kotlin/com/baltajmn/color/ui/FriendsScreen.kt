@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -57,6 +58,10 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -82,6 +87,7 @@ import com.baltajmn.color.ui.theme.screenInsets
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.Apple
 import io.github.jan.supabase.auth.providers.Google
+import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.compose.auth.composable.NativeSignInResult
 import io.github.jan.supabase.compose.auth.composable.rememberSignInWithApple
@@ -156,6 +162,7 @@ internal fun PaletteStrip(colors: List<String>, description: String? = null) {
 @Composable
 private fun Intro() {
     var failed by remember { mutableStateOf(false) }
+    var emailOpen by remember { mutableStateOf(false) }
     val auth = Social.client.composeAuth
     val onResult = { r: NativeSignInResult -> failed = r is NativeSignInResult.Error || r is NativeSignInResult.NetworkError }
     // Native where the platform has it (Apple on iOS, Google on Android), the web flow elsewhere.
@@ -174,6 +181,79 @@ private fun Intro() {
     OutlinedAction(S.signInApple, { apple.startFlow() }, Modifier.fillMaxWidth())
     Spacer(Modifier.height(8.dp))
     OutlinedAction(S.signInGoogle, { google.startFlow() }, Modifier.fillMaxWidth())
+    Spacer(Modifier.height(8.dp))
+    // Only for the App Review account (docs/tecnico.md 9.1): the server refuses every other email
+    // sign-up. A visible link, not a gesture, so the reviewer finds it (Apple 2.3.1).
+    if (emailOpen) EmailSignIn { emailOpen = false }
+    else Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        TextAction(S.signInEmail, { emailOpen = true }, quiet = true)
+    }
+}
+
+/** Email and password, sign in only: there is no sign-up here and the server would refuse it. */
+@Composable
+private fun EmailSignIn(onClose: () -> Unit) {
+    var mail by remember { mutableStateOf("") }
+    var secret by remember { mutableStateOf("") }
+    var busy by remember { mutableStateOf(false) }
+    var failed by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    FormField(mail, { mail = it }, S.emailField, KeyboardType.Email)
+    Spacer(Modifier.height(8.dp))
+    FormField(secret, { secret = it }, S.passwordField, KeyboardType.Password, hidden = true)
+    Spacer(Modifier.height(12.dp))
+    if (failed) Text(S.signInEmailFailed, style = Styles.caption, modifier = Modifier.padding(bottom = 12.dp))
+    PrimaryAction(
+        if (busy) S.working else S.signInAction,
+        {
+            busy = true
+            failed = false
+            scope.launch {
+                // A success changes the session status and the screen leaves this form by itself.
+                failed = runCatching {
+                    Social.client.auth.signInWith(Email) {
+                        email = mail.trim()
+                        password = secret
+                    }
+                }.isFailure
+                busy = false
+            }
+        },
+        Modifier.fillMaxWidth(),
+        enabled = !busy && mail.isNotBlank() && secret.isNotEmpty(),
+    )
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        TextAction(S.cancel, onClose, quiet = true)
+    }
+}
+
+/** One line on a surface, named by its placeholder for a screen reader while it is empty. */
+@Composable
+private fun FormField(value: String, onChange: (String) -> Unit, placeholder: String, type: KeyboardType, hidden: Boolean = false) {
+    Box(
+        Modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+    ) {
+        BasicTextField(
+            value = value,
+            onValueChange = onChange,
+            singleLine = true,
+            textStyle = Styles.body,
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false, keyboardType = type),
+            visualTransformation = if (hidden) PasswordVisualTransformation() else VisualTransformation.None,
+            modifier = Modifier.fillMaxWidth(),
+            decorationBox = { field ->
+                Box {
+                    if (value.isEmpty()) Text(placeholder, style = Styles.muted)
+                    field()
+                }
+            },
+        )
+    }
 }
 
 @Composable

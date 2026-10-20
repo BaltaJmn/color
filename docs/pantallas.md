@@ -373,7 +373,11 @@ Al pie, fuera de las tarjetas y centrado, "Chroma" y la versión: es un dato de 
 
 Pantalla de presentación: tres líneas (`friendsIntro1` a `friendsIntro3`) sobre una tira de colores
 de ejemplo, callada para el lector de pantalla. Botones: Apple y Google, iguales y con borde, Apple
-primero (App Store 4.8: igual de visibles). Tras iniciar sesión, si
+primero (App Store 4.8: igual de visibles). Debajo, un enlace de texto discreto, `signInEmail`
+(`TextAction` apagado, visible y sin gesto: Apple 2.3.1), solo para la cuenta de revisión de las
+tiendas. Al pulsarlo se cambia por dos campos (`emailField` con teclado de correo, `passwordField`
+con teclado de contraseña y texto oculto), `signInAction` relleno y `cancel` en texto. Un fallo pone
+`signInEmailFailed` en una línea sobre el botón. Sin alta: solo entra. Tras iniciar sesión, si
 es la primera vez: nombre visible (con tope visible `n/30`, como la palabra del día), casilla
 `age16`, `termsAgree` con el enlace `termsRow`, y `continue`. Los términos se aceptan ahí, antes de ver nada de nadie (Apple 1.2).
 
