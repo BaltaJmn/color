@@ -383,8 +383,13 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
                             onAccept = {
                                 act {
                                     // Once per friendship: the moment a request turns into a friend.
-                                    if (Friends.accept(person.id)) haptic.performHapticFeedback(HapticFeedbackType.Confirm)
-                                    else message = S.friendLimit
+                                    if (Friends.accept(person.id)) {
+                                        haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                                        // Their days were not readable before: without a reload the new friend shows no card.
+                                        attempt++
+                                    } else {
+                                        message = S.friendLimit
+                                    }
                                 }
                             },
                         )
