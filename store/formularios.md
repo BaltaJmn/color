@@ -68,6 +68,8 @@ contraseña puesta. Si es tu cuenta personal, se cambia en el paso 3.2.
 
 ### Paso 2. Pasar la 1.1 a 1.2 en App Store Connect (Claude, con tu sí, 2 minutos)
 
+**Comprobado el 20-10 por la mañana: App Store Connect ya tiene la versión 1.2 con la build 19, la ficha, las novedades y las notas de este fichero subidas.** Antes de repetir nada, `appstore.py estado com.baltajmn.color`. Dos cosas a mirar: el borrador de envío tiene 1 elemento, y la publicación de la 1.2 está en *Después de la aprobación* (automática), no manual: cámbiala a manual en la página de la versión si quieres salir el mismo día que Play.
+
 Dile a Claude "pasa la 1.1 de Chroma a 1.2 en App Store Connect". Lo hace por la API y lo comprueba con
 `appstore.py estado com.baltajmn.color`:
 
@@ -87,8 +89,7 @@ python3 ~/keys/appstore.py notas com.baltajmn.color ~/AndroidStudioProjects/colo
 `build` necesita la 19 ya procesada (`estado` la lista como `('19', 'VALID')`). `ficha` sube la
 descripción que cuenta los grupos; `novedades`, las de `store/whatsnew` (Amigos, grupos, fotos 2 días,
 Pro mensual: quien viene de la 1.0.14 no ha visto la 1.1); `notas`, las de la sección 6, que ya son las
-de la 1.2 (3881 caracteres, tope 4000). `novedades` y `notas` están en la copia local de
-`BaltaJmn/ci`, todavía sin commit.
+de la 1.2 (3881 caracteres, tope 4000). `novedades` y `notas` ya están en `BaltaJmn/ci` (commit 2fb0926).
 
 ### Paso 3. App Store Connect en la web (tú, 10 minutos)
 
@@ -129,6 +130,8 @@ de la 1.2 (3881 caracteres, tope 4000). `novedades` y `notas` están en la copia
    suscripción. **Enviar a revisión**.
 
 ### Paso 4. Google Play (tú, 5 minutos)
+
+0. **Antes de nada, clasificación de contenido (IARC):** *Política y programas > Contenido de la aplicación > Clasificación de contenido*. El cuestionario de Amigos no está guardado (se perdió el 19-10): rellénalo con las respuestas de la sección 6b, *Guardar*, *Siguiente* y *Enviar*. Sin él, Play no deja publicar la 1.2 en producción.
 
 1. *Política y programas > Contenido de la aplicación > Acceso a la aplicación > Gestionar*: "Todas o
    algunas funciones están restringidas" > *Añadir instrucciones*. Nombre `Cuenta de prueba`, usuario y
