@@ -26,7 +26,7 @@ def main():
              "launchInSelectMarketsFirst": False, "preOrderEnabled": False, "submitted": "--enviar" in sys.argv}
     rel = {"relatedApps": {"data": [{"type": "apps", "id": app}]},
            "inAppEvents": {"data": [{"type": "appEvents", "id": i} for i in eventos]}}
-    # Apple only takes events that are ready to submit: with draft events the nomination goes without them.
+    # Apple only takes events that are already approved: until then the nomination goes without them.
     ya = [x for estado in ("DRAFT", "SUBMITTED") for x in a.get_all(f"/v1/nominations?filter[state]={estado}") if x["attributes"]["name"] == n["name"]]
 
     def enviar(rel):
@@ -39,7 +39,7 @@ def main():
     except SystemExit as e:
         if "inAppEvents" not in str(e):
             raise
-        print("Apple no acepta aun los eventos (siguen en borrador): la nominacion va sin ellos; repetir cuando esten enviados")
+        print("Apple no acepta aun los eventos (no estan aprobados): la nominacion va sin ellos; repetir cuando se aprueben")
         attrs["hasInAppEvents"] = False
         r = enviar({"relatedApps": rel["relatedApps"]})
     print(r["data"]["id"], r["data"]["attributes"]["state"])

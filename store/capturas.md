@@ -168,3 +168,21 @@ las de en-US y es-ES, de dispositivo, son de la 1.0.
 `StoreScreenshots.kt` pone en `Social` un cliente de Supabase sobre memoria (`quietSocial`): el real
 no se puede construir en una JVM sin ajustes de Android, y Hoy pregunta si hay cuenta. Sin eso el
 test falla desde que entro Amigos.
+
+## 8. Eventos y escaparate
+
+`store/events/<nombre>/` lleva `event.json` (textos en los 13 idiomas), `card.png` (1920x1080) y
+`details.png` (2160x3840, vertical: Apple pide 9:16, no 16:9). `tools/store/evento.py` dibuja las dos
+imagenes: un año de cuadros con el 2027 en grande y sin una sola frase, porque Apple pone el nombre
+y la insignia encima de la tarjeta. Un evento dura 31 dias como maximo, asi que 15-12 al 31-01 son dos:
+"Start 2027 in color" (15-12 al 14-01, enlace `com.baltajmn.color://year`) e "It's not too late for
+2027" (15-01 al 31-01, `://today`). Apple exige un enlace profundo para enviarlos.
+
+Las imagenes de evento (y las capturas de una prueba de Product Page Optimization) las rechaza
+la API de App Store Connect siempre, con `INVALID_ASSET_FILE_FORMAT`, incluso una captura que ya vale
+en la ficha. La web las acepta: se suben desde ella (Claude in Chrome, `file_upload`), y lo ya subido
+se coloca por API en el resto de idiomas con `ci/tienda/biblioteca.py colocar_evento`. La prueba
+de PPO admite capturas de 6,1" o 6,3" (1206x2622), no las de 6,9" de la ficha.
+
+La nominacion de featuring es `tools/store/nominacion.py` sobre `store/events/nominacion.json`. Apple solo
+admite en ella eventos ya aprobados: se envia sin ellos y se repite con `--enviar` al aprobarse.
