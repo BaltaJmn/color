@@ -55,6 +55,12 @@ import com.baltajmn.color.model.ChromaEntry
 import com.baltajmn.color.model.JournalFile
 import com.baltajmn.color.model.JournalJson
 import com.baltajmn.color.model.isoKey
+import com.baltajmn.color.social.Social
+import com.baltajmn.color.social.SupabaseConfig
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.MemoryCodeVerifierCache
+import io.github.jan.supabase.auth.MemorySessionManager
+import io.github.jan.supabase.createSupabaseClient
 import java.io.File
 import kotlin.io.path.createTempDirectory
 import kotlinx.datetime.LocalDate
@@ -91,6 +97,7 @@ class StoreScreenshots {
         File(out, "photos").copyRecursively(File(work, "photos"))
         Storage.rootOverride = work
         addToday(work)
+        quietSocial()
         // There is no store in a JVM: Billing stays quiet, and the demo's Pro is never switched off.
         Billing::class.java.getDeclaredField("configured").apply { isAccessible = true }.set(Billing, true)
 
@@ -111,6 +118,22 @@ class StoreScreenshots {
         compose.onAllNodesWithText(S.navToday).onFirst().performClick()
         compose.onAllNodesWithText(S.share).onFirst().performScrollTo().performClick()
         shot("04_tarjeta")
+    }
+
+    /**
+     * Today asks the Supabase client whether there is an account, and a JVM has no Android settings
+     * to build its session store from: a client over memory instead, which finds no session and
+     * never leaves the machine, put where Social's lazy would have built the real one.
+     */
+    private fun quietSocial() {
+        val client = createSupabaseClient(SupabaseConfig.url!!, SupabaseConfig.anonKey!!) {
+            install(Auth) {
+                sessionManager = MemorySessionManager()
+                codeVerifierCache = MemoryCodeVerifierCache()
+            }
+        }
+        val lazy = Social::class.java.getDeclaredField("client\$delegate").apply { isAccessible = true }.get(Social)!!
+        lazy.javaClass.getDeclaredField("_value").apply { isAccessible = true }.set(lazy, client)
     }
 
     /**

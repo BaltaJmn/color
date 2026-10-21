@@ -36,6 +36,14 @@ WORDS = {
     "pt-BR": ["chuva", "feira", "praia", "café", "trem", "jardim", "neve", "show", "piquenique", "balsa"],
     "de-DE": ["Regen", "Markt", "Strand", "Kaffee", "Zug", "Garten", "Schnee", "Konzert", "Picknick", "Fähre"],
     "fr-FR": ["pluie", "marché", "plage", "café", "train", "jardin", "neige", "concert", "pique-nique", "ferry"],
+    "it-IT": ["pioggia", "mercato", "spiaggia", "caffè", "treno", "giardino", "neve", "concerto", "picnic", "traghetto"],
+    "nl-NL": ["regen", "markt", "strand", "koffie", "trein", "tuin", "sneeuw", "concert", "picknick", "veerboot"],
+    "pl-PL": ["deszcz", "targ", "plaża", "kawa", "pociąg", "ogród", "śnieg", "koncert", "piknik", "prom"],
+    "ru-RU": ["дождь", "рынок", "пляж", "кофе", "поезд", "сад", "снег", "концерт", "пикник", "паром"],
+    "tr-TR": ["yağmur", "pazar", "plaj", "kahve", "tren", "bahçe", "kar", "konser", "piknik", "vapur"],
+    "id": ["hujan", "pasar", "pantai", "kopi", "kereta", "taman", "salju", "konser", "piknik", "feri"],
+    "ja-JP": ["雨", "市場", "海辺", "コーヒー", "電車", "庭", "雪", "コンサート", "ピクニック", "フェリー"],
+    "ko-KR": ["비", "시장", "바닷가", "커피", "기차", "정원", "눈", "콘서트", "소풍", "페리"],
 }
 
 

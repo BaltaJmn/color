@@ -1,1 +1,1 @@
-year in pixels,dziennik zdjęć,nastrój,paleta,rok,piksele,codzienny,wspomnienia,odcień
+nastrój,mood,tracker,rok,piksel,kalendarz,widżet,zdjęcie,paleta,tapeta,plakat,wspomnienia,siatka

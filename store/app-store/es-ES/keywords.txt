@@ -1,1 +1,1 @@
-foto,diario,paleta,colores,año,píxeles,visual,tono,muestra,degradado,recuerdos,rejilla,pintar
+mood,tracker,ánimo,año,píxeles,calendario,widget,foto,paleta,fondo,pantalla,póster,recuerdos

@@ -1,1 +1,1 @@
-year in pixels,fotoğraf günlüğü,ruh hali,palet,yıl,piksel,anı,ton,ızgara,takvim
+ruh,hali,mood,tracker,yıl,piksel,takvim,widget,fotoğraf,palet,duvar,kağıdı,poster,anılar

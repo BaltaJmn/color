@@ -1,1 +1,1 @@
-photo,journal,palette,couleurs,année,pixels,visuel,teinte,nuancier,dégradé,souvenirs,grille
+humeur,suivi,mood,tracker,année,pixel,calendrier,widget,photo,palette,fond,écran,poster,souvenirs

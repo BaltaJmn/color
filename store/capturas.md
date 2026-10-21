@@ -1,8 +1,14 @@
 # Capturas de las fichas
 
-Seis escenas, las mismas en las dos tiendas, en **en-US** y **es-ES**. Los otros once idiomas
-heredan las de en-US, que es lo que hacen Play y App Store cuando un idioma no trae las suyas. Se
-sacan con el año de demostración, nunca con uno real.
+Seis escenas, las mismas en las dos tiendas y en los trece idiomas. **en-US y es-ES** salen de
+dispositivo (Play, emulador; iPhone, simulador); los otros once, dibujadas con la interfaz de la
+version (seccion 7), cada una con su idioma en la interfaz y en el titular. Se sacan con el año de
+demostracion, nunca con uno real.
+
+**Orden de la ficha (21-10-2026):** primero la rejilla de Mi año, con "year in pixels" en el
+titular, porque es lo que busca quien llega por esa frase y lo primero que ve en los resultados;
+despues Hoy, la tira, la tarjeta, los widgets y el poster. Los nombres de las crudas no cambian
+(`01_hoy` a `06_poster`); el orden lo da `CAPTURAS` en `tools/store/capturas.py`.
 
 **Una ficha, un tipo de captura.** Las seis de un dispositivo salen todas del mismo sitio, y si una
 cambia se rehacen todas: Play, del emulador (sección 1); iPhone, del simulador (sección 6) o, sin
@@ -48,16 +54,24 @@ Espera dentro `01_hoy.png` a `06_poster.png` y deja el resultado en
 
 ## 3. Titulares
 
-Dos líneas por escena, en `tools/store/capturas.py`. Es lo único que se lee en la tira de la ficha.
+Dos lineas por escena, en `TITULARES` de `tools/store/capturas.py`, para los trece idiomas. Es lo unico
+que se lee en la tira de la ficha, asi que va en negrita y lo mas grande que cabe: 88 px en la lamina
+de Play (1200 de ancho), menos si la linea mas larga del idioma no cabe (un solo tamaño para las seis
+de un idioma, `letra()`). Cuentan el beneficio, no la funcion, y no dicen "sin suscripcion": Pro
+tambien se paga al mes.
 
 | Escena | en-US | es-ES |
 |---|---|---|
-| 01 | One photo a day. / One color you choose. | Una foto al día. / Un color que eliges tú. |
-| 02 | Your year, / painted day by day | Tu año, / pintado día a día |
+| 02 (primera) | Your year in pixels, / made from your photos | Tu año en píxeles, / hecho con tus fotos |
+| 01 (segunda) | One photo a day. / One color you choose. | Una foto al día. / Un color que eliges tú. |
 | 03 | The whole year / in one gradient | El año entero / en un degradado |
 | 04 | Share the card, / or just the color | Comparte la tarjeta, / o solo el color |
 | 05 | On your home screen, / never your photo | En tu pantalla de inicio, / sin tu foto |
-| 06 | Your year as a poster. / One payment, no subscription. | Tu año en un póster. / Un pago, sin suscripción. |
+| 06 | Your year as a poster. / Pay once, keep it. | Tu año en un póster. / Pagas una vez, es tuyo. |
+
+Para cambiar solo los titulares de una ficha de dispositivo, de la que no se guardo la cruda:
+`python3 tools/store/capturas.py --recaptionar en-US play` (o `iphone`). Tapa el hueco de arriba, que
+es de fondo liso, y escribe el titular nuevo; las seis salen en el orden de `CAPTURAS`.
 
 ## 4. El año de demostración
 
@@ -138,3 +152,19 @@ verdad.
 La captura para la revisión de la compra (`revision-compra.png`, cruda y sin marco) sale de la misma
 build con Pro apagado en `entries.json` y el botón de compra forzado con un precio a mano: sin tienda,
 `Pro.kt` lo esconde. Ese cambio solo vive en esa build y no se sube nunca.
+
+## 7. Los otros once idiomas
+
+```bash
+python3 tools/store/iphone.py de-DE fr-FR pt-BR it-IT nl-NL pl-PL ru-RU tr-TR id ja-JP ko-KR
+```
+
+Una pasada por idioma (~20 s): `generar.py` con sus palabras, el atardecer, `StoreScreenshots.kt` en
+ese idioma, y el marco dos veces, `iphone` (las seis) y `play-dibujado` (cinco: la de widgets es de
+iOS y en Android no se parece, asi que Play no la lleva). Cada ficha tiene un solo tipo de captura:
+las de estos idiomas, todas dibujadas. En la interfaz dibujada se ve la pestaña Amigos (la 1.2);
+las de en-US y es-ES, de dispositivo, son de la 1.0.
+
+`StoreScreenshots.kt` pone en `Social` un cliente de Supabase sobre memoria (`quietSocial`): el real
+no se puede construir en una JVM sin ajustes de Android, y Hoy pregunta si hay cuenta. Sin eso el
+test falla desde que entro Amigos.

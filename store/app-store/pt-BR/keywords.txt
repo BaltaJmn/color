@@ -1,1 +1,1 @@
-foto,diario,paleta,cores,ano,pixels,visual,tom,amostra,degradê,lembranças,grade,pintar
+humor,mood,tracker,ano,pixel,calendário,widget,foto,paleta,papel,parede,pôster,memórias,grade

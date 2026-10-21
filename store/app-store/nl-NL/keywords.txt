@@ -1,1 +1,1 @@
-year in pixels,fotodagboek,stemming,palet,jaar,pixels,dagelijks,herinneringen,tint,raster
+stemming,mood,tracker,jaar,pixel,kalender,widget,dagboek,fotodagboek,palet,achtergrond,poster,raster

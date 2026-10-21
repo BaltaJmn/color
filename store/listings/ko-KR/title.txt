@@ -1,1 +1,1 @@
-Chroma: 컬러 일기
+Chroma: Color Year in Pixels

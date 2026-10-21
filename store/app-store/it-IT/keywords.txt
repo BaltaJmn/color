@@ -1,1 +1,1 @@
-year in pixels,pixel,diario fotografico,umore,palette,anno,griglia,calendario,ricordi,tinta
+umore,mood,tracker,anno,pixel,calendario,widget,fotografico,palette,sfondo,poster,ricordi,griglia
