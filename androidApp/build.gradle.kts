@@ -38,8 +38,8 @@ android {
         applicationId = "com.baltajmn.color"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 21
-        versionName = "1.2.1"
+        versionCode = 22
+        versionName = "1.2.2"
     }
     packaging {
         resources {
