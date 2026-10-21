@@ -228,8 +228,9 @@ entero de un vistazo. Antes la rejilla medía unos 800 y se veía del 1 al 17.
 - Tocar un día con entrada abre el día (sección 5). El lector de pantalla recorre el año mes a mes,
   columna abajo; cada mes con días es una cabecera con su nombre, para saltar de mes en mes, y el día
   de hoy lo dice (`navToday`).
-- `poster` abre la misma capa que compartir (sección 5) con el póster del año y un
-  segmentado de tres: `posterGrid`, `posterStrip`, `posterWallpaper`. Mirarlo es gratis; sin Pro,
+- `poster` abre la misma capa que compartir (sección 5) con el póster del año y cuatro estilos en dos
+  segmentados de dos, uno debajo del otro (`posterGrid`, `posterStrip` y `posterStory`,
+  `posterWallpaper`): en una fila, "Hintergrund" y "Achtergrond" se salían de su tercio a 360 dp. Mirarlo es gratis; sin Pro,
   compartir y guardar llevan `proTag` y abren el paywall.
 - Año sin entradas: `yearEmpty`.
 - **En palabras** (`statsTitle`): pantalla completa con frases cortas, una por línea en `body`
@@ -263,8 +264,8 @@ quita la miniatura de la imagen, no del día. No usa las palabras de compartir c
 (`shareColorOnly`, `shareWithPhoto`) porque son dos ajustes distintos y con las mismas palabras
 parecían uno. Después, lado a lado, `share` como botón principal con su icono (hoja del sistema) y
 `saveToPhotos` con borde (en Android solo desde la 10, que no pide permiso). Sin Pro, en el póster,
-los dos van con borde y `proTag`. La marca "Chroma" la
-decide el ajuste `watermarkRow`, no esta pantalla.
+los dos van con borde y `proTag`. La firma (`shareSignature`, el título de la ficha: "Chroma: Color Year in Pixels")
+la decide el ajuste `watermarkRow`, no esta pantalla.
 
 ---
 

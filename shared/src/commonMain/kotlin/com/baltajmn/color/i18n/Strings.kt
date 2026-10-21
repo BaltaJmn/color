@@ -758,6 +758,26 @@ object S {
         "今週の色",
         "이번 주의 색",
     )
+    /**
+     * What a shared card or poster signs: the title of the store listing, so whoever sees the picture can
+     * type it into a store and land on the app (a bare "Chroma" found nothing). The test compares it with
+     * each store/listings/<language>/title.txt.
+     */
+    val shareSignature get() = t(
+        "Chroma: Color Year in Pixels",
+        "Chroma: Color Year in Pixels",
+        "Chroma: Color Year in Pixels",
+        "Chroma: Color Year in Pixels",
+        "Chroma: Color Year in Pixels",
+        "Chroma: Color Year in Pixels",
+        "Chroma: Color Year in Pixels",
+        "Chroma: Color Year in Pixels",
+        "Chroma: Color Year in Pixels",
+        "Chroma: Color Year in Pixels",
+        "Chroma: Color Year in Pixels",
+        "Chroma: Color Year in Pixels",
+        "Chroma: Color Year in Pixels",
+    )
     val watermarkRow get() = t(
         "\"Chroma\" on shared cards",
         "\"Chroma\" en las tarjetas compartidas",
@@ -1277,19 +1297,19 @@ object S {
         "Chroma Pro",
     )
     val proPoster get() = t(
-        "Your year as a poster, in three styles",
-        "Tu año en póster, en tres estilos",
-        "Seu ano em pôster, em três estilos",
-        "Dein Jahr als Poster, in drei Stilen",
-        "Ton année en affiche, en trois styles",
-        "Il tuo anno in un poster, in tre stili",
-        "Je jaar als poster, in drie stijlen",
-        "Twój rok jako plakat, w trzech stylach",
-        "Твой год на постере, в трёх стилях",
-        "Yılın bir posterde, üç stilde",
-        "Tahunmu jadi poster, dalam tiga gaya",
-        "1年をポスターに。3つのスタイルで",
-        "한 해를 포스터로, 세 가지 스타일로",
+        "Your year as a poster, in four styles",
+        "Tu año en póster, en cuatro estilos",
+        "Seu ano em pôster, em quatro estilos",
+        "Dein Jahr als Poster, in vier Stilen",
+        "Ton année en affiche, en quatre styles",
+        "Il tuo anno in un poster, in quattro stili",
+        "Je jaar als poster, in vier stijlen",
+        "Twój rok jako plakat, w czterech stylach",
+        "Твой год на постере, в четырёх стилях",
+        "Yılın bir posterde, dört stilde",
+        "Tahunmu jadi poster, dalam empat gaya",
+        "1年をポスターに。4つのスタイルで",
+        "한 해를 포스터로, 네 가지 스타일로",
     )
     val proStats get() = t(
         "Your year told in short sentences",
@@ -1538,6 +1558,7 @@ object S {
     )
     val posterGrid get() = t("Grid", "Rejilla", "Grade", "Raster", "Grille", "Griglia", "Raster", "Siatka", "Сетка", "Izgara", "Kisi", "グリッド", "격자")
     val posterStrip get() = t("Strip", "Tira", "Faixa", "Streifen", "Bande", "Striscia", "Strook", "Pasek", "Полоса", "Şerit", "Pita", "ストリップ", "띠")
+    val posterStory get() = t("Story", "Historia", "Story", "Story", "Story", "Storia", "Story", "Relacja", "История", "Hikaye", "Cerita", "ストーリー", "스토리")
     val posterWallpaper get() = t(
         "Wallpaper",
         "Fondo de pantalla",

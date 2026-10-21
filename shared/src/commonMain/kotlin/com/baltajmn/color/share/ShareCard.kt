@@ -62,13 +62,22 @@ fun renderDayCard(
     }
     val dateBaseline = if (watermark) CARD_H - MARGIN - 56f else CARD_H - MARGIN
     text(measurer, S.caps(S.dayMonthYear(date)), TextStyle(fontSize = 34.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 4.sp, color = ink), MARGIN, dateBaseline)
-    if (watermark) text(measurer, "Chroma", TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Medium, color = ink), MARGIN, CARD_H - MARGIN)
+    if (watermark) text(measurer, S.shareSignature, TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Medium, color = ink), MARGIN, CARD_H - MARGIN)
     photo?.let { thumbnail(it, Offset(CARD_W - MARGIN - THUMB, CARD_H - MARGIN - THUMB), THUMB, ink) }
 }
 
 // --- the poster (Pro to export, free to look at) --------------------------------------------------
 
-enum class PosterStyle { Grid, Strip, Wallpaper }
+enum class PosterStyle { Grid, Strip, Story, Wallpaper }
+
+/**
+ * The year for an Instagram or TikTok story, 9:16. Both apps cover the top and the bottom of a story
+ * with their own bars, so the content keeps clear of them: the same grid, pushed in by these.
+ */
+const val STORY_W = 1080
+const val STORY_H = 1920
+private const val STORY_TOP = 180f
+private const val STORY_BOTTOM = 270f
 
 /** A tall phone screen: iOS and Android both fit it to theirs by cropping the sides. */
 const val WALL_W = 1170
@@ -89,20 +98,30 @@ fun renderPoster(style: PosterStyle, year: Int, days: Map<String, String>, water
     val colors = days.filterKeys { it.startsWith("$year-") }.entries.sortedBy { it.key }.map { colorOf(it.value) }
     return when (style) {
         PosterStyle.Grid -> gridPoster(year, days, watermark, measurer)
+        PosterStyle.Story -> gridPoster(year, days, watermark, measurer, STORY_W, STORY_H, STORY_TOP, STORY_BOTTOM)
         PosterStyle.Strip -> stripPoster(year, colors, watermark, measurer)
         PosterStyle.Wallpaper -> wallpaper(colors)
     }
 }
 
 /** Twelve columns of months, a row per day, as in My year. Days that do not exist stay paper. */
-private fun gridPoster(year: Int, days: Map<String, String>, watermark: Boolean, measurer: TextMeasurer) = picture(CARD_W, CARD_H) {
+private fun gridPoster(
+    year: Int,
+    days: Map<String, String>,
+    watermark: Boolean,
+    measurer: TextMeasurer,
+    width: Int = CARD_W,
+    height: Int = CARD_H,
+    insetTop: Float = 0f,
+    insetBottom: Float = 0f,
+) = picture(width, height) {
     drawRect(PAPER)
-    val title = posterTitle(year, measurer)
+    val title = posterTitle(year, measurer, insetTop)
     val top = title.bottom + 72f
-    val bottom = CARD_H - MARGIN - if (watermark) 56f else 0f
+    val bottom = height - MARGIN - insetBottom - if (watermark) 56f else 0f
     val gap = 8f
     val rowGap = 6f
-    val cellW = (CARD_W - 2 * MARGIN - 11 * gap) / 12
+    val cellW = (width - 2 * MARGIN - 11 * gap) / 12
     val cellH = (bottom - top - 30 * rowGap) / 31
     val radius = CornerRadius(6f)
     val label = TextStyle(fontSize = 28.sp, color = PAPER_INK)
@@ -122,7 +141,7 @@ private fun gridPoster(year: Int, days: Map<String, String>, watermark: Boolean,
             }
         }
     }
-    if (watermark) posterMark(measurer)
+    if (watermark) posterMark(measurer, height - insetBottom)
 }
 
 /** Every day with a color as a thin column, in order, the blank days left out so the year runs on. */
@@ -139,7 +158,7 @@ private fun stripPoster(year: Int, colors: List<Color>, watermark: Boolean, meas
             drawLine(PAPER_INK.copy(alpha = 0.13f), Offset(filled.right, area.top), Offset(filled.right, area.bottom), 2f)
         }
     }
-    if (watermark) posterMark(measurer)
+    if (watermark) posterMark(measurer, CARD_H.toFloat())
 }
 
 /** The year top to bottom in bands, edge to edge and without a word: the clock goes on top. */
@@ -161,11 +180,12 @@ private fun DrawScope.bands(colors: List<Color>, area: Rect, vertical: Boolean) 
     }
 }
 
-private fun DrawScope.posterTitle(year: Int, measurer: TextMeasurer) =
-    text(measurer, year.toString(), TextStyle(fontSize = 120.sp, fontWeight = FontWeight.ExtraLight, letterSpacing = (-4).sp, color = PAPER_INK), MARGIN, MARGIN + 110f)
+private fun DrawScope.posterTitle(year: Int, measurer: TextMeasurer, inset: Float = 0f) =
+    text(measurer, year.toString(), TextStyle(fontSize = 120.sp, fontWeight = FontWeight.ExtraLight, letterSpacing = (-4).sp, color = PAPER_INK), MARGIN, MARGIN + 110f + inset)
 
-private fun DrawScope.posterMark(measurer: TextMeasurer) =
-    text(measurer, "Chroma", TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Medium, color = PAPER_INK), MARGIN, CARD_H - MARGIN)
+/** [floor] is the picture's usable bottom edge; the signature sits a margin above it. */
+private fun DrawScope.posterMark(measurer: TextMeasurer, floor: Float) =
+    text(measurer, S.shareSignature, TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Medium, color = PAPER_INK), MARGIN, floor - MARGIN)
 
 /** Draws [image] cropped to a centered square with rounded corners, and a faint ring of [ink]. */
 internal fun DrawScope.thumbnail(image: ImageBitmap, at: Offset, side: Float, ink: Color) {

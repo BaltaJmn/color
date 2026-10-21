@@ -159,6 +159,7 @@ analítica e informes de fallos de terceros.
 | Edad mínima de Amigos | **16** años declarados | La edad de consentimiento digital más alta de la UE: vale en todos los países |
 | Servidor | Supabase en **Frankfurt** | Ya conectado, SDK KMP (`supabase-kt`), datos en la UE |
 | Rachas | **Ninguna** | La rejilla enseña la constancia sin castigo |
+| Firma de lo que se comparte | El título de la ficha ("Chroma: Color Year in Pixels"), no "Chroma" | Una imagen compartida es la publicidad de la app, y quien la ve solo puede buscar lo que lee: "Chroma" no encuentra nada en las tiendas. Se puede apagar en Ajustes |
 
 ---
 

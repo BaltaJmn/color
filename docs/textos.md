@@ -41,6 +41,7 @@ de Quilt. Cualquier otro idioma cae a inglés. Android da el indonesio como `in`
 | Sintonía | in tune | en sintonía | em sintonia | im Einklang | en accord |
 | Color de la semana | color of the week | color de la semana | cor da semana | Farbe der Woche | couleur de la semaine |
 | Póster | poster | póster | pôster | Poster | affiche |
+| Historia (póster 9:16) | Story | Historia | Story | Story | Story |
 
 | Concepto | it | nl | pl | ru | tr | id | ja | ko |
 |---|---|---|---|---|---|---|---|---|
@@ -53,6 +54,7 @@ de Quilt. Cualquier otro idioma cae a inglés. Android da el indonesio como `in`
 | Sintonía | in sintonia | in harmonie | zgrani | в унисон | uyum içinde | sehati | おそろい | 닮은 색 |
 | Color de la semana | colore della settimana | kleur van de week | kolor tygodnia | цвет недели | haftanın rengi | warna minggu ini | 今週の色 | 이번 주의 색 |
 | Póster | poster | poster | plakat | постер | poster | poster | ポスター | 포스터 |
+| Historia (póster 9:16) | Storia | Story | Relacja | История | Hikaye | Cerita | ストーリー | 스토리 |
 | Copia | copia | back-up | kopia zapasowa | резервная копия | yedek | cadangan | バックアップ | 백업 |
 
 ## 3. Nombres de color

@@ -22,10 +22,14 @@ fun PosterScreen(year: Int, onClose: () -> Unit) {
     var style by remember { mutableStateOf(PosterStyle.Grid) }
     val measurer = rememberPixelMeasurer()
     val picture = remember(style, year, days, settings.watermark) { renderPoster(style, year, days, settings.watermark, measurer) }
-    val styleLabels = listOf(S.posterGrid, S.posterStrip, S.posterWallpaper)
+    val styleLabels = listOf(S.posterGrid, S.posterStrip, S.posterStory, S.posterWallpaper)
 
     PictureScreen(S.poster, picture, "$year, ${styleLabels[style.ordinal]}", onClose, locked = !settings.pro, onLocked = { Paywall.open = true }) {
-        Segmented(styleLabels, style.ordinal) { style = PosterStyle.entries[it] }
+        // Two rows of two: four labels in one row put "Hintergrund" or "Achtergrond" over the edge at 360 dp.
+        // Each row is a Segmented of its own, and a selection outside it leaves it with none lit.
+        Segmented(styleLabels.take(2), style.ordinal) { style = PosterStyle.entries[it] }
+        Spacer(Modifier.height(8.dp))
+        Segmented(styleLabels.drop(2), style.ordinal - 2) { style = PosterStyle.entries[it + 2] }
         Spacer(Modifier.height(16.dp))
     }
 }

@@ -388,7 +388,12 @@ peticiones en vuelo.
 - Tarjeta: 1080x1350 (`share/ShareCard.kt`). Fondo del color; márgenes de 72 px; nombre a 96 px con
   su base a 168 px del borde; hex a 40 px; palabra a 56 px en cursiva; fecha con año a 40 px abajo a
   la izquierda; miniatura cuadrada de 320 px con radio del 10 % abajo a la derecha. Con `watermark`,
-  "Chroma" a 32 px en la última línea y la fecha sube 56 px.
+  la firma (`S.shareSignature`) a 32 px en la última línea y la fecha sube 56 px.
+- **Firma**: el título de la ficha de tienda de cada idioma, hoy "Chroma: Color Year in Pixels" en los
+  trece (`store/listings/<idioma>/title.txt`). Antes era "Chroma" a secas, y esa palabra no encuentra la
+  app en ninguna tienda: cada imagen compartida es la única publicidad que tiene la app. Vive en
+  `Strings.kt` y `ShareSignatureTest` la compara con cada `title.txt`, para que cambiar el título de la
+  ficha obligue a cambiarla. Con el título en 28 caracteres cabe a la izquierda de la miniatura.
 - Póster, siempre sobre papel claro (`#F3F3F3`, tinta `#111111`) sea cual sea el tema, porque es
   para imprimir:
   - Rejilla, 1080x1350: el año a 72 px arriba; 12 columnas de meses y 31 filas de días, como Mi
@@ -400,7 +405,11 @@ peticiones en vuelo.
     el último día se confunde con él.
   - Fondo de pantalla, 1170x2532: el año en bandas horizontales de arriba abajo, a sangre y sin
     texto, para que el reloj vaya encima.
-  - Con `watermark`, "Chroma" abajo a la izquierda en la rejilla y la tira; nunca en el fondo.
+  - Historia, 1080x1920 (9:16, `STORY_W` x `STORY_H`): la misma rejilla que la del póster, con el año
+    y la firma metidos hacia dentro 180 px por arriba y 270 por abajo (`STORY_TOP`, `STORY_BOTTOM`),
+    porque Instagram y TikTok tapan esas franjas con sus barras. Esos márgenes valen también sin firma.
+  - Con `watermark`, la firma abajo a la izquierda en la rejilla, la tira y la historia; nunca en el
+    fondo.
 - Se pinta con `Canvas` sobre un `ImageBitmap` en común y se codifica a PNG en cada plataforma, como
   la tarjeta de Purl.
 
@@ -960,7 +969,10 @@ con cuenta; el valor para los días nuevos, en Ajustes > Amigos.
 Enlace `https://color.baltajmn.dev/i/<code>`. Android: `intent-filter` con `autoVerify` y
 `.well-known/assetlinks.json` de `chroma-privacy`. iOS: `applinks:color.baltajmn.dev` y su
 `.well-known/apple-app-site-association`. La web (su `404.html`, que GitHub Pages sirve para
-cualquier ruta) lee el código y enseña los botones de las tiendas.
+cualquier ruta) lee el código y enseña el botón de la tienda de ese móvil: Google Play si el
+navegador dice Android, App Store si dice iPhone o iPad (un iPad que se presenta como Mac se
+reconoce por tener pantalla táctil), y los dos en cualquier otro sitio. Con la app instalada el enlace
+ni llega a la web.
 
 - El código son 10 caracteres hexadecimales; `inviteCodeOf` solo acepta ese host y esa forma.
 - Un enlace abierto sin sesión, o antes de elegir nombre, se guarda en memoria (`Friends.pendingCode`)
@@ -1139,3 +1151,4 @@ entonces corre solo; Robolectric y sus dependencias no entran en el binario.
 | #54 Grupos, cliente | 9.5; test 21 |
 | #55 Grupos, pantallas y textos | `pantallas.md` 8.7 |
 | #56 Web de invitación | 9.5 |
+| #62 Firma y póster de historia | 6.9, 9.4 |
