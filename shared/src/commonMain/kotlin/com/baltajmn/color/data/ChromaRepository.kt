@@ -327,9 +327,10 @@ object ChromaRepository {
     }
 
     /**
-     * A week of colors in and 120 days since the last ask, called on coming back to the app with today's already picked: a
-     * calm moment, never on top of a pick, an import or a save that runs with the app stopped. Marked
-     * only once the store was asked, so an attempt with nothing to show it in is not spent.
+     * A week of colors in and 120 days since the last ask, called a moment after the color of today is
+     * picked on Today: the reveal has played, nothing is under way, and the one request is not spent
+     * on an import or a save that runs with the app stopped. Marked only once the store was asked, so an
+     * attempt with nothing to show it in is not spent.
      */
     fun maybeRequestReview() {
         if (!reachedReviewDayCount(journal.size, settings.reviewAskedAt, nowMillis()) || today().isoKey() !in journal) return

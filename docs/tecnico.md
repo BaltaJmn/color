@@ -372,14 +372,16 @@ cambian Pro sin esperar a que nadie pregunte, y el paywall abierto se cierra sol
 Restaurar sin llegar a la tienda dice `storeUnavailable`, no `restoreNothing`: esa respuesta asusta a
 quien sí pagó.
 
-Valoración en la tienda: una vez, con 7 días o más, al volver a la app con el color de hoy ya
-elegido. Se decide en `ON_START` (sin bloqueo y sin volver de un viaje propio: cámara, galería,
-compartir, ajustes del sistema) y se pide en el `ON_RESUME` siguiente, en Hoy, sin capas, sin
-paywall y sin una ruta de widget pendiente: iOS descarta la petición de una escena que aún no está
-activa, y un diálogo de permiso pausa sin volver. No desde el guardado: gastaba la única petición al
-importar una copia o con la app parada. `reviewRequested` se marca solo cuando la tienda ha recibido
-la petición (Android, al terminar `launchReviewFlow` con la Activity delante; iOS, con una escena
-activa), y no hay dos peticiones en vuelo.
+Valoración en la tienda: con 7 días con color o más, una vez cada 120 días, **justo después de elegir
+el color de hoy**, nunca al abrir ni al volver a la app. Con la tarjeta ya revelada (`onPicked` de
+`TodayScreen` suma un `picks` en `App`), pasan 2,5 s y se pide si Hoy sigue delante, sin capas, sin
+paywall, sin bloqueo y sin una ruta de widget pendiente. Hasta el 21-10-2026 se pedía al volver a la
+app con el color de hoy ya elegido, que exige una segunda visita el mismo día: casi nadie la hace, y
+la App Store tenía 0 valoraciones. Tampoco se pide desde el guardado: gastaba la única petición al
+importar una copia o con la app parada; el pick viene de un toque, así que hay una escena activa
+en iOS y la Activity delante en Android. `reviewAskedAt` se marca solo cuando la tienda ha recibido
+la petición (Android, al terminar `launchReviewFlow`; iOS, con una escena activa), y no hay dos
+peticiones en vuelo.
 
 ### 6.9 Tarjeta y póster a imagen
 

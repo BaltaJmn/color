@@ -112,6 +112,7 @@ fun TodayScreen(
     onSettings: () -> Unit,
     onPhoto: (ImageBitmap) -> Unit,
     onShare: (LocalDate) -> Unit,
+    onPicked: () -> Unit = {},
     below: @Composable () -> Unit = {},
 ) {
     val journal = ChromaRepository.journal
@@ -253,6 +254,7 @@ fun TodayScreen(
                             notice = S.photoNotSaved
                         }
                         justPicked = true
+                        onPicked()
                     } else {
                         notice = S.galleryNotToday
                     }

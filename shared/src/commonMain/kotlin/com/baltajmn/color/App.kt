@@ -129,7 +129,8 @@ fun App() {
     // elapsedMillis and not a monotonic mark: Android's stops while the phone sleeps in a pocket.
     var leftAt by remember { mutableStateOf<Long?>(null) }
     var leftOnTrip by remember { mutableStateOf(false) }
-    var reviewDue by remember { mutableStateOf(false) }
+    // Counts the first picks of a day on Today: each one is a moment the rating may be asked at.
+    var picks by remember { mutableStateOf(0) }
     var proCheck by remember { mutableStateOf(0) }
     var barHeight by remember { mutableStateOf(0.dp) }
 
@@ -143,16 +144,14 @@ fun App() {
         proCheck++
         // A minute away locks it again, ten after a trip of our own. A clock that went back locks too.
         if (ChromaRepository.settings.lockOn && relocks(leftAt?.let { elapsedMillis() - it }, leftOnTrip)) locked = true
-        // Not back from a camera, a share sheet or system settings of our own (a pick may be under
-        // way), nor locked.
-        reviewDue = !locked && !leftOnTrip
     }
-    // Decided on a real return (ON_START), asked once the window is in front (ON_RESUME): iOS drops a
-    // request from a scene that is not active yet. A permission dialog pauses and resumes without a
-    // return, so it never brings one. Not over a layer, the paywall, or a screen a widget asked for.
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        if (!reviewDue) return@LifecycleEventEffect
-        reviewDue = false
+    // Asked a moment after the color of today is picked (the reveal has played and the card is theirs),
+    // from the pick itself: coming back to the app never asks, an import or a save with the app
+    // stopped never spends the one request, and iOS has an active scene because a finger just
+    // touched it. Not if a layer, the paywall or a screen a widget asked for took the screen meanwhile.
+    LaunchedEffect(picks) {
+        if (picks == 0) return@LaunchedEffect
+        delay(2_500)
         val clear = openDay == null && sharing == null && poster == null && stats == null && photo == null
         if (!locked && clear && !Paywall.open && Route.pending == null && screen == Screen.Today) {
             ChromaRepository.maybeRequestReview()
@@ -234,6 +233,7 @@ fun App() {
                                     onSettings = { screen = Screen.Settings },
                                     onPhoto = { photo = it },
                                     onShare = { sharing = it },
+                                    onPicked = { picks++ },
                                 )
                                 Screen.Year -> YearScreen(day, onOpenDay = { openDay = it }, onPoster = { poster = it }, onStats = { stats = it })
                                 Screen.Settings -> SettingsScreen(onBack = { screen = Screen.Today })
