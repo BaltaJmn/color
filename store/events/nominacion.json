@@ -1,0 +1,33 @@
+{
+ "name": "Chroma: Start 2027 in color",
+ "type": "APP_ENHANCEMENTS",
+ "description": "Chroma is a private color diary: one photo a day, the color you choose, and the whole year painted as a grid, a year in pixels. Version 1.2 adds Friends and Groups without metrics: no likes, comments, counters or streaks, shared photos are deleted after 2 days, and nothing leaves the phone unless you share it. Around New Year, the peak of year in pixels searches, two in-app events invite people to start their 2027 grid. No ads, no analytics. Free core; Pro is a one-time purchase or monthly.",
+ "notes": "Two in-app events are attached: Start 2027 in color (Dec 15 to Jan 14) and It is not too late for 2027 (Jan 15 to 31). App Store Connect caps an event at 31 days, so the season is split in two.",
+ "publishStart": "2026-12-15T00:00:00Z",
+ "publishEnd": "2027-01-31T23:59:00Z",
+ "deviceFamilies": [
+  "IPHONE"
+ ],
+ "locales": [
+  "en-US",
+  "es-ES",
+  "de-DE",
+  "fr-FR",
+  "it",
+  "pt-BR",
+  "nl-NL",
+  "pl",
+  "ru",
+  "tr",
+  "id",
+  "ja",
+  "ko"
+ ],
+ "supplementalMaterials": [
+  "https://color.baltajmn.dev/"
+ ],
+ "events": [
+  "start-2027",
+  "no-es-tarde-2027"
+ ]
+}

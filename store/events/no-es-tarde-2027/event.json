@@ -1,0 +1,78 @@
+{
+ "referenceName": "Chroma It is not too late for 2027",
+ "badge": "CHALLENGE",
+ "purpose": "ATTRACT_NEW_USERS",
+ "publish": "2027-01-01T08:00:00Z",
+ "start": "2027-01-15T00:00:00Z",
+ "end": "2027-01-31T23:59:00Z",
+ "excluding": [
+  "CHN"
+ ],
+ "locales": {
+  "en-US": {
+   "name": "It's not too late for 2027",
+   "short": "Start your year in pixels today",
+   "long": "Missed New Year's Day? Start your 2027 in pixels today: one photo a day, one color you choose, and a year still to fill."
+  },
+  "es-ES": {
+   "name": "2027 aún está a tiempo",
+   "short": "Empieza hoy tu año en píxeles",
+   "long": "¿Te perdiste el 1 de enero? Empieza hoy tu 2027 en píxeles: una foto al día, un color que eliges tú y un año por pintar."
+  },
+  "de-DE": {
+   "name": "Für 2027 ist es nicht zu spät",
+   "short": "Starte heute dein Jahr in Pixeln",
+   "long": "Den 1. Januar verpasst? Starte heute dein 2027 in Pixeln: ein Foto am Tag, eine Farbe nach Wahl und ein Jahr zum Füllen."
+  },
+  "fr-FR": {
+   "name": "2027 n'est pas encore perdu",
+   "short": "Commence ton année en pixels aujourd'hui",
+   "long": "Raté le 1er janvier ? Commence ton 2027 en pixels aujourd'hui : une photo par jour, ta couleur, une année à peindre."
+  },
+  "it": {
+   "name": "Per il 2027 sei in tempo",
+   "short": "Inizia oggi il tuo anno in pixel",
+   "long": "Hai perso il 1° gennaio? Inizia oggi il 2027 in pixel: una foto al giorno, un colore tuo e un anno da dipingere."
+  },
+  "pt-BR": {
+   "name": "Ainda dá tempo para 2027",
+   "short": "Comece hoje o seu ano em pixels",
+   "long": "Perdeu o 1º de janeiro? Comece hoje seu 2027 em pixels: uma foto por dia, uma cor que você escolhe e um ano para pintar."
+  },
+  "nl-NL": {
+   "name": "Voor 2027 ben je nog op tijd",
+   "short": "Begin vandaag je jaar in pixels",
+   "long": "1 januari gemist? Begin vandaag je 2027 in pixels: één foto per dag, een kleur naar keuze en een jaar om te kleuren."
+  },
+  "pl": {
+   "name": "Na 2027 jeszcze nie za późno",
+   "short": "Zacznij swój rok w pikselach dziś",
+   "long": "Ominął Cię 1 stycznia? Zacznij 2027 w pikselach dziś: zdjęcie dziennie, kolor, który wybierasz, i rok do pomalowania."
+  },
+  "ru": {
+   "name": "Для 2027 ещё не поздно",
+   "short": "Начните свой год в пикселях сегодня",
+   "long": "Пропустили 1 января? Начните 2027 в пикселях сегодня: фото каждый день, цвет на ваш выбор и целый год впереди."
+  },
+  "tr": {
+   "name": "2027 için geç değil",
+   "short": "Yılını bugün piksellerle başlat",
+   "long": "1 Ocak'ı kaçırdın mı? 2027'ye bugün piksellerle başla: günde bir fotoğraf, seçtiğin renk ve boyanacak koca bir yıl."
+  },
+  "id": {
+   "name": "2027 belum terlambat",
+   "short": "Mulai tahunmu dalam piksel hari ini",
+   "long": "Terlewat 1 Januari? Mulai 2027 dalam piksel hari ini: satu foto sehari, satu warna pilihanmu, setahun untuk diwarnai."
+  },
+  "ja": {
+   "name": "2027年は、まだ間に合う",
+   "short": "今日から1年をピクセルで始めよう",
+   "long": "1月1日に間に合わなかった? 今日から2027年をピクセルで。毎日1枚の写真、自分で選ぶ色、これから色づく1年。"
+  },
+  "ko": {
+   "name": "2027년, 아직 늦지 않았어요",
+   "short": "오늘부터 한 해를 픽셀로 시작해요",
+   "long": "1월 1일을 놓쳤나요? 오늘부터 2027년을 픽셀로 시작하세요. 하루 한 장의 사진, 직접 고르는 색, 앞으로 채울 한 해."
+  }
+ }
+}

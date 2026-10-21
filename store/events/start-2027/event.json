@@ -1,0 +1,78 @@
+{
+ "referenceName": "Chroma Start 2027 in color",
+ "badge": "CHALLENGE",
+ "purpose": "ATTRACT_NEW_USERS",
+ "publish": "2026-12-01T08:00:00Z",
+ "start": "2026-12-15T00:00:00Z",
+ "end": "2027-01-14T23:59:00Z",
+ "excluding": [
+  "CHN"
+ ],
+ "locales": {
+  "en-US": {
+   "name": "Start 2027 in color",
+   "short": "One photo a day paints your year in pixels",
+   "long": "Start your 2027 in pixels: one photo a day, one color you choose, and a whole year painted square by square."
+  },
+  "es-ES": {
+   "name": "Empieza 2027 en color",
+   "short": "Una foto al día pinta tu año en píxeles",
+   "long": "Empieza tu 2027 en píxeles: una foto al día, un color que eliges tú y un año entero pintado cuadro a cuadro."
+  },
+  "de-DE": {
+   "name": "2027 in Farbe beginnen",
+   "short": "Ein Foto am Tag malt dein Jahr in Pixeln",
+   "long": "Starte dein 2027 in Pixeln: ein Foto am Tag, eine Farbe nach Wahl und ein ganzes Jahr, Feld für Feld gemalt."
+  },
+  "fr-FR": {
+   "name": "Commence 2027 en couleur",
+   "short": "Une photo par jour peint ton année en pixels",
+   "long": "Commence ton 2027 en pixels : une photo par jour, la couleur de ton choix et une année peinte case par case."
+  },
+  "it": {
+   "name": "Inizia il 2027 a colori",
+   "short": "Una foto al giorno dipinge il tuo anno in pixel",
+   "long": "Inizia il tuo 2027 in pixel: una foto al giorno, un colore scelto da te e un anno intero dipinto quadrato per quadrato."
+  },
+  "pt-BR": {
+   "name": "Comece 2027 em cores",
+   "short": "Uma foto por dia pinta seu ano em pixels",
+   "long": "Comece seu 2027 em pixels: uma foto por dia, uma cor que você escolhe e um ano inteiro pintado quadrado a quadrado."
+  },
+  "nl-NL": {
+   "name": "Begin 2027 in kleur",
+   "short": "Eén foto per dag kleurt je jaar in pixels",
+   "long": "Begin je 2027 in pixels: één foto per dag, een kleur naar keuze en een heel jaar, vakje voor vakje geschilderd."
+  },
+  "pl": {
+   "name": "Zacznij 2027 w kolorze",
+   "short": "Jedno zdjęcie dziennie maluje Twój rok",
+   "long": "Zacznij 2027 w pikselach: jedno zdjęcie dziennie, kolor, który wybierasz, i cały rok malowany kwadrat po kwadracie."
+  },
+  "ru": {
+   "name": "Начните 2027 в цвете",
+   "short": "Одно фото в день рисует ваш год в пикселях",
+   "long": "Начните 2027 год в пикселях: фото каждый день, цвет на ваш выбор и целый год, нарисованный квадрат за квадратом."
+  },
+  "tr": {
+   "name": "2027'ye renkle başla",
+   "short": "Günde bir fotoğraf yılını piksellerle boyar",
+   "long": "2027'ye piksellerle başla: günde bir fotoğraf, senin seçtiğin renk ve kare kare boyanan koca bir yıl."
+  },
+  "id": {
+   "name": "Mulai 2027 dengan warna",
+   "short": "Satu foto sehari mewarnai tahunmu dalam piksel",
+   "long": "Mulai 2027 dalam piksel: satu foto sehari, satu warna pilihanmu, dan setahun penuh terlukis kotak demi kotak."
+  },
+  "ja": {
+   "name": "2027年を、色で始めよう",
+   "short": "1日1枚の写真で、1年をピクセルに",
+   "long": "2027年をピクセルで始めよう。毎日1枚の写真、自分で選ぶ色、そして1マスずつ色づく1年。"
+  },
+  "ko": {
+   "name": "2027년을 색으로 시작하세요",
+   "short": "하루 한 장의 사진으로 한 해를 픽셀로 채워요",
+   "long": "2027년을 픽셀로 시작하세요. 하루 한 장의 사진, 직접 고르는 색, 한 칸씩 채워지는 한 해."
+  }
+ }
+}
