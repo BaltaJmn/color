@@ -337,6 +337,11 @@ object ChromaRepository {
         Review.request { updateSettings { it.copy(reviewAskedAt = nowMillis()) } }
     }
 
+    /** The one Pro offer is still pending: a week of colors, today's among them, free, and not offered before. */
+    fun proOfferDue() = shouldOfferPro(journal.size, settings.pro, settings.proOffered) && today().isoKey() in journal
+
+    fun markProOffered() = updateSettings { it.copy(proOffered = true) }
+
     /**
      * Photos nobody references any more, and whatever an import left half done. Photos only when the
      * journal came from the main file and nothing ever went to corrupt/: otherwise they may belong to
@@ -365,6 +370,14 @@ object ChromaRepository {
 
     private fun Map<String, ChromaEntry>.toSortedMap() = entries.sortedBy { it.key }.associate { it.toPair() }
 }
+
+/**
+ * Pro is offered once, the first calm moment after a week of colors (the rating's threshold too), to
+ * someone free who was not offered it before. It never blocks anything: it is the paywall's own
+ * dialog with "Not now" (docs/tecnico.md 6.8), and what is never charged stays as it is.
+ */
+internal fun shouldOfferPro(totalDays: Int, pro: Boolean, offered: Boolean): Boolean =
+    totalDays >= 7 && !pro && !offered
 
 /**
  * Whether the journal earns an in-app rating request: a week of colors (so also a week installed),

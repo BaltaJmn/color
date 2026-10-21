@@ -53,6 +53,9 @@ import kotlinx.coroutines.launch
 object Paywall {
     var open by mutableStateOf(false)
 
+    /** Opened by the one offer after a week of colors, not by the user reaching a wall: adds a line of why. */
+    var offered by mutableStateOf(false)
+
     /** What the user was reaching for when the paywall opened: done as soon as Pro arrives. */
     var onPro: (() -> Unit)? = null
 }
@@ -103,7 +106,12 @@ fun ProDialog(onDismiss: () -> Unit) {
     val pro = ChromaRepository.settings.pro
     LaunchedEffect(pro) { if (pro) unlocked() }
     // Closed without buying, the wish goes with it: a purchase made later from elsewhere opens nothing.
-    DisposableEffect(Unit) { onDispose { Paywall.onPro = null } }
+    DisposableEffect(Unit) {
+        onDispose {
+            Paywall.onPro = null
+            Paywall.offered = false
+        }
+    }
     var note by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
@@ -136,6 +144,10 @@ fun ProDialog(onDismiss: () -> Unit) {
                 GlyphTile(Glyph.SPARK)
                 Spacer(Modifier.width(12.dp))
                 Text(S.proTitle, style = Styles.title)
+            }
+            if (Paywall.offered) {
+                Spacer(Modifier.height(12.dp))
+                Text(S.proWeekIntro, style = Styles.body)
             }
             // The poster is made of the user's own days: the offer shows their year, not a stock picture.
             if (mine.size >= 2) {

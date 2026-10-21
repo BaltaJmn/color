@@ -347,7 +347,9 @@ El plan Pro de Supabase se paga con unas 12 ventas al mes.
 ### Reglas
 
 Las de la familia: el plan gratis es la prueba, el paywall aparece al chocar (exportar el póster,
-tocar el widget del año sin Pro) o desde la fila de Ajustes, nunca al arrancar; restaurar compra en
+tocar el widget del año sin Pro) o desde la fila de Ajustes, nunca al arrancar, y **una sola vez más por
+su cuenta, al cumplir una semana de colores** (decisión del 21-10-2026, D9 del plan de crecimiento): es el
+momento en que ya hay rejilla que enseñar, y no bloquea nada ni toca lo que es gratis para siempre; restaurar compra en
 Ajustes; sin anuncios; RevenueCat KMP con un producto no consumible; Small Business Program de Apple
 desde el primer día; sección "Más apps" discreta en Ajustes.
 

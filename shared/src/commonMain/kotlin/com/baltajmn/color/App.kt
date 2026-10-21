@@ -149,12 +149,23 @@ fun App() {
     // from the pick itself: coming back to the app never asks, an import or a save with the app
     // stopped never spends the one request, and iOS has an active scene because a finger just
     // touched it. Not if a layer, the paywall or a screen a widget asked for took the screen meanwhile.
+    // The same moment holds the one Pro offer, which goes first: after it the paywall is open and the rating
+    // waits for the next pick. The store is asked before the wait, so a phone that cannot reach it does not
+    // spend the only offer on a paywall that says "store unavailable". Whether it is due is asked after the
+    // wait, like the rating: a pick with a photo reaches the journal a moment later.
     LaunchedEffect(picks) {
         if (picks == 0) return@LaunchedEffect
+        val storeReady = !ChromaRepository.settings.run { pro || proOffered } && Billing.proOffer() != null
         delay(2_500)
         val clear = openDay == null && sharing == null && poster == null && stats == null && photo == null
         if (!locked && clear && !Paywall.open && Route.pending == null && screen == Screen.Today) {
-            ChromaRepository.maybeRequestReview()
+            if (storeReady && ChromaRepository.proOfferDue()) {
+                ChromaRepository.markProOffered()
+                Paywall.offered = true
+                Paywall.open = true
+            } else {
+                ChromaRepository.maybeRequestReview()
+            }
         }
     }
     LaunchedEffect(proCheck) { Billing.refresh() }

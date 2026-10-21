@@ -125,7 +125,7 @@ class StringsTest {
             S.lang = code
             val sample = listOf(
                 S.todayPrompt, S.firstHelp, S.galleryNotToday, S.noticeCorrupt, S.importSummary(2, 1),
-                S.proOnce, S.reminderText, S.watermarkRow, S.importTooNew, S.siblingQuilt,
+                S.proOnce, S.reminderText, S.watermarkRow, S.importTooNew, S.siblingQuilt, S.shareSignature, S.proWeekIntro,
             )
             for (text in sample) for (c in banned) assertFalse(c in text, "$code: $text")
         }

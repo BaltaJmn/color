@@ -1296,6 +1296,25 @@ object S {
         "Chroma Pro",
         "Chroma Pro",
     )
+    /**
+     * Said once at the top of the paywall when it opens by itself after a week of colors, so it does not
+     * arrive unexplained. It counts nothing: no text in the app counts days.
+     */
+    val proWeekIntro get() = t(
+        "Your year is taking shape. Here is what Pro adds.",
+        "Tu año ya va tomando forma. Esto es lo que añade Pro.",
+        "Seu ano já está ganhando forma. Veja o que o Pro acrescenta.",
+        "Dein Jahr nimmt Gestalt an. Das bringt Pro dazu.",
+        "Ton année prend forme. Voici ce que Pro ajoute.",
+        "Il tuo anno sta prendendo forma. Ecco cosa aggiunge Pro.",
+        "Je jaar krijgt vorm. Dit voegt Pro toe.",
+        "Twój rok zaczyna nabierać kształtu. Oto, co dodaje Pro.",
+        "Твой год обретает форму. Вот что добавляет Pro.",
+        "Yılın şekilleniyor. Pro'nun eklediği şeyler şunlar.",
+        "Tahunmu mulai terbentuk. Ini yang ditambahkan Pro.",
+        "あなたの1年が形になってきました。Proで増えるのはこちらです。",
+        "당신의 한 해가 모양을 갖춰 가고 있어요. Pro로 더해지는 것은 이래요.",
+    )
     val proPoster get() = t(
         "Your year as a poster, in four styles",
         "Tu año en póster, en cuatro estilos",

@@ -160,7 +160,7 @@ data class ChromaEntry(
   `shareAsked: Boolean`, `weekColorOn: Boolean = true`, `watermark: Boolean = true`,
   `hiddenCards: List<String>` (`<author>/<day>` de cada día reportado: oculto para siempre, porque
   los reportes no se pueden leer desde la app), `quarantineSeen: Int` (ficheros de `corrupt/` de los
-  que el usuario ya fue avisado).
+  que el usuario ya fue avisado), `proOffered: Boolean` (la oferta única de Pro, 6.8) y `reviewAskedAt`.
 - `JournalJson`: `ignoreUnknownKeys`, sin valores por defecto ni nulos explícitos. Igual que Purl.
 - `entries.bak.json`, cuarentena en `corrupt/` y un único escritor con rebote de 800 ms: Purl 6.12,
   con cuatro diferencias (1.0.6 y 1.0.7):
@@ -366,6 +366,18 @@ usuario:
 - `Unreachable`, `StoreProblemError`: la tienda no responde antes de cobrar, `storeUnavailable`.
 - `ProductAlreadyPurchasedError` restaura y, si aparece, es un `Success`.
 - `Cancelled`, nada; el resto, `Failed`.
+
+**Oferta única (D9, 21-10-2026).** Además de al chocar, Pro se ofrece **una sola vez**: la primera vez que
+alguien sin Pro elige el color de hoy con 7 días con color o más (`shouldOfferPro`, el mismo umbral que
+la valoración). Es el mismo diálogo del paywall con `proWeekIntro` encima, sin bloquear nada: se cierra con
+`notNow` o tocando fuera, y lo que nunca se cobra (SPEC 7) sigue igual. Salta en el mismo momento que la
+valoración y va primero (`LaunchedEffect(picks)` de `App`, tras los mismos 2,5 s y con las mismas
+condiciones: Hoy delante, sin capas, sin paywall, sin bloqueo y sin ruta de widget pendiente); la
+valoración espera al siguiente pick. `Settings.proOffered` se marca al abrir el diálogo y no se vuelve a
+poner. Antes de esperar se le pregunta a la tienda por la oferta (`Billing.proOffer`): sin ella, un
+teléfono que no llega a la tienda no gasta la única oferta en un paywall que diría "tienda no disponible".
+Quien ya tenía más de 7 días al actualizar la ve una vez en su próximo pick. Precios sin cambios: 1,99
+vitalicio y 0,99 al mes.
 
 Un `PurchasesDelegate` escucha cada `CustomerInfo` nueva: un pago diferido aprobado o un reembolso
 cambian Pro sin esperar a que nadie pregunte, y el paywall abierto se cierra solo si llega Pro.
@@ -1152,3 +1164,4 @@ entonces corre solo; Robolectric y sus dependencias no entran en el binario.
 | #55 Grupos, pantallas y textos | `pantallas.md` 8.7 |
 | #56 Web de invitación | 9.5 |
 | #62 Firma y póster de historia | 6.9, 9.4 |
+| #63 Oferta de Pro tras una semana | 6.8; test `ProOfferTest` |

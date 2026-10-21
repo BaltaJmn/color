@@ -53,6 +53,8 @@ data class Settings(
     val watermark: Boolean = true,
     /** Friends' days this person reported, "<author>/<day>": hidden from them for good. */
     val hiddenCards: List<String> = emptyList(),
+    /** Pro was offered once, after a week of colors ([shouldOfferPro]); never again. */
+    val proOffered: Boolean = false,
     /** Epoch millis of the last in-app rating request, shown or not; 0 = never. */
     val reviewAskedAt: Long = 0,
     /** Files in corrupt/ the user was already told about: more than this shows the notice again. */

@@ -518,7 +518,9 @@ solo cuando Amigos existe, v1.1); el botón principal a lo ancho con el precio l
 no llegan a la tienda, `storeUnavailable`; un pago pendiente, `buyPending`. Con letra grande el panel
 se desplaza: el botón de compra nunca se queda fuera. Mientras la tienda contesta, el botón ocupa su
 sitio desactivado y con `working`, para que el diálogo no salte al llegar el precio. Abierto desde algo
-concreto (En palabras), al llegar Pro se abre eso mismo.
+concreto (En palabras), al llegar Pro se abre eso mismo. Abierto por la oferta única de la primera semana
+(`tecnico.md` 6.8), lleva `proWeekIntro` bajo el título: es lo único que cambia, y `notNow` y tocar fuera lo
+cierran como siempre.
 
 ---
 
