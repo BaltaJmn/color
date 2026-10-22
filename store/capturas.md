@@ -164,6 +164,10 @@ ese idioma, y el marco dos veces, `iphone` (las seis) y `play-dibujado` (cinco: 
 iOS y en Android no se parece, asi que Play no la lleva). Cada ficha tiene un solo tipo de captura:
 las de estos idiomas, todas dibujadas. En la interfaz dibujada se ve la pestaña Amigos (la 1.2);
 las de en-US y es-ES, de dispositivo, son de la 1.0.
+Las once dibujadas se rehicieron el 22-10-2026 con la 1.2.3: el póster (06) enseña el selector de cuatro
+estilos en dos filas y la tarjeta (04) y el póster llevan la firma "Chroma: Color Year in Pixels". Las de
+dispositivo (en-US y es-ES, iPhone y Play) siguen con la tarjeta y el póster de antes; rehacerlas pide el
+set de seis entero en el simulador (sección 6) y en el emulador (sección 1), por la regla de arriba.
 
 `StoreScreenshots.kt` pone en `Social` un cliente de Supabase sobre memoria (`quietSocial`): el real
 no se puede construir en una JVM sin ajustes de Android, y Hoy pregunta si hay cuenta. Sin eso el
