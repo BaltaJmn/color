@@ -35,6 +35,14 @@ Textos, gráficos y capturas en `store/`, con la estructura del README de `ci`. 
 la comprueba; para subirla, `gh workflow run listings.yml -f target=play` (o `app-store`, `both`).
 La App Store solo acepta cambios con una versión en preparación.
 
+## Ficha de temporada
+
+La descripción corta y el principio de la larga de Play cambian en las semanas de "year in pixels" y de
+propósitos (15-12 al 31-01) con `temporada.yml`, que solo toca el texto (no iconos ni capturas). Los
+textos, las fechas y las órdenes están en `store/temporada/README.md`. Cada push a `store/` la
+comprueba, y subirla o volver a la normal se elige a mano: `gh workflow run temporada.yml -f
+ficha=invierno-2027 -f modo=subir` (o `modo=dry` para que Play valide sin cambiar nada).
+
 ## Secretos del repositorio
 
 Los cinco de Play salen de la clave de esta app y de la cuenta de servicio que publica. Se ponen sin
