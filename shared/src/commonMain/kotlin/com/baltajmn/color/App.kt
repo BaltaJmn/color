@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -45,6 +46,10 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -326,46 +331,60 @@ private fun BottomBar(current: Screen, todayColor: String?, modifier: Modifier =
         Screen.Year to (Glyph.YEAR to S.navYear),
         (Screen.Friends to (Glyph.FRIENDS to S.navFriends)).takeIf { Social.available },
     )
-    Box(
-        modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.navigationBars).padding(top = 8.dp, bottom = 12.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Row(
-            Modifier.shadow(12.dp, RoundedCornerShape(32.dp), ambientColor = Color.Black.copy(alpha = 0.10f), spotColor = Color.Black.copy(alpha = 0.10f))
-                .clip(RoundedCornerShape(32.dp))
-                .background(colors.surface)
-                .border(1.dp, colors.outlineVariant, RoundedCornerShape(32.dp))
-                .selectableGroup()
-                .padding(6.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+    // Chrome, not content: the names grow with the system text up to the largest regular size and
+    // stop there, as the system tab bars do (docs/pantallas.md 2).
+    val density = LocalDensity.current
+    CompositionLocalProvider(LocalDensity provides if (density.fontScale > 1.3f) Density(density.density, 1.3f) else density) {
+        BoxWithConstraints(
+            modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.navigationBars).padding(top = 8.dp, bottom = 12.dp),
+            contentAlignment = Alignment.Center,
         ) {
-            tabs.forEach { (s, look) ->
-                val (glyph, label) = look
-                val on = s == current
-                val ink = if (on) colors.onPrimary else colors.onSurfaceVariant
-                Row(
-                    Modifier.heightIn(min = 48.dp)
-                        .clip(RoundedCornerShape(26.dp))
-                        .background(if (on) colors.primary else Color.Transparent)
-                        .selectable(selected = on, role = Role.Tab, onClick = { onSelect(s) })
-                        .padding(horizontal = 18.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    // The one place the chrome takes a color: once picked, Today's dot is the day's own.
-                    if (s == Screen.Today && todayColor != null) {
-                        Box(Modifier.size(20.dp), contentAlignment = Alignment.Center) {
-                            Box(
-                                Modifier.size(14.dp)
-                                    .clip(CircleShape)
-                                    .background(colorOf(todayColor))
-                                    .border(1.dp, if (on) colors.onPrimary.copy(alpha = 0.6f) else colors.outline, CircleShape),
-                            )
+            // Three names do not always fit (French on an iPhone, Russian or Turkish at 1.3): then only
+            // the chosen tab keeps its name, as Material's bar does, and the others read it aloud.
+            val measurer = rememberTextMeasurer()
+            val style = Styles.label.copy(fontWeight = FontWeight.SemiBold)
+            val chrome = with(LocalDensity.current) { (tabs.size * (18 + 20 + 8 + 18) + (tabs.size - 1) * 4 + 2 * 6 + 2 * 8).dp.roundToPx() }
+            val named = tabs.sumOf { measurer.measure(it.second.second, style).size.width } + chrome <= constraints.maxWidth
+            Row(
+                Modifier.shadow(12.dp, RoundedCornerShape(32.dp), ambientColor = Color.Black.copy(alpha = 0.10f), spotColor = Color.Black.copy(alpha = 0.10f))
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(colors.surface)
+                    .border(1.dp, colors.outlineVariant, RoundedCornerShape(32.dp))
+                    .selectableGroup()
+                    .padding(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                tabs.forEach { (s, look) ->
+                    val (glyph, label) = look
+                    val on = s == current
+                    val ink = if (on) colors.onPrimary else colors.onSurfaceVariant
+                    Row(
+                        Modifier.heightIn(min = 48.dp)
+                            .clip(RoundedCornerShape(26.dp))
+                            .background(if (on) colors.primary else Color.Transparent)
+                            .selectable(selected = on, role = Role.Tab, onClick = { onSelect(s) })
+                            .then(if (named || on) Modifier else Modifier.semantics { contentDescription = label })
+                            .padding(horizontal = 18.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        // The one place the chrome takes a color: once picked, Today's dot is the day's own.
+                        if (s == Screen.Today && todayColor != null) {
+                            Box(Modifier.size(20.dp), contentAlignment = Alignment.Center) {
+                                Box(
+                                    Modifier.size(14.dp)
+                                        .clip(CircleShape)
+                                        .background(colorOf(todayColor))
+                                        .border(1.dp, if (on) colors.onPrimary.copy(alpha = 0.6f) else colors.outline, CircleShape),
+                                )
+                            }
+                        } else {
+                            GlyphIcon(glyph, tint = ink)
                         }
-                    } else {
-                        GlyphIcon(glyph, tint = ink)
+                        if (named || on) {
+                            Spacer(Modifier.width(8.dp))
+                            Text(label, style = Styles.label.copy(color = ink, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Medium))
+                        }
                     }
-                    Spacer(Modifier.width(8.dp))
-                    Text(label, style = Styles.label.copy(color = ink, fontWeight = if (on) FontWeight.SemiBold else FontWeight.Medium))
                 }
             }
         }

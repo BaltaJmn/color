@@ -129,6 +129,14 @@ El icono de Hoy es un punto. Con el color del día elegido, el punto es ese colo
 color, y dice de un vistazo, desde cualquier pestaña, si hoy ya tiene el suyo. Atrás, en Android, cierra la capa abierta y después vuelve a
 Hoy.
 
+**Con letra grande.** La cápsula es marco, no contenido: sus nombres crecen con la letra del sistema
+hasta **1,3** (el mayor tamaño normal en las dos: escala 1,3 en Android, el último de Texto más
+grande antes de los de accesibilidad en iPhone) y ahí se quedan, como la barra de pestañas del propio
+iOS. Si los tres nombres no caben con 8 de margen a cada lado (francés ya con la letra normal en un
+iPhone de 402, ruso o turco a 1,3; el español sí cabe a 1,3), **solo la pestaña elegida lleva nombre** y las otras quedan
+en su icono, como la barra de Material con las etiquetas solo en la activa; el lector de pantalla las
+sigue leyendo por su nombre. Un nombre nunca se parte, se corta ni lleva puntos suspensivos.
+
 Capas sobre cualquier pantalla: el día abierto (hoja), la foto a pantalla completa, compartir, el
 paywall y el bloqueo.
 
