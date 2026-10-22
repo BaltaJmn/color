@@ -55,8 +55,10 @@ escala hasta 1,3 y encoge el nombre antes de partir una palabra; y la cabecera d
 `numeral` escala hasta 1,15 (también el año de Mi año) y cuyo mes y día de la semana encogen en vez
 de partirse ("septiembre" no tiene dónde cortar; un mes de dos palabras sí puede ir en dos líneas). Un segmentado iguala la altura de sus opciones si una etiqueta pasa a dos
 líneas, y un botón centra su texto y encoge una palabra que no cabe en vez de partirla. Los dos botones
-de compartir y del póster van lado a lado, a medias y con la misma altura, solo si cada etiqueta cabe
-en una línea a su tamaño; si no (letra grande), uno encima del otro a todo el ancho.
+de compartir y del póster, y "Añadir una palabra" con "Compartir" en Hoy (`ActionRow`), van lado a lado y con
+la misma altura: a medias si cada etiqueta cabe en una línea en su mitad; si no, cada uno con el ancho de su
+etiqueta más un reparto igual de lo que sobra ("Ein Wort hinzufügen" no cabía en media pantalla y apilaba
+los dos); y solo si ni así caben (letra grande), uno encima del otro a todo el ancho.
 
 ### Forma y espacio
 

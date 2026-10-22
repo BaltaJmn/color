@@ -133,20 +133,33 @@ private fun RowScope.ActionLabel(label: String, style: TextStyle) {
 }
 
 /**
- * Buttons side by side, sharing the width and one height, while every label fits on one line at its
- * own size; otherwise one above the other at full width. With large text a shared half is too narrow
- * for "Compartir" even shrunk, and a cut word is worse than a taller screen.
+ * Buttons side by side and one height. Each takes an equal share while every label fits on one line in it;
+ * when one does not ("Ein Wort hinzufügen" in half of a phone), each takes the width of its label plus an
+ * equal part of what is left, which still shows every label whole. Only when even that is too narrow, one
+ * above the other at full width: with large text a cut word is worse than a taller screen.
  */
 @Composable
 fun ActionRow(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Layout(content, modifier) { buttons, constraints ->
         val gap = 10.dp.roundToPx()
         val width = constraints.maxWidth
-        val share = (width - gap * (buttons.size - 1)) / buttons.size.coerceAtLeast(1)
-        if (buttons.all { it.maxIntrinsicWidth(Constraints.Infinity) <= share }) {
-            val height = buttons.maxOf { it.minIntrinsicHeight(share) }
-            val placed = buttons.map { it.measure(Constraints.fixed(share, height)) }
-            layout(width, height) { placed.forEachIndexed { i, p -> p.place(i * (share + gap), 0) } }
+        val free = width - gap * (buttons.size - 1)
+        val natural = buttons.map { it.maxIntrinsicWidth(Constraints.Infinity) }
+        val widths = when {
+            natural.all { it <= free / buttons.size.coerceAtLeast(1) } -> List(buttons.size) { free / buttons.size }
+            natural.sum() <= free -> natural.map { it + (free - natural.sum()) / buttons.size }
+            else -> null
+        }
+        if (widths != null) {
+            val height = buttons.indices.maxOf { buttons[it].minIntrinsicHeight(widths[it]) }
+            val placed = buttons.mapIndexed { i, b -> b.measure(Constraints.fixed(widths[i], height)) }
+            layout(width, height) {
+                var x = 0
+                placed.forEach {
+                    it.place(x, 0)
+                    x += it.width + gap
+                }
+            }
         } else {
             val placed = buttons.map { it.measure(Constraints(minWidth = width, maxWidth = width)) }
             layout(width, placed.sumOf { it.height } + gap * (placed.size - 1).coerceAtLeast(0)) {
