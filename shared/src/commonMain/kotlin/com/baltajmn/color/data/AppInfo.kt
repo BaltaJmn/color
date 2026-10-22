@@ -29,6 +29,12 @@ expect val Sibling.storeUrl: String?
 expect val onIos: Boolean
 
 /**
+ * The store of this platform, by name. It lives in each platform's source set, not behind an `if` in
+ * common code: a literal "Google Play" in the iOS binary is a rejection (App Store 2.3.10).
+ */
+expect val storeName: String
+
+/**
  * Reduce Motion (iOS) or animations turned off (Android). Asked directly instead of left to Compose:
  * the iOS setting is not one Compose can be counted on to follow.
  */

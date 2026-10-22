@@ -27,4 +27,6 @@ actual val Sibling.storeUrl: String? get() = iosUrl
 
 actual val onIos: Boolean = true
 
+actual val storeName: String = "App Store"
+
 actual fun reduceMotion(): Boolean = UIAccessibilityIsReduceMotionEnabled()

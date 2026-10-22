@@ -1,9 +1,11 @@
 package com.baltajmn.color.i18n
 
+import com.baltajmn.color.data.onIos
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.minus
@@ -128,6 +130,19 @@ class StringsTest {
                 S.proOnce, S.reminderText, S.watermarkRow, S.importTooNew, S.siblingQuilt, S.shareSignature, S.proWeekIntro,
             )
             for (text in sample) for (c in banned) assertFalse(c in text, "$code: $text")
+        }
+    }
+
+    /** Apple 2.3.10: the iOS binary names no other store, and Android names no Apple one. */
+    @Test
+    fun subscriptionTermsNameOnlyThisStore() {
+        for (code in SUPPORTED) {
+            S.lang = code
+            val text = S.subscriptionTerms
+            // German writes the name with hyphens (App-Store-Kontos).
+            val apple = "App Store" in text || "App-Store" in text
+            val google = "Google" in text
+            assertTrue(if (onIos) apple && !google else google && !apple, "$code: $text")
         }
     }
 }

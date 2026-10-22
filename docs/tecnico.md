@@ -367,6 +367,11 @@ usuario:
 - `ProductAlreadyPurchasedError` restaura y, si aparece, es un `Success`.
 - `Cancelled`, nada; el resto, `Failed`.
 
+**Texto de renovación (Apple 2.3.10).** `subscriptionTerms` nombra solo la tienda de la plataforma:
+"App Store" en iOS y "Google Play" en Android (`storeName`, un `expect` con un `actual` por plataforma: el literal "Google Play" no existe en el binario de iOS), 13 idiomas. Un binario de iOS no puede
+nombrar Google Play. `StringsTest.subscriptionTermsNameOnlyThisStore` lo comprueba en JVM (Android) y
+en Native (iOS).
+
 **Oferta única (D9, 21-10-2026).** Además de al chocar, Pro se ofrece **una sola vez**: la primera vez que
 alguien sin Pro elige el color de hoy con 7 días con color o más (`shouldOfferPro`, el mismo umbral que
 la valoración). Es el mismo diálogo del paywall con `proWeekIntro` encima, sin bloquear nada: se cierra con
