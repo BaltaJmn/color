@@ -1,8 +1,9 @@
 # Capturas de las fichas
 
-Seis escenas, las mismas en las dos tiendas y en los trece idiomas. **en-US y es-ES** salen de
-dispositivo (Play, emulador; iPhone, simulador); los otros once, dibujadas con la interfaz de la
-version (seccion 7), cada una con su idioma en la interfaz y en el titular. Se sacan con el año de
+Seis escenas, las mismas en las dos tiendas y en los trece idiomas. Las de Play de **en-US y es-ES**
+salen del emulador; todas las demas (las de iPhone de los trece idiomas y las de Play de los otros
+once) se dibujan con la interfaz de la version (secciones 5 y 7), cada una con su idioma en la
+interfaz y en el titular. Se sacan con el año de
 demostracion, nunca con uno real.
 
 **Orden de la ficha (21-10-2026):** primero la rejilla de Mi año, con "year in pixels" en el
@@ -29,7 +30,7 @@ Herramientas:
 | Destino | Dispositivo | Captura cruda | Imagen final |
 |---|---|---|---|
 | `play` | Emulador Pixel 8, API 36 | 1080x2400 | 1200x2100 PNG |
-| `iphone` | Simulador iPhone 17 Pro Max (sección 6); sin Mac, `tools/store/iphone.py` (sección 5) | 1320x2868 | 1320x2868 PNG (6,9") |
+| `iphone` | `tools/store/iphone.py` (sección 5); el simulador iPhone 17 Pro Max, sección 6 | 1320x2868 | 1320x2868 PNG (6,9") |
 
 Sin iPad: la v1.0 es solo iPhone (`docs/tecnico.md` 1), y App Store Connect no pide capturas de un
 dispositivo que la app no declara.
@@ -129,8 +130,9 @@ Con un Mac, mejor el simulador: sección 6.
 
 ## 6. iPhone con Mac: el simulador
 
-Las de `store/screenshots/iphone/` salen de aquí, con la letra SF Pro y los widgets de WidgetKit de
-verdad.
+Hasta el 22-10-2026 las de iPhone de en-US y es-ES salían de aquí; desde entonces todas las de
+`store/screenshots/iphone/` se dibujan (sección 5). El simulador queda para cuando haga falta la letra
+SF Pro o los widgets de WidgetKit de verdad, y entonces con las seis de cada idioma que cambie.
 
 1. Un simulador propio, para no pisar los de otras sesiones:
    `xcrun simctl create "Chroma capturas" com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max <runtime>`.
@@ -162,12 +164,12 @@ python3 tools/store/iphone.py de-DE fr-FR pt-BR it-IT nl-NL pl-PL ru-RU tr-TR id
 Una pasada por idioma (~20 s): `generar.py` con sus palabras, el atardecer, `StoreScreenshots.kt` en
 ese idioma, y el marco dos veces, `iphone` (las seis) y `play-dibujado` (cinco: la de widgets es de
 iOS y en Android no se parece, asi que Play no la lleva). Cada ficha tiene un solo tipo de captura:
-las de estos idiomas, todas dibujadas. En la interfaz dibujada se ve la pestaña Amigos (la 1.2);
-las de en-US y es-ES, de dispositivo, son de la 1.0.
+las de estos idiomas, todas dibujadas. En la interfaz dibujada se ve la pestaña Amigos (la 1.2).
 Las once dibujadas se rehicieron el 22-10-2026 con la 1.2.3: el póster (06) enseña el selector de cuatro
 estilos en dos filas y la tarjeta (04) y el póster llevan la firma "Chroma: Color Year in Pixels". Las de
-dispositivo (en-US y es-ES, iPhone y Play) siguen con la tarjeta y el póster de antes; rehacerlas pide el
-set de seis entero en el simulador (sección 6) y en el emulador (sección 1), por la regla de arriba.
+iPhone de en-US y es-ES se dibujaron igual ese mismo día (`iphone.py en-US es-ES`; antes eran del
+simulador, de la 1.0). Las de Play de en-US y es-ES, del emulador, siguen con la tarjeta y el póster de
+antes; rehacerlas pide el set de seis entero en el emulador (sección 1), por la regla de arriba.
 
 `StoreScreenshots.kt` pone en `Social` un cliente de Supabase sobre memoria (`quietSocial`): el real
 no se puede construir en una JVM sin ajustes de Android, y Hoy pregunta si hay cuenta. Sin eso el
