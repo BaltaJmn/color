@@ -13,20 +13,28 @@ Igual en las cuatro apps de la familia: el proceso, los workflows y los scripts 
 
 La primera subida a Play fue un borrador por CI (24-09-2026, `-f stores=play -f track=internal -f status=draft`, `versionCode` 2): Play acepta la primera subida por API y aplica solo su firma de apps.
 
-## Publicar una versión
+## Publicar una versión: el tren de los lunes
 
-1. Subir el `versionCode` (y `versionName` si toca). Un `versionCode` no se reutiliza nunca.
-2. Si cambia algo visible, reescribir `store/whatsnew/whatsnew-<idioma>` en todos los idiomas (tope 500).
-3. Commit, y `git tag vX.Y && git push origin vX.Y`: Play `alpha` y TestFlight, la misma versión.
-4. Producción en Play: `gh workflow run release.yml -f stores=play -f track=production`, que la envía
-   a revisión al confirmar la edición (la primera, 1.0.14, el 15-10-2026).
-5. App Store: la versión nueva se crea por API (`POST /v1/appStoreVersions`, publicación
-   `AFTER_APPROVAL`, como Play) cuando la anterior ya está a la venta. Después `~/keys/appstore.py ficha`, `capturas --reemplazar`,
-   las novedades (las de `store/whatsnew` sin las líneas de Android, en `whatsNew` de cada idioma) y
-   `appstore.py build <bundle> <versionCode>`. *Añadir a revisión* y *Enviar a revisión*, el titular
-   en la web. La primera actualización, 1.0.14 (17), el 15-10-2026.
+Desde el 26-10-2026 las versiones salen solas con el tren semanal (`.github/workflows/tren.yml`; el
+proceso, en `BaltaJmn/ci` PUBLICAR.md sección 7):
 
-Otro canal o una sola tienda: `gh workflow run release.yml -f stores=play -f track=internal`
+- **Domingo 19:37** (hora de Madrid): si hay cambios en main desde la última versión (sin contar
+  `.md` ni `.github`), sube la minor (`X.Y+1.0`) y el `versionCode`, deja el commit y la etiqueta,
+  sube a Play `alpha` y a TestFlight y avisa por ntfy con el botón "Parar esta semana".
+- **Lunes 9:07**: producción al 100 % en Play y revisión en App Store (sale sola al aprobarse), con
+  la ficha de `store/app-store` y las capturas de iPhone si cambiaron. Una tienda con la versión
+  anterior en revisión, rechazada o sin publicar se salta la semana, y el aviso lo dice.
+- **Entre semana nadie toca la versión ni pone etiquetas.** Un arreglo urgente sube la patch
+  (`X.Y.Z+1`) a mano y solo con el sí del usuario: commit con la versión, `git tag vX.Y.Z && git
+  push origin vX.Y.Z` (alpha y TestFlight) y `gh workflow run tren.yml -f paso=lunes -f seco=false`.
+- **Novedades**: quien cambia algo visible reescribe `store/whatsnew/whatsnew-<idioma>` en todos los
+  idiomas en el mismo commit (tope 500). Valen para las dos tiendas: nada que solo exista en una, ni
+  el nombre de la otra tienda (Apple rechaza que se nombre Google Play). Si nadie las toca, salen las
+  genéricas de `store/whatsnew-generic` y el aviso del domingo lo dice.
+- Prueba sin publicar nada: `gh workflow run tren.yml -f paso=domingo` (seco por defecto) y después
+  `-f paso=lunes`.
+
+Otro canal o una sola tienda, a mano: `gh workflow run release.yml -f stores=play -f track=internal`
 (`-f status=draft` mientras la app no haya publicado nada en Play).
 
 ## Ficha

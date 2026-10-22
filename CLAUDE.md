@@ -91,5 +91,6 @@ xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp \
 
 Iterar con el objetivo mínimo del módulo tocado; el build de todo, una vez al final.
 
-Publicar: subir el `versionCode`, y `git tag vX.Y && git push origin vX.Y` dispara Play (`alpha`) y
-TestFlight (`store/ci.md`).
+Publicar: nadie toca la versión ni pone etiquetas. Sale sola con el tren de los lunes (`store/ci.md`,
+"Publicar una versión"). Quien cambia algo visible reescribe `store/whatsnew` en los trece idiomas en el
+mismo commit. Un arreglo urgente (patch), a mano y solo con el sí del usuario.
