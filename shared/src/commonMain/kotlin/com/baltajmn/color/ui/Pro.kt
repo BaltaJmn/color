@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -67,6 +68,7 @@ object Paywall {
     var onPro: (() -> Unit)? = null
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun PlanOption(
     title: String,
@@ -85,9 +87,10 @@ private fun PlanOption(
             .selectable(selected = selected, enabled = enabled, role = Role.RadioButton, onClick = onClick)
             .padding(14.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(title, style = Styles.body, modifier = Modifier.weight(1f))
-            Text(price, style = Styles.body, modifier = Modifier.padding(start = 12.dp))
+        // With large text the price goes under the name rather than breaking it in the middle of a word.
+        FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(title, style = Styles.body, modifier = Modifier.padding(end = 12.dp))
+            Text(price, style = Styles.body)
         }
         badge?.let { Text(it, style = Styles.caption.copy(color = colors.primary)) }
         caption?.let { Text(it, style = Styles.caption) }
@@ -147,7 +150,7 @@ fun ProDialog(onDismiss: () -> Unit) {
                     // What is left below fades out instead of ending on a cut line.
                     .drawWithContent {
                         drawContent()
-                        val fade = 48.dp.toPx()
+                        val fade = 32.dp.toPx()
                         if (scroll.canScrollForward) {
                             drawRect(
                                 Brush.verticalGradient(listOf(Color.Transparent, paper), startY = size.height - fade, endY = size.height),
@@ -298,7 +301,8 @@ fun ProDialog(onDismiss: () -> Unit) {
                 Glyph.CLOSE,
                 S.a11yClose,
                 { onDismiss() },
-                Modifier.align(Alignment.TopEnd).padding(top = 18.dp, end = 12.dp),
+                // On a disc of the dialog's paper: what scrolls under it does not show through.
+                Modifier.align(Alignment.TopEnd).padding(top = 18.dp, end = 12.dp).background(paper, CircleShape),
                 enabled = !busy,
             )
         }
