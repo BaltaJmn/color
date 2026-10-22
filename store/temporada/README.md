@@ -8,7 +8,7 @@ larga): el título, el icono, el gráfico y las capturas no se tocan.
 | Carpeta | Cuándo | Qué dice |
 |---|---|---|
 | `invierno-2027/` | Del 15-12-2026 al 31-01-2027 | "Your 2027 year in pixels": empezar el año en una rejilla, un propósito que lleva un momento al día |
-| `normal` (no es carpeta: es `store/listings/`) | Desde el 1-02-2027 | La ficha de siempre |
+| `normal` (no es carpeta: es `store/listings/`) | Desde el 2-02-2027 | La ficha de siempre |
 
 Cada idioma lleva dos ficheros:
 
@@ -22,7 +22,9 @@ La larga de la temporada se monta con la normal en el momento de subir, así que
 ## Subirla y volver
 
 Los cambios de ficha de cara al público los pide el usuario: la rutina de los lunes se lo recuerda la
-semana anterior (lunes 14-12 para la de invierno y lunes 1-02 para la vuelta) y se suben con una orden.
+semana anterior (lunes 7-12 y 25-01) y se suben con una orden, en martes (15-12 la de invierno y 2-02 la
+vuelta): el lunes es del tren de versiones, y Play rechaza un cambio de ficha con la versión del tren
+en revisión (`ci/PUBLICAR.md`).
 
 ```bash
 # 1. Comprobar (también corre sola en cada push a store/): topes, idiomas y caracteres
@@ -31,10 +33,10 @@ python3 tools/store/temporada.py comprobar
 # 2. Ensayo: Play valida la edición y la descarta, sin cambiar nada
 gh workflow run temporada.yml -f ficha=invierno-2027 -f modo=dry
 
-# 3. Subir, el lunes 14-12: la ficha pasa a la de invierno
+# 3. Subir, el martes 15-12: la ficha pasa a la de invierno
 gh workflow run temporada.yml -f ficha=invierno-2027 -f modo=subir
 
-# 4. Volver a la normal, el lunes 1-02
+# 4. Volver a la normal, el martes 2-02
 gh workflow run temporada.yml -f ficha=normal -f modo=subir
 ```
 
