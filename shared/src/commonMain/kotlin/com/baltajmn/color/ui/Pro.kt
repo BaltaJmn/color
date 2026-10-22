@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -87,6 +89,7 @@ private fun PlanOption(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProDialog(onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
@@ -243,11 +246,13 @@ fun ProDialog(onDismiss: () -> Unit) {
             // rejected for not showing them, 20-10-2026).
             Spacer(Modifier.height(8.dp))
             if (monthly != null) Text(S.subscriptionTerms, style = Styles.caption)
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            // Flow rows and not Rows: in a Row "Privacy policy" got what "Terms of use" left and broke in two
+            // on an iPhone; here a link that does not fit goes to the next line whole.
+            FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 TextAction(S.termsOfUse, quiet = true, onClick = { runCatching { uriHandler.openUri(TERMS_URL) } })
                 TextAction(S.privacyRow, quiet = true, onClick = { runCatching { uriHandler.openUri(PRIVACY_URL) } })
             }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 TextAction(
                     label = S.restore,
                     enabled = !busy,

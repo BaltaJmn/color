@@ -58,7 +58,9 @@ líneas, y un botón centra su texto y encoge una palabra que no cabe en vez de 
 de compartir y del póster, y "Añadir una palabra" con "Compartir" en Hoy (`ActionRow`), van lado a lado y con
 la misma altura: a medias si cada etiqueta cabe en una línea en su mitad; si no, cada uno con el ancho de su
 etiqueta más un reparto igual de lo que sobra ("Ein Wort hinzufügen" no cabía en media pantalla y apilaba
-los dos); y solo si ni así caben (letra grande), uno encima del otro a todo el ancho.
+los dos); y solo si ni así caben (letra grande), uno encima del otro a todo el ancho. Los dos
+enlaces del pie del paywall (términos y privacidad) y sus dos botones de texto van en una fila que pasa de
+línea (`FlowRow`): un enlace que no cabe baja entero, no se parte en dos.
 
 ### Forma y espacio
 
