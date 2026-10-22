@@ -24,6 +24,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
@@ -96,12 +97,14 @@ fun OutlinedAction(
     modifier: Modifier = Modifier,
     pro: Boolean = false,
     glyph: Glyph? = null,
+    enabled: Boolean = true,
 ) {
     Box(
         modifier.heightIn(min = 48.dp)
+            .alpha(if (enabled) 1f else 0.4f)
             .clip(RoundedCornerShape(24.dp))
             .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(24.dp))
-            .clickable(role = Role.Button, onClick = onClick)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 8.dp),
         contentAlignment = Alignment.Center,
     ) {

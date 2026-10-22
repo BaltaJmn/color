@@ -382,9 +382,15 @@ primero (App Store 4.8: igual de visibles). Debajo, un enlace de texto discreto,
 (`TextAction` apagado, visible y sin gesto: Apple 2.3.1), solo para la cuenta de revisión de las
 tiendas. Al pulsarlo se cambia por dos campos (`emailField` con teclado de correo, `passwordField`
 con teclado de contraseña y texto oculto), `signInAction` relleno y `cancel` en texto. Un fallo pone
-`signInEmailFailed` en una línea sobre el botón. Sin alta: solo entra. Tras iniciar sesión, si
-es la primera vez: nombre visible (con tope visible `n/30`, como la palabra del día), casilla
-`age16`, `termsAgree` con el enlace `termsRow`, y `continue`. Los términos se aceptan ahí, antes de ver nada de nadie (Apple 1.2).
+`signInEmailFailed` en una línea sobre el botón. Sin alta: solo entra.
+
+Sobre los botones de Apple y Google, la casilla `age16`, `termsAgree` y el enlace `termsRow`: los
+dos botones están apagados (40 % de opacidad) hasta marcarla. Los términos se aceptan antes de entrar
+y antes de ver nada de nadie (Apple 1.2). **Tras iniciar sesión no se pide nada**: ni nombre ni correo
+(Apple 4, Sign in with Apple). La primera vez se crea el perfil solo, con el nombre de pila que dio
+el proveedor o, si no vino, `Chroma 0042` (cuatro cifras sacadas del id), y se cambia cuando se
+quiera desde la fila del nombre en Ajustes. Mientras se crea, `working`. El enlace de correo de la
+cuenta de revisión no lleva la casilla: solo entra esa cuenta.
 
 Con una sesión guardada, la pantalla sigue el estado de la sesión en vez de adivinarlo. Mientras se
 lee, `working`. Si no se puede renovar sin red, `friendsOffline` sin botón: el cliente reintenta solo

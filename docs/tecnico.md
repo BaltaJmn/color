@@ -865,8 +865,15 @@ que por eso figura en `PrivacyInfo.xcprivacy` (razón `CA92.1`). Flujo PKCE; la 
 es `com.baltajmn.color://login`.
 
 Apple y Google con `compose-auth`: nativos en su plataforma, y el otro por el flujo web (Apple en
-Android, Google en iOS). Al crear la cuenta: nombre visible de 1 a 30 caracteres y casilla de 16
-años o más, obligatoria. Sin proyecto (`SupabaseConfig.url` nulo), la pestaña Amigos no existe.
+Android, Google en iOS). La casilla de 16 años o más y los términos van **antes** de entrar, en la
+presentación, y apagan los botones de Apple y Google hasta marcarla. Después de entrar no se pide
+nada (Apple 4: nombre o correo tras Sign in with Apple se rechazan). La primera vez
+`Social.ensureProfile` crea el perfil con `startingName`: el nombre de pila que dio el proveedor o,
+sin él, `Chroma NNNN` (cuatro cifras sacadas del id, siempre las mismas). De dónde sale el nombre:
+en iOS, la credencial nativa de Apple (`fullName`, que solo se entrega la primera vez y el token no
+lleva) la lee `appleName()` (`AppleName.ios.kt`) en el `onResult` y la deja en `Social.nameHint`;
+Google, y Apple por el flujo web en Android, lo dejan en `user_metadata` (`full_name` o `name`).
+Cambiarlo es la fila del nombre de Ajustes. Sin proyecto (`SupabaseConfig.url` nulo), la pestaña Amigos no existe.
 
 Correo y contraseña existen solo para la cuenta de revisión de las tiendas (8, *Cuenta de revisión*):
 un enlace discreto bajo Apple y Google (`signInEmail`) abre un formulario que llama a

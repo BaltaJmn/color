@@ -30,6 +30,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.JsonPrimitive
 
 /** Where the OAuth web flow comes back to: com.baltajmn.color://login. */
 const val LOGIN_SCHEME = "com.baltajmn.color"
@@ -93,6 +95,26 @@ object Social {
         val row = client.postgrest.rpc("my_profile").decodeList<Profile>().firstOrNull()
         me = row
         needsName = row == null
+    }
+
+    /**
+     * The first name Apple handed over with the native sign in, which the session does not carry
+     * (the identity token has no name). Read once, by [ensureProfile].
+     */
+    var nameHint: String? = null
+
+    /**
+     * The first sign in has no profile yet. It is made here with the name the provider gave, or a
+     * made-up one: asking for a name or an email after Sign in with Apple is rejected (App Store
+     * 4), and Settings renames it whenever the person wants.
+     */
+    suspend fun ensureProfile() {
+        val id = userId() ?: return
+        if (!needsName) return
+        val meta = client.auth.currentUserOrNull()?.userMetadata
+        val given = nameHint ?: listOf("full_name", "name").firstNotNullOfOrNull { (meta?.get(it) as? JsonPrimitive)?.contentOrNull }
+        nameHint = null
+        createProfile(startingName(given, id))
     }
 
     suspend fun createProfile(name: String) {
@@ -202,3 +224,11 @@ fun hasLiveSession(): Boolean {
 
 /** The name rule of the server (1 to 30), said once for the field and the button. */
 fun isValidName(name: String): Boolean = name.trim().length in 1..30
+
+/**
+ * The first word of what the provider called this person, or "Chroma 0042" made from the id: never
+ * empty and never asked for. The same id always gives the same number.
+ */
+internal fun startingName(given: String?, userId: String): String =
+    given?.trim()?.substringBefore(' ')?.take(30)?.takeIf(::isValidName)
+        ?: "Chroma " + (userId.hashCode().toLong().let { if (it < 0) -it else it } % 10000).toString().padStart(4, '0')

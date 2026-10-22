@@ -15,6 +15,8 @@ import com.baltajmn.color.social.photoFits
 import com.baltajmn.color.social.readable
 import com.baltajmn.color.social.sessionLost
 import com.baltajmn.color.social.splitFriendships
+import com.baltajmn.color.social.isValidName
+import com.baltajmn.color.social.startingName
 import io.github.jan.supabase.auth.status.RefreshFailureCause
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
@@ -145,5 +147,20 @@ class FriendsLogicTest {
         assertFalse(sessionLost(live, offline))
         assertFalse(sessionLost(offline, live))
         assertFalse(sessionLost(SessionStatus.Initializing, live))
+    }
+
+    @Test
+    fun startingNameIsTheProvidersFirstNameOrAMadeUpOne() {
+        assertEquals("Ana", startingName("Ana Lopez", "u1"))
+        assertEquals("Ana", startingName("  Ana  ", "u1"))
+        assertEquals("山田太郎", startingName("山田太郎", "u1"))
+        assertEquals("A".repeat(30), startingName("A".repeat(40), "u1"))
+        // Nothing usable from the provider: a name that passes the server's rule, the same each time.
+        for (none in listOf(null, "", "   ")) {
+            val made = startingName(none, "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d")
+            assertTrue(Regex("Chroma \\d{4}").matches(made), made)
+            assertTrue(isValidName(made))
+            assertEquals(made, startingName(null, "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"))
+        }
     }
 }

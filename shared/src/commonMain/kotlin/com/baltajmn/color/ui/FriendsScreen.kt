@@ -78,8 +78,8 @@ import com.baltajmn.color.social.Groups
 import com.baltajmn.color.social.InviteResult
 import com.baltajmn.color.social.Outbox
 import com.baltajmn.color.social.Social
+import com.baltajmn.color.social.appleName
 import com.baltajmn.color.social.inTune
-import com.baltajmn.color.social.isValidName
 import com.baltajmn.color.ui.theme.GUTTER
 import com.baltajmn.color.ui.theme.MAX_CONTENT_WIDTH
 import com.baltajmn.color.ui.theme.Styles
@@ -163,8 +163,12 @@ internal fun PaletteStrip(colors: List<String>, description: String? = null) {
 private fun Intro() {
     var failed by remember { mutableStateOf(false) }
     var emailOpen by remember { mutableStateOf(false) }
+    var adult by remember { mutableStateOf(false) }
     val auth = Social.client.composeAuth
-    val onResult = { r: NativeSignInResult -> failed = r is NativeSignInResult.Error || r is NativeSignInResult.NetworkError }
+    val onResult = { r: NativeSignInResult ->
+        r.appleName()?.let { Social.nameHint = it }
+        failed = r is NativeSignInResult.Error || r is NativeSignInResult.NetworkError
+    }
     // Native where the platform has it (Apple on iOS, Google on Android), the web flow elsewhere.
     val apple = auth.rememberSignInWithApple(onResult = onResult, fallback = { Social.client.auth.signInWith(Apple) })
     val google = auth.rememberSignInWithGoogle(onResult = onResult, fallback = { Social.client.auth.signInWith(Google) })
@@ -177,10 +181,28 @@ private fun Intro() {
     }
     Spacer(Modifier.height(20.dp))
     if (failed) Notice(S.signInFailed, S.ok to { failed = false })
+    // The age and the terms are said before signing in, not after: nothing is asked of a person
+    // once Apple or Google has said who they are (App Store 4).
+    Row(
+        Modifier.fillMaxWidth().clickable(role = Role.Checkbox) { adult = !adult },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(
+            adult,
+            onCheckedChange = { adult = it },
+            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.onBackground),
+        )
+        Text(S.age16, style = Styles.body)
+    }
+    Spacer(Modifier.height(12.dp))
+    // Apple 1.2: the terms are accepted before anything shared by others is seen.
+    Text(S.termsAgree, style = Styles.caption)
+    TextAction(S.termsRow, { AppInfo.open(TERMS_URL) }, Modifier.padding(top = 4.dp))
+    Spacer(Modifier.height(12.dp))
     // Apple first, and identical to Google: App Store guideline 4.8, equally prominent.
-    OutlinedAction(S.signInApple, { apple.startFlow() }, Modifier.fillMaxWidth())
+    OutlinedAction(S.signInApple, { apple.startFlow() }, Modifier.fillMaxWidth(), enabled = adult)
     Spacer(Modifier.height(8.dp))
-    OutlinedAction(S.signInGoogle, { google.startFlow() }, Modifier.fillMaxWidth())
+    OutlinedAction(S.signInGoogle, { google.startFlow() }, Modifier.fillMaxWidth(), enabled = adult)
     Spacer(Modifier.height(8.dp))
     // Only for the App Review account (docs/tecnico.md 9.1): the server refuses every other email
     // sign-up. A visible link, not a gesture, so the reviewer finds it (Apple 2.3.1).
@@ -261,61 +283,15 @@ private fun SignedIn(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
     var offline by remember { mutableStateOf(false) }
     var attempt by remember { mutableStateOf(0) }
     LaunchedEffect(attempt) {
-        offline = runCatching { Social.loadMe() }.isFailure
+        // A first sign in has no profile: it is made here from what the provider gave, not asked for.
+        offline = runCatching { Social.loadMe(); Social.ensureProfile() }.isFailure
         Outbox.kick()
     }
     when {
         offline -> Page { Notice(S.friendsOffline, S.retry to { attempt++ }) }
-        Social.needsName -> Page { NameAndAge() }
         Social.me != null -> SocialHome(today, onPhoto)
         else -> Page { Text(S.working, style = Styles.caption) }
     }
-}
-
-/** The first sign in: a name to be known by, and the age that Friends requires (SPEC 4). */
-@Composable
-private fun NameAndAge() {
-    var name by remember { mutableStateOf("") }
-    var adult by remember { mutableStateOf(false) }
-    var busy by remember { mutableStateOf(false) }
-    var failed by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-
-    Text(S.nameTitle, style = Styles.title)
-    Spacer(Modifier.height(4.dp))
-    Text(S.nameHint, style = Styles.muted)
-    Spacer(Modifier.height(16.dp))
-    NameField(name) { name = it }
-    Spacer(Modifier.height(12.dp))
-    Row(
-        Modifier.fillMaxWidth().clickable(role = Role.Checkbox) { adult = !adult },
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Checkbox(
-            adult,
-            onCheckedChange = { adult = it },
-            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.onBackground),
-        )
-        Text(S.age16, style = Styles.body)
-    }
-    Spacer(Modifier.height(12.dp))
-    // Apple 1.2: the terms are accepted before anything shared by others is seen.
-    Text(S.termsAgree, style = Styles.caption)
-    TextAction(S.termsRow, { AppInfo.open(TERMS_URL) }, Modifier.padding(top = 4.dp))
-    Spacer(Modifier.height(12.dp))
-    if (failed) Notice(S.friendsOffline, S.ok to { failed = false })
-    PrimaryAction(
-        if (busy) S.working else S.continueAction,
-        {
-            busy = true
-            scope.launch {
-                failed = runCatching { Social.createProfile(name) }.isFailure
-                busy = false
-            }
-        },
-        Modifier.fillMaxWidth(),
-        enabled = !busy && adult && isValidName(name),
-    )
 }
 
 /** One line, the name, with the server's limit of 30 kept on the way in, and a counter under it. */

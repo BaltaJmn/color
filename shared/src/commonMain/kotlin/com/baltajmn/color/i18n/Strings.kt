@@ -1917,36 +1917,6 @@ object S {
         "メールまたはパスワードが違います。AppleかGoogleをお使いください。",
         "이메일 또는 비밀번호가 맞지 않아요. Apple이나 Google을 사용해 주세요.",
     )
-    val nameTitle get() = t(
-        "Your name for friends",
-        "Tu nombre para tus amigos",
-        "Seu nome para os amigos",
-        "Dein Name für Freunde",
-        "Ton nom pour tes amis",
-        "Il tuo nome per gli amici",
-        "Je naam voor vrienden",
-        "Twoje imię dla znajomych",
-        "Твоё имя для друзей",
-        "Arkadaşların için adın",
-        "Namamu untuk teman",
-        "友だちに見せる名前",
-        "친구에게 보일 이름",
-    )
-    val nameHint get() = t(
-        "The one your friends know you by.",
-        "El que tus amigos reconocen.",
-        "O nome pelo qual seus amigos te conhecem.",
-        "Der, unter dem deine Freunde dich kennen.",
-        "Celui sous lequel tes amis te connaissent.",
-        "Quello con cui ti conoscono i tuoi amici.",
-        "De naam waaronder je vrienden je kennen.",
-        "To, pod którym znają cię znajomi.",
-        "То, под которым тебя знают друзья.",
-        "Arkadaşlarının seni tanıdığı ad.",
-        "Nama yang dikenal teman-temanmu.",
-        "友だちがあなただとわかる名前にしましょう。",
-        "친구들이 알아볼 수 있는 이름이요.",
-    )
     val age16 get() = t(
         "I'm 16 or older",
         "Tengo 16 años o más",
@@ -1961,21 +1931,6 @@ object S {
         "Usiaku 16 tahun atau lebih",
         "16歳以上です",
         "만 16세 이상이에요",
-    )
-    val continueAction get() = t(
-        "Continue",
-        "Continuar",
-        "Continuar",
-        "Weiter",
-        "Continuer",
-        "Continua",
-        "Doorgaan",
-        "Dalej",
-        "Продолжить",
-        "Devam",
-        "Lanjutkan",
-        "続ける",
-        "계속",
     )
     val friendsOffline get() = t(
         "Friends can't be reached right now.",

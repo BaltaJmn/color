@@ -386,7 +386,7 @@ app sola.
 | Permiso de cámara con motivo | iOS `NSCameraUsageDescription` | Texto en los trece idiomas. La galería usa el selector del sistema, sin permiso de fotos |
 | Contenido generado por usuarios | Apple 1.2, política de Play | Términos con tolerancia cero, reportar, bloquear y actuar en 24 horas (#36) |
 | Borrar la cuenta | Apple 5.1.1(v), formulario de Play | Desde Ajustes y desde una web (#37) |
-| Sign in with Apple | Apple 4.8 | Se ofrece junto a Google (#29) |
+| Sign in with Apple | Apple 4.8 y 4 | Se ofrece junto a Google (#29); después de entrar no se pide nombre ni correo, el perfil se crea solo |
 | Declaración de datos | App Privacy, Data Safety, `PrivacyInfo.xcprivacy` | v1.0: nada sale salvo RevenueCat. v1.1: fotos, colores, nombre e identificador de lo que compartes (#25, #38) |
 | Edad | Cuestionarios de las dos tiendas | v1.1 declara interacción entre usuarios. Amigos exige 16 años declarados |
 
