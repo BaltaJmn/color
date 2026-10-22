@@ -1,10 +1,10 @@
 # Capturas de las fichas
 
-Seis escenas, las mismas en las dos tiendas y en los trece idiomas. Las de Play de **en-US y es-ES**
-salen del emulador; todas las demas (las de iPhone de los trece idiomas y las de Play de los otros
-once) se dibujan con la interfaz de la version (secciones 5 y 7), cada una con su idioma en la
-interfaz y en el titular. Se sacan con el año de
-demostracion, nunca con uno real.
+Seis escenas, las mismas en las dos tiendas y en los trece idiomas (cinco en Play: la de widgets es
+de iOS). Desde el 22-10-2026 todas se dibujan con la interfaz de la version (secciones 5 y 7), cada
+una con su idioma en la interfaz y en el titular; el emulador y el simulador (secciones 1 y 6) quedan
+para cuando haga falta un set de dispositivo entero. Se sacan con el año de demostracion, nunca con
+uno real.
 
 **Orden de la ficha (21-10-2026):** primero la rejilla de Mi año, con "year in pixels" en el
 titular, porque es lo que busca quien llega por esa frase y lo primero que ve en los resultados;
@@ -22,13 +22,14 @@ Herramientas:
 - `tools/store/capturas.py`: el marco de Purl, con las seis escenas de abajo.
 - `tools/store/widgets.py`: la escena de los widgets, limpia.
 - Topes y subida de las dos fichas: `listings.yml`, con `tienda/` de `BaltaJmn/ci` (`store/ci.md`).
-- `tools/store/iphone.py`: las seis de iPhone sin Mac, de principio a fin (sección 5).
+- `tools/store/iphone.py`: las seis de iPhone y las cinco de Play, sin dispositivo, de principio a fin (sección 5).
 - `tools/demo/atardecer.py`: la foto de la escena 01.
 
 ## 1. Tamaños
 
 | Destino | Dispositivo | Captura cruda | Imagen final |
 |---|---|---|---|
+| `play-dibujado` | `tools/store/iphone.py` (sección 5) | 1320x2868 | 1200x2100 PNG |
 | `play` | Emulador Pixel 8, API 36 | 1080x2400 | 1200x2100 PNG |
 | `iphone` | `tools/store/iphone.py` (sección 5); el simulador iPhone 17 Pro Max, sección 6 | 1320x2868 | 1320x2868 PNG (6,9") |
 
@@ -167,9 +168,8 @@ iOS y en Android no se parece, asi que Play no la lleva). Cada ficha tiene un so
 las de estos idiomas, todas dibujadas. En la interfaz dibujada se ve la pestaña Amigos (la 1.2).
 Las once dibujadas se rehicieron el 22-10-2026 con la 1.2.3: el póster (06) enseña el selector de cuatro
 estilos en dos filas y la tarjeta (04) y el póster llevan la firma "Chroma: Color Year in Pixels". Las de
-iPhone de en-US y es-ES se dibujaron igual ese mismo día (`iphone.py en-US es-ES`; antes eran del
-simulador, de la 1.0). Las de Play de en-US y es-ES, del emulador, siguen con la tarjeta y el póster de
-antes; rehacerlas pide el set de seis entero en el emulador (sección 1), por la regla de arriba.
+iPhone y de Play de en-US y es-ES se dibujaron igual ese mismo día (`iphone.py en-US es-ES`; antes
+eran del simulador y del emulador, de la 1.0), así que Play lleva ya las cinco dibujadas en los trece.
 
 `StoreScreenshots.kt` pone en `Social` un cliente de Supabase sobre memoria (`quietSocial`): el real
 no se puede construir en una JVM sin ajustes de Android, y Hoy pregunta si hay cuenta. Sin eso el

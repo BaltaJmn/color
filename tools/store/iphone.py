@@ -6,9 +6,8 @@ Usage: python3 tools/store/iphone.py <idioma> [...]   (any of the 13 of TITULARE
 For each language: writes the demo year (tools/demo/generar.py) and the sunset photo
 (tools/demo/atardecer.py), draws the six raw scenes at 1320x2580 (the 440x860 pt safe area at 3x),
 puts back the status bar and home indicator margins (62 and 34 pt) so they are 1320x2868 like a
-simulator capture, and frames them with capturas.py into store/screenshots/iphone/<idioma>/. Except en-US and es-ES, whose
-Play sets come from the emulator, the same raw scenes also make the Play set (play-dibujado: five
-scenes, the widgets one is iOS-only).
+simulator capture, and frames them with capturas.py into store/screenshots/iphone/<idioma>/. The same
+raw scenes also make the Play set (play-dibujado: five scenes, the widgets one is iOS-only).
 Needs Pillow and rsvg-convert. Detail: store/capturas.md.
 """
 import pathlib
@@ -54,8 +53,7 @@ def main():
         for scene in SCENES:
             pad(DATA / (scene + ".png"), raw / (scene + ".png"))
         run(sys.executable, str(ROOT / "tools" / "store" / "capturas.py"), str(raw), lang, "iphone")
-        if lang not in ("en-US", "es-ES"):
-            run(sys.executable, str(ROOT / "tools" / "store" / "capturas.py"), str(raw), lang, "play-dibujado")
+        run(sys.executable, str(ROOT / "tools" / "store" / "capturas.py"), str(raw), lang, "play-dibujado")
 
 
 if __name__ == "__main__":
