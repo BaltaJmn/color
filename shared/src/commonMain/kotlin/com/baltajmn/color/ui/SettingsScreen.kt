@@ -544,7 +544,8 @@ fun SettingRow(
             GlyphTile(it, tint = if (destructive) red else MaterialTheme.colorScheme.onBackground)
             Spacer(Modifier.width(14.dp))
         }
-        Column(Modifier.weight(1f).padding(vertical = 10.dp)) {
+        // The gap at the end keeps a long title, with large text, off the switch or the arrow.
+        Column(Modifier.weight(1f).padding(top = 10.dp, end = 12.dp, bottom = 10.dp)) {
             Text(title, style = if (destructive) Styles.body.copy(color = red) else Styles.body)
             if (subtitle != null) Text(subtitle, style = Styles.caption)
         }
