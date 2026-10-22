@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
@@ -248,11 +249,11 @@ fun Masthead(day: Int, above: String, below: String, modifier: Modifier = Modifi
 
 /** A square of surface with a glyph in it: the start of a settings row, the head of a tile. */
 @Composable
-fun GlyphTile(glyph: Glyph, modifier: Modifier = Modifier) {
+fun GlyphTile(glyph: Glyph, modifier: Modifier = Modifier, tint: Color = MaterialTheme.colorScheme.onBackground) {
     Box(
         modifier.size(36.dp).clip(RoundedCornerShape(11.dp)).background(MaterialTheme.colorScheme.surfaceVariant),
         contentAlignment = Alignment.Center,
-    ) { GlyphIcon(glyph, size = 18.dp, tint = MaterialTheme.colorScheme.onBackground) }
+    ) { GlyphIcon(glyph, size = 18.dp, tint = tint) }
 }
 
 @Composable

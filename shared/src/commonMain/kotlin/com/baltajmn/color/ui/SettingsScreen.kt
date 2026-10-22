@@ -47,6 +47,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.baltajmn.color.billing.Billing
 import com.baltajmn.color.billing.RestoreOutcome
@@ -155,25 +156,16 @@ fun SettingsScreen(onBack: () -> Unit) {
                     Friends.refresh()
                 }
             }
-            if (account) {
+            // Without a profile (signed in, never named) there is nothing to rename, share or list; the
+            // Account section at the foot stays, because the session is all it needs (Apple 5.1.1(v)).
+            if (account && named) {
                 Section(S.sectionFriends) {
-                    // Without a profile (signed in, never named) there is nothing to rename, share or list;
-                    // leaving and erasing stay, because the session is all they need (Apple 5.1.1(v)).
-                    if (named) {
-                        // What needs the profile or the lists waits for them; the rest is always there.
-                        SettingRow(S.nameRow, me?.displayName, enabled = me != null, onClick = { renaming = true })
-                        SettingRow(S.defaultShareRow, shareLabel(settings.defaultShare), onClick = { choosingShare = true })
-                        SettingRow(S.friendsRow, enabled = me != null, onClick = { Friends.listOpen = true })
-                        SettingRow(S.inviteFriend, enabled = me != null, onClick = { Friends.inviteOpen = true })
-                        SettingRow(S.blockedRow, onClick = { viewingBlocked = true })
-                    }
-                    SettingRow(S.signOut, onClick = { leaving = true })
-                    SettingRow(
-                        S.deleteAccount,
-                        if (erasingNow) S.working else null,
-                        enabled = !erasingNow,
-                        onClick = { erasing = true },
-                    )
+                    // What needs the profile or the lists waits for them; the rest is always there.
+                    SettingRow(S.nameRow, me?.displayName, enabled = me != null, onClick = { renaming = true }, glyph = Glyph.PERSON)
+                    SettingRow(S.defaultShareRow, shareLabel(settings.defaultShare), onClick = { choosingShare = true }, glyph = Glyph.SHARE)
+                    SettingRow(S.friendsRow, enabled = me != null, onClick = { Friends.listOpen = true }, glyph = Glyph.FRIENDS)
+                    SettingRow(S.inviteFriend, enabled = me != null, onClick = { Friends.inviteOpen = true }, glyph = Glyph.INVITE)
+                    SettingRow(S.blockedRow, onClick = { viewingBlocked = true }, glyph = Glyph.BLOCK)
                 }
             }
 
@@ -288,6 +280,23 @@ fun SettingsScreen(onBack: () -> Unit) {
                 }
             }
 
+            // Leaving and erasing apart and last, the way a system's settings end: what is looked for
+            // least, and the one place in red. No arrow: they open a question, not a screen.
+            if (account) {
+                Section(S.sectionAccount) {
+                    SettingRow(S.signOut, onClick = { leaving = true }, glyph = Glyph.EXIT, trailing = {})
+                    SettingRow(
+                        S.deleteAccount,
+                        if (erasingNow) S.working else null,
+                        enabled = !erasingNow,
+                        onClick = { erasing = true },
+                        glyph = Glyph.TRASH,
+                        destructive = true,
+                        trailing = {},
+                    )
+                }
+            }
+
             // The version is a fact about the app, not a setting: it goes at the foot, not in a card.
             Spacer(Modifier.height(36.dp))
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -396,7 +405,7 @@ private fun RenameDialog(current: String, onDone: () -> Unit) {
     AlertDialog(
         onDismissRequest = { if (!busy) onDone() },
         title = { Text(S.nameRow, style = Styles.title) },
-        text = { NameField(name) { name = it } },
+        text = { NameField(name, S.nameRow) { name = it } },
         confirmButton = {
             TextAction(
                 if (busy) S.working else S.ok,
@@ -443,10 +452,9 @@ private fun TimeDialog(hour: Int, minute: Int, onDismiss: () -> Unit, onPick: (I
  * the text starts.
  */
 @Composable
-fun Section(label: String, content: @Composable () -> Unit) {
+fun Section(label: String?, lineStart: Dp = ROW_TEXT_START, content: @Composable () -> Unit) {
     Spacer(Modifier.height(28.dp))
-    Text(S.caps(label), style = Styles.eyebrow, modifier = Modifier.padding(start = 4.dp).semantics { heading() })
-    Spacer(Modifier.height(8.dp))
+    label?.let { SectionLabel(it) }
     val line = MaterialTheme.colorScheme.outlineVariant
     val cuts = remember { mutableListOf<Int>() }
     Layout(
@@ -456,7 +464,7 @@ fun Section(label: String, content: @Composable () -> Unit) {
             .background(MaterialTheme.colorScheme.surface)
             .drawWithContent {
                 drawContent()
-                val start = ROW_TEXT_START.toPx()
+                val start = lineStart.toPx()
                 cuts.forEach { y -> drawLine(line, Offset(start, y.toFloat()), Offset(size.width, y.toFloat()), 1.dp.toPx()) }
             },
     ) { measurables, constraints ->
@@ -473,8 +481,14 @@ fun Section(label: String, content: @Composable () -> Unit) {
     }
 }
 
+/** The name of a section, in small capitals: a heading for a screen reader too. */
+@Composable
+fun SectionLabel(label: String, modifier: Modifier = Modifier) {
+    Text(S.caps(label), style = Styles.eyebrow, modifier = modifier.padding(start = 4.dp, bottom = 8.dp).semantics { heading() })
+}
+
 // Where the words of a row begin: after the padding, the glyph tile and the gap.
-private val ROW_TEXT_START = 64.dp
+internal val ROW_TEXT_START = 64.dp
 
 /** The card that sells Pro, at the top of Settings until it is bought. The whole card opens the paywall. */
 @Composable
@@ -513,22 +527,25 @@ fun SettingRow(
     enabled: Boolean = true,
     onClick: (() -> Unit)? = null,
     glyph: Glyph? = null,
+    destructive: Boolean = false,
     trailing: @Composable (() -> Unit)? = null,
 ) {
     Row(
         Modifier.fillMaxWidth()
             .heightIn(min = 60.dp)
-            .then(if (onClick != null && enabled) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
+            // Kept clickable while disabled, so a screen reader says it is off rather than not saying it at all.
+            .then(if (onClick != null) Modifier.clickable(enabled = enabled, role = Role.Button, onClick = onClick) else Modifier)
             .alpha(if (enabled) 1f else 0.4f)
             .padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        val red = MaterialTheme.colorScheme.error
         glyph?.let {
-            GlyphTile(it)
+            GlyphTile(it, tint = if (destructive) red else MaterialTheme.colorScheme.onBackground)
             Spacer(Modifier.width(14.dp))
         }
         Column(Modifier.weight(1f).padding(vertical = 10.dp)) {
-            Text(title, style = Styles.body)
+            Text(title, style = if (destructive) Styles.body.copy(color = red) else Styles.body)
             if (subtitle != null) Text(subtitle, style = Styles.caption)
         }
         when {

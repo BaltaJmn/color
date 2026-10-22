@@ -1,6 +1,13 @@
 package com.baltajmn.color.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.layout.Layout
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -137,12 +144,39 @@ private fun Page(content: @Composable ColumnScope.() -> Unit) {
 @Composable
 private fun Header(action: (@Composable () -> Unit)? = null) = FriendsHeader(S.navFriends, action)
 
-/** The title of the tab, or of the group on screen, with what can be done there beside it. */
+/**
+ * The title of the tab, or of the group on screen, with what can be done there beside it. When both
+ * do not fit on one line (large text, a long language) the action goes under it, at the end: the
+ * title is never squeezed into broken words.
+ */
 @Composable
 internal fun FriendsHeader(title: String, action: (@Composable () -> Unit)? = null) {
-    Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(title, style = Styles.title, modifier = Modifier.weight(1f), maxLines = 2, overflow = TextOverflow.Ellipsis)
-        action?.invoke()
+    Layout(
+        content = {
+            Text(title, style = Styles.title, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.semantics { heading() })
+            action?.invoke()
+        },
+        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+    ) { measurables, constraints ->
+        val width = constraints.maxWidth
+        val loose = constraints.copy(minWidth = 0, minHeight = 0)
+        val act = measurables.getOrNull(1)?.measure(loose)
+        val actWidth = act?.width ?: 0
+        val inline = act == null || measurables[0].maxIntrinsicWidth(Int.MAX_VALUE) + actWidth <= width
+        val text = measurables[0].measure(loose.copy(maxWidth = if (inline) width - actWidth else width))
+        if (inline) {
+            val height = maxOf(constraints.minHeight, text.height, act?.height ?: 0)
+            layout(width, height) {
+                text.placeRelative(0, (height - text.height) / 2)
+                act?.placeRelative(width - actWidth, (height - act.height) / 2)
+            }
+        } else {
+            val band = maxOf(constraints.minHeight, text.height)
+            layout(width, band + act!!.height) {
+                text.placeRelative(0, (band - text.height) / 2)
+                act.placeRelative(width - actWidth, band)
+            }
+        }
     }
 }
 
@@ -175,34 +209,52 @@ private fun Intro() {
 
     PaletteStrip(EXAMPLE)
     Spacer(Modifier.height(24.dp))
-    listOf(S.friendsIntro1, S.friendsIntro2, S.friendsIntro3).forEach {
-        Text(it, style = Styles.body)
-        Spacer(Modifier.height(12.dp))
+    // One idea and its small print, not three lines of equal weight.
+    Text(S.friendsIntro1, style = Styles.title)
+    Spacer(Modifier.height(8.dp))
+    Text("${S.friendsIntro2} ${S.friendsIntro3}", style = Styles.muted)
+    if (failed) {
+        Spacer(Modifier.height(16.dp))
+        Notice(S.signInFailed, S.ok to { failed = false })
     }
-    Spacer(Modifier.height(20.dp))
-    if (failed) Notice(S.signInFailed, S.ok to { failed = false })
     // The age and the terms are said before signing in, not after: nothing is asked of a person
-    // once Apple or Google has said who they are (App Store 4).
-    Row(
-        Modifier.fillMaxWidth().clickable(role = Role.Checkbox) { adult = !adult },
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Checkbox(
-            adult,
-            onCheckedChange = { adult = it },
-            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.onBackground),
-        )
-        Text(S.age16, style = Styles.body)
+    // once Apple or Google has said who they are (App Store 4). Apple 1.2: the terms are accepted
+    // before anything shared by others is seen.
+    Section(null) {
+        Row(
+            Modifier.fillMaxWidth()
+                .heightIn(min = 60.dp)
+                .toggleable(adult, role = Role.Checkbox) { adult = it }
+                .padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // In the place of a glyph tile, so the words start where every row's do.
+            Box(Modifier.size(36.dp), contentAlignment = Alignment.Center) {
+                Checkbox(
+                    adult,
+                    onCheckedChange = null,
+                    colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.onBackground),
+                )
+            }
+            Spacer(Modifier.width(14.dp))
+            Text(S.age16, style = Styles.body, modifier = Modifier.weight(1f).padding(vertical = 10.dp))
+        }
+        SettingRow(S.termsRow, S.termsAgree, onClick = { AppInfo.open(TERMS_URL) }, glyph = Glyph.DOC)
     }
-    Spacer(Modifier.height(12.dp))
-    // Apple 1.2: the terms are accepted before anything shared by others is seen.
-    Text(S.termsAgree, style = Styles.caption)
-    TextAction(S.termsRow, { AppInfo.open(TERMS_URL) }, Modifier.padding(top = 4.dp))
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(16.dp))
     // Apple first, and identical to Google: App Store guideline 4.8, equally prominent.
     OutlinedAction(S.signInApple, { apple.startFlow() }, Modifier.fillMaxWidth(), enabled = adult)
     Spacer(Modifier.height(8.dp))
     OutlinedAction(S.signInGoogle, { google.startFlow() }, Modifier.fillMaxWidth(), enabled = adult)
+    // Two buttons off without a word look broken: the reason sits under them until the box is ticked.
+    if (!adult) {
+        Text(
+            S.signInNeedsAge,
+            style = Styles.caption,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp).semantics { liveRegion = LiveRegionMode.Polite },
+        )
+    }
     Spacer(Modifier.height(8.dp))
     // Only for the App Review account (docs/tecnico.md 9.1): the server refuses every other email
     // sign-up. A visible link, not a gesture, so the reviewer finds it (Apple 2.3.1).
@@ -253,30 +305,33 @@ private fun EmailSignIn(onClose: () -> Unit) {
 /** One line on a surface, named by its placeholder for a screen reader while it is empty. */
 @Composable
 private fun FormField(value: String, onChange: (String) -> Unit, placeholder: String, type: KeyboardType, hidden: Boolean = false) {
-    Box(
-        Modifier.fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-    ) {
-        BasicTextField(
-            value = value,
-            onValueChange = onChange,
-            singleLine = true,
-            textStyle = Styles.body,
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
-            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false, keyboardType = type),
-            visualTransformation = if (hidden) PasswordVisualTransformation() else VisualTransformation.None,
-            modifier = Modifier.fillMaxWidth(),
-            decorationBox = { field ->
-                Box {
-                    if (value.isEmpty()) Text(placeholder, style = Styles.muted)
-                    field()
-                }
-            },
-        )
-    }
+    BasicTextField(
+        value = value,
+        onValueChange = onChange,
+        singleLine = true,
+        textStyle = Styles.body,
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
+        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false, keyboardType = type),
+        visualTransformation = if (hidden) PasswordVisualTransformation() else VisualTransformation.None,
+        modifier = Modifier.fieldSurface(placeholder),
+        decorationBox = { field ->
+            Box(Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
+                if (value.isEmpty()) Text(placeholder, style = Styles.muted)
+                field()
+            }
+        },
+    )
 }
+
+/**
+ * The surface is the field, padding included: a tap anywhere on it starts typing, and it keeps its
+ * name for a screen reader once there is text in it.
+ */
+@Composable
+private fun Modifier.fieldSurface(label: String): Modifier = fillMaxWidth()
+    .clip(RoundedCornerShape(20.dp))
+    .background(MaterialTheme.colorScheme.surfaceVariant)
+    .semantics { contentDescription = label }
 
 @Composable
 private fun SignedIn(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
@@ -294,26 +349,23 @@ private fun SignedIn(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
     }
 }
 
-/** One line, the name, with the server's limit of 30 kept on the way in, and a counter under it. */
+/**
+ * One line, the name, with the server's limit of 30 kept on the way in, and a counter under it.
+ * [label] is the dialog's title, said by a screen reader on the field.
+ */
 @Composable
-fun NameField(value: String, onChange: (String) -> Unit) {
+fun NameField(value: String, label: String, onChange: (String) -> Unit) {
     // A Column of its own: the dialog's text slot is a Box and would stack the counter on the field.
     Column(Modifier.fillMaxWidth()) {
-        Box(
-            Modifier.fillMaxWidth()
-                .clip(RoundedCornerShape(20.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-        ) {
-            BasicTextField(
-                value = value,
-                onValueChange = { onChange(it.take(30)) },
-                singleLine = true,
-                textStyle = Styles.body,
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
-                modifier = Modifier.fillMaxWidth(),
-            )
-        }
+        BasicTextField(
+            value = value,
+            onValueChange = { onChange(it.take(30)) },
+            singleLine = true,
+            textStyle = Styles.body,
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onBackground),
+            modifier = Modifier.fieldSurface(label),
+            decorationBox = { field -> Box(Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) { field() } },
+        )
         Text(
             S.counter(value.length, 30),
             style = Styles.caption,
@@ -429,38 +481,48 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
             }
             if (Friends.requests.isNotEmpty()) {
                 friendsBlock {
-                    Spacer(Modifier.height(8.dp))
-                    Text(S.requestsTitle, style = Styles.label)
-                    Friends.requests.forEach { person ->
-                        RequestRow(
-                            person.displayName,
-                            onBlock = { Friends.acting = Acting(person, request = true) },
-                            onIgnore = { act { Friends.decline(person.id) } },
-                            onAccept = {
-                                act {
-                                    // Once per friendship: the moment a request turns into a friend.
-                                    if (Friends.accept(person.id)) {
-                                        haptic.performHapticFeedback(HapticFeedbackType.Confirm)
-                                        // Their days were not readable before: without a reload the new friend shows no card.
-                                        attempt++
-                                    } else {
-                                        message = S.friendLimit
+                    // A card of their own: a question waiting for an answer, apart from the days below.
+                    Section(S.requestsTitle, lineStart = 16.dp) {
+                        Friends.requests.forEach { person ->
+                            RequestRow(
+                                person.displayName,
+                                onBlock = { Friends.acting = Acting(person, request = true) },
+                                onIgnore = { act { Friends.decline(person.id) } },
+                                onAccept = {
+                                    act {
+                                        // Once per friendship: the moment a request turns into a friend.
+                                        if (Friends.accept(person.id)) {
+                                            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                                            // Their days were not readable before: without a reload the new friend shows no card.
+                                            attempt++
+                                        } else {
+                                            message = S.friendLimit
+                                        }
                                     }
-                                }
-                            },
-                        )
+                                },
+                            )
+                        }
                     }
                 }
             }
             if (names.isEmpty()) {
                 friendsBlock {
+                    // Lower than the top, toward the optical middle, and with an empty strip where the
+                    // circle's colors will be: what this place is for, before there is anything in it.
                     Column(
-                        Modifier.fillMaxWidth().padding(vertical = 24.dp),
+                        Modifier.fillMaxWidth().padding(top = 48.dp, bottom = 24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
+                        Row(
+                            Modifier.fillMaxWidth().height(24.dp).clip(RoundedCornerShape(12.dp)).clearAndSetSemantics {},
+                            horizontalArrangement = Arrangement.spacedBy(2.dp),
+                        ) {
+                            repeat(7) { Box(Modifier.weight(1f).fillMaxHeight().background(MaterialTheme.colorScheme.surfaceVariant)) }
+                        }
                         Text(S.friendsEmpty, style = Styles.muted, textAlign = TextAlign.Center)
                         PrimaryAction(S.inviteFriend, { Friends.inviteOpen = true })
+                        if (Groups.groups.isEmpty()) Text(S.friendsEmptyGroups, style = Styles.caption, textAlign = TextAlign.Center)
                     }
                 }
             } else {
@@ -487,16 +549,16 @@ private fun FriendsHome(today: LocalDate, onPhoto: (ImageBitmap) -> Unit) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun RequestRow(name: String, onBlock: () -> Unit, onIgnore: () -> Unit, onAccept: () -> Unit) {
-    Column(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+    Column(Modifier.fillMaxWidth().padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 4.dp)) {
         Text(name, style = Styles.body, maxLines = 2, overflow = TextOverflow.Ellipsis)
         FlowRow(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
             verticalArrangement = Arrangement.Center,
         ) {
-            // Quiet like Ignore, but for good: the link stays valid, so Ignore alone invites a repeat.
+            // In red: Ignore leaves the link valid and invites a repeat, Block is for good.
             // The same three words for every person: each says whose request it answers.
-            TextAction(S.block, onBlock, Modifier.semantics { contentDescription = "${S.block}, $name" }, quiet = true)
+            TextAction(S.block, onBlock, Modifier.semantics { contentDescription = "${S.block}, $name" }, destructive = true)
             TextAction(S.ignore, onIgnore, Modifier.semantics { contentDescription = "${S.ignore}, $name" })
             OutlinedAction(S.accept, onAccept, Modifier.semantics { contentDescription = "${S.accept}, $name" })
         }
@@ -514,7 +576,7 @@ private fun LazyListScope.feedSection(
     onPhoto: (ImageBitmap) -> Unit,
 ) {
     if (rows.isEmpty()) return
-    friendsBlock { Text(title, style = Styles.label, modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)) }
+    friendsBlock { SectionLabel(title, Modifier.padding(top = 20.dp)) }
     items(rows, key = { it.author + it.day }) { row ->
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER, vertical = 8.dp)) {
             FeedCard(row, names.getValue(row.author), onPhoto)

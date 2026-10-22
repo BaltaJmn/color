@@ -146,7 +146,10 @@ fun ProDialog(onDismiss: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 GlyphTile(Glyph.SPARK)
                 Spacer(Modifier.width(12.dp))
-                Text(S.proTitle, style = Styles.title)
+                Text(S.proTitle, style = Styles.title, modifier = Modifier.weight(1f))
+                // Leaving is in sight from the start: "Not now" sits under the plans, below the fold
+                // with large text.
+                GlyphButton(Glyph.CLOSE, S.a11yClose, { onDismiss() }, enabled = !busy)
             }
             if (Paywall.offered) {
                 Spacer(Modifier.height(12.dp))

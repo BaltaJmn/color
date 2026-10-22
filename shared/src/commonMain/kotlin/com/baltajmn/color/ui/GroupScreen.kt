@@ -203,7 +203,7 @@ private fun LazyListScope.groupSection(
     onPhoto: (ImageBitmap) -> Unit,
 ) {
     if (rows.isEmpty()) return
-    friendsBlock { Text(title, style = Styles.label, modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)) }
+    friendsBlock { SectionLabel(title, Modifier.padding(top = 20.dp)) }
     items(rows, key = { it.author + it.day }) { row ->
         val name = names[row.author] ?: return@items
         Column(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxWidth().padding(horizontal = GUTTER, vertical = 8.dp)) {
@@ -337,7 +337,7 @@ internal fun GroupDialogs() {
         AlertDialog(
             onDismissRequest = { Groups.creating = false },
             title = { Text(S.groupNewTitle, style = Styles.title) },
-            text = { NameField(name) { name = it } },
+            text = { NameField(name, S.groupNewTitle) { name = it } },
             confirmButton = {
                 TextAction(
                     if (busy) S.working else S.groupCreate,

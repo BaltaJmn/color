@@ -307,25 +307,25 @@ tarjeta abre el paywall.
 Después, las secciones: cada una con su nombre en `eyebrow` y sus filas juntas en una tarjeta en
 `surface` de radio 20, separadas por un filete `outlineVariant` que empieza donde empieza el texto.
 Cada fila, de 60 como mínimo, lleva delante una tesela con su icono (campana, candado, documento,
-sello, rombo, exportar, importar, restaurar, apps) y al final su interruptor o, si lleva a otro sitio,
-una flecha. Una lista de opciones se lee como unas pocas cosas que decidir, no como un párrafo:
+sello, rombo, exportar, importar, restaurar, apps, persona, compartir, amigos, invitar, bloqueo, salir,
+papelera) y al final su interruptor o, si lleva a otro sitio, una flecha. Una fila que solo abre una
+pregunta (cerrar sesión, borrar la cuenta) no lleva flecha. Una fila apagada sigue siendo un botón para
+el lector de pantalla, que la dice desactivada en vez de callarla. El rojo de `error` solo en
+`deleteAccount`, título y tesela: es lo único de Ajustes que no se deshace. Una lista de opciones se lee como unas pocas cosas que decidir, no como un párrafo:
 
 1. **Recordatorio**: interruptor y hora (`reminderRow`). Encendido y sin poder llegar (notificaciones
    de Chroma apagadas en el sistema), debajo sale `reminderBlocked` con `openSystemSettings`, que abre
    los ajustes de notificaciones de la app (en un iPhone donde nunca se preguntó, la pregunta).
-2. **Amigos** (v1.1): cuenta y nombre visible, `defaultShareRow`, `friendsRow`, `inviteFriend` (el
-   mismo nombre que la pantalla que abre), `blockedRow`, `signOut`,
-   `deleteAccount` (confirmación `deleteAccountText`; mientras borra, `working`; sin conexión, el aviso
-   de siempre y nada cambia).
-   - La sección sale con cuenta (una sesión viva, o guardada y a la espera de red), no cuando el
-     perfil ya se cargó: tras un arranque en frío está desde el primer momento, y cerrar sesión y
-     borrar la cuenta no esperan a la red. Lo que necesita el perfil o las listas (el nombre,
-     `friendsRow`, `inviteFriend`) sale desactivado hasta que cargan, y Ajustes los pide al abrirse y
-     otra vez cuando la sesión vuelve a estar viva (arranque en frío sin red, que luego se conecta).
-   - Con sesión pero sin perfil (se inició sesión y no se llegó a elegir nombre), la sección enseña solo
-     `signOut` y `deleteAccount`. El resto (`nameRow`, `defaultShareRow`, `friendsRow`, `inviteFriend`,
-     `blockedRow`) necesita un perfil y no sale. Cerrar sesión y borrar la cuenta nunca se esconden
-     con una sesión: Apple 5.1.1(v) pide poder borrarla desde la app.
+2. **Amigos** (v1.1): nombre visible, `defaultShareRow`, `friendsRow`, `inviteFriend` (el
+   mismo nombre que la pantalla que abre) y `blockedRow`. Cerrar sesión y borrar la cuenta no van
+   aquí: tienen su sección al final (8).
+   - La sección sale con cuenta (una sesión viva, o guardada y a la espera de red) y perfil, no cuando
+     el perfil ya se cargó: tras un arranque en frío está desde el primer momento. Lo que necesita el
+     perfil o las listas (el nombre, `friendsRow`, `inviteFriend`) sale desactivado hasta que cargan, y
+     Ajustes los pide al abrirse y otra vez cuando la sesión vuelve a estar viva (arranque en frío sin
+     red, que luego se conecta).
+   - Con sesión pero sin perfil (se inició sesión y no se llegó a elegir nombre), la sección no sale:
+     todas sus filas necesitan un perfil. La de Cuenta sí.
    - `blockedRow` abre un diálogo y no una pantalla: atrás lo cierra donde está. Título `blockedRow` y
      una fila por persona bloqueada, por orden alfabético y sin número: su nombre en una línea propia
      (hasta dos, como la solicitud de Amigos 8.3) y debajo, a la derecha, `unblock`: en un diálogo de
@@ -367,6 +367,11 @@ una flecha. Una lista de opciones se lee como unas pocas cosas que decidir, no c
 5. **Copia**: exportar (con fecha de la última) e importar.
 6. **Chroma Pro**: "ya lo tienes" con una marca (sin Pro lo vende la tarjeta de arriba), restaurar.
 7. **Más apps**: una fila por hermana publicada en esa tienda.
+8. **Cuenta** (`sectionAccount`), con sesión: `signOut` y `deleteAccount` (confirmación
+   `deleteAccountText`; mientras borra, `working`; sin conexión, el aviso de siempre y nada cambia).
+   Aparte y la última, como acaban los ajustes del sistema: es lo que menos se busca, y el único rojo.
+   Con una sesión nunca se esconde, aunque no haya perfil ni red: Apple 5.1.1(v) pide poder borrar la
+   cuenta desde la app.
 
 Al pie, fuera de las tarjetas y centrado, "Chroma" y la versión: es un dato de la app, no un ajuste.
 
@@ -376,16 +381,19 @@ Al pie, fuera de las tarjetas y centrado, "Chroma" y la versión: es un dato de 
 
 ### 8.1 Sin cuenta
 
-Pantalla de presentación: tres líneas (`friendsIntro1` a `friendsIntro3`) sobre una tira de colores
-de ejemplo, callada para el lector de pantalla. Botones: Apple y Google, iguales y con borde, Apple
+Pantalla de presentación: sobre una tira de colores de ejemplo, callada para el lector de pantalla,
+`friendsIntro1` en `title` y debajo `friendsIntro2` y `friendsIntro3` juntas en `muted`: una idea y su
+letra pequeña. Botones: Apple y Google, iguales y con borde, Apple
 primero (App Store 4.8: igual de visibles). Debajo, un enlace de texto discreto, `signInEmail`
 (`TextAction` apagado, visible y sin gesto: Apple 2.3.1), solo para la cuenta de revisión de las
 tiendas. Al pulsarlo se cambia por dos campos (`emailField` con teclado de correo, `passwordField`
 con teclado de contraseña y texto oculto), `signInAction` relleno y `cancel` en texto. Un fallo pone
 `signInEmailFailed` en una línea sobre el botón. Sin alta: solo entra.
 
-Sobre los botones de Apple y Google, la casilla `age16`, `termsAgree` y el enlace `termsRow`: los
-dos botones están apagados (40 % de opacidad) hasta marcarla. Los términos se aceptan antes de entrar
+Sobre los botones de Apple y Google, una tarjeta como las de Ajustes, sin nombre: la casilla `age16`
+(toda la fila la marca, y la casilla ocupa el sitio de la tesela) y la fila `termsRow` con su tesela de
+documento, `termsAgree` debajo y flecha. Los dos botones están apagados (40 % de opacidad) hasta
+marcarla, y mientras tanto debajo de ellos dice `signInNeedsAge`, que el lector anuncia al cambiar. Los términos se aceptan antes de entrar
 y antes de ver nada de nadie (Apple 1.2). **Tras iniciar sesión no se pide nada**: ni nombre ni correo
 (Apple 4, Sign in with Apple). La primera vez se crea el perfil solo, con el nombre de pila que dio
 el proveedor o, si no vino, `Chroma 0042` (cuatro cifras sacadas del id), y se cambia cuando se
@@ -398,23 +406,30 @@ y la pantalla vuelve sola al conectar. Nunca una espera que no acaba.
 
 ### 8.2 Con cuenta y sin amigos
 
-`friendsEmpty` y el botón principal `inviteFriend`.
+Bajada hacia el centro óptico: una tira vacía de siete segmentos en `surfaceVariant`, del tamaño de la
+paleta del círculo y callada para el lector (enseña dónde saldrán los colores), `friendsEmpty` y el
+botón principal `inviteFriend`. Sin grupos, debajo y en `caption`, `friendsEmptyGroups`.
+
+La cabecera (`navFriends`, o el nombre del grupo) es un título para el lector. Si no cabe en una línea
+con su acción (letra grande, un idioma largo), la acción baja a la línea siguiente, a la derecha: el
+título nunca se parte en trozos.
 
 ### 8.3 Feed
 
 - Arriba, **la paleta del círculo**: una tira de 24 de alto, radio 12, con un segmento por amigo con
   color hoy, en orden de hora (el primero del día a la izquierda). Sin nombres. Si nadie tiene color
   hoy, no hay tira. El lector de pantalla la anuncia como `a11yFriendsToday`, sin número.
-- Solicitudes recibidas, si las hay: bajo la etiqueta `requestsTitle`, una fila por persona. El nombre
+- Solicitudes recibidas, si las hay: en su propia tarjeta de sección (`requestsTitle` en `eyebrow`,
+  filetes desde 16), una fila por persona. El nombre
   va en su propia línea (hasta dos): con letra grande o un idioma largo, tres botones a su lado le
   dejaban un ancho de cero, y quién pide es lo que importa. Debajo, a la derecha y en una fila que se
   parte si no cabe, `block`, `ignore` y `accept`. Para el lector de pantalla cada uno lleva el nombre
   ("`block`, nombre"): las tres palabras se repiten por persona y sin él no se sabe a quién contestan.
-  Sin número. Ignorar no avisa a nadie. Bloquear abre
+  Sin número. Ignorar no avisa a nadie. Bloquear va en rojo, el único de la pantalla, y abre
   directamente la confirmación (`blockText`) y está aquí porque el enlace sigue valiendo: tras Ignorar,
   quien lo tenga puede mandar otra solicitud.
 - Las tarjetas (`compact`) de hoy y de ayer, separadas por los títulos `feedToday` y
-  `feedYesterday`, en orden de hora: la última cambiada, arriba. Cada una con el nombre y la fecha de
+  `feedYesterday` en `eyebrow` (títulos también para el lector, como los de las secciones), en orden de hora: la última cambiada, arriba. Cada una con el nombre y la fecha de
   su autor, que puede no ser la tuya cerca de medianoche. Si una foto no se pudo bajar, la tarjeta se
   ve sin miniatura solo hasta la siguiente carga: tirar hacia abajo la pide otra vez.
 - Al final, `caughtUp`. Nada debajo. Por eso, con amigos, `inviteFriend` va arriba a la derecha,
@@ -520,7 +535,8 @@ cuál), `groupFull` (el grupo está lleno o tú en 5 grupos) o `inviteTooMany`.
 
 ## 9. Paywall
 
-Un diálogo propio en `surface`, radio 28: `proTitle` con su icono; con dos días o más este año, una
+Un diálogo propio en `surface`, radio 28: `proTitle` con su icono y, al otro lado, cerrar
+(`a11yClose`), porque con letra grande `notNow` queda por debajo del pliegue; con dos días o más este año, una
 tira de 56 de alto con los colores del usuario; lo que incluye, una fila por cosa con su icono
 (`proPoster`, `proYearWidget`, y en v1.2 `proStats`); `proOnce` en `caption` (con `proFriendsFree`
 solo cuando Amigos existe, v1.1); el botón principal a lo ancho con el precio leído de la tienda

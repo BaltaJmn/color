@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 enum class Glyph {
     BACK, FORWARD, SHARE, SETTINGS, YEAR, CLOSE, PHOTO, CAMERA, TODAY, FRIENDS, MORE, TRASH, CHECK,
     BELL, LOCK, DOC, DIAMOND, STAMP, EXPORT, IMPORT, SPARK, RESTORE, WORDS, WIDGET, POSTER, APPS, STRIP,
+    PERSON, INVITE, BLOCK, EXIT,
 }
 
 /** A 48dp tap target with no background: the glyph is the whole control. */
@@ -182,6 +183,27 @@ fun GlyphIcon(glyph: Glyph, size: Dp = 20.dp, tint: Color = MaterialTheme.colorS
             // The Strip view of My year: the three columns of YEAR's dots drawn as bars. Six thin bars
             // at 20 dp ran together into a black block.
             Glyph.STRIP -> listOf(0.25f, 0.50f, 0.75f).forEach { x -> line(x to 0.22f, x to 0.78f) }
+            // A head and shoulders: the name others see.
+            Glyph.PERSON -> {
+                drawCircle(tint, radius = 0.16f * side, center = at(0.50f, 0.34f), style = stroke)
+                drawArc(tint, 180f, 180f, false, at(0.20f, 0.58f), Size(0.60f * side, 0.52f * side), style = stroke)
+            }
+            Glyph.INVITE -> {
+                drawCircle(tint, radius = 0.14f * side, center = at(0.40f, 0.34f), style = stroke)
+                drawArc(tint, 180f, 180f, false, at(0.14f, 0.60f), Size(0.52f * side, 0.48f * side), style = stroke)
+                line(0.80f to 0.34f, 0.80f to 0.62f)
+                line(0.66f to 0.48f, 0.94f to 0.48f)
+            }
+            Glyph.BLOCK -> {
+                drawCircle(tint, radius = 0.32f * side, center = at(0.50f, 0.50f), style = stroke)
+                line(0.28f to 0.28f, 0.72f to 0.72f)
+            }
+            // A door left behind: leaving, not deleting.
+            Glyph.EXIT -> {
+                line(0.50f to 0.18f, 0.20f to 0.18f, 0.20f to 0.82f, 0.50f to 0.82f)
+                line(0.42f to 0.50f, 0.86f to 0.50f)
+                line(0.70f to 0.34f, 0.86f to 0.50f, 0.70f to 0.66f)
+            }
             Glyph.APPS -> listOf(0.32f, 0.68f).forEach { y ->
                 listOf(0.32f, 0.68f).forEach { x ->
                     drawRoundRect(tint, topLeft = at(x - 0.13f, y - 0.13f), size = Size(0.26f * side, 0.26f * side), cornerRadius = CornerRadius(0.07f * side), style = stroke)
