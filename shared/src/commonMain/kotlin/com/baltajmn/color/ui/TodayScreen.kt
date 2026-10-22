@@ -96,10 +96,21 @@ import kotlinx.datetime.LocalDate
 private val EMPTY_RESERVE = 320.dp
 private val EMPTY_MIN = 200.dp
 
-/** The card's 4:5, but never taller than [max]: on a short phone what waits under it stays in sight. */
-private fun Modifier.cardShape(max: Dp) = layout { measurable, constraints ->
-    val height = minOf(constraints.maxWidth * 5 / 4, max.roundToPx())
-    val placeable = measurable.measure(Constraints.fixed(constraints.maxWidth, height))
+/**
+ * What the card may take of [viewport]. The reserve is mostly text, so it grows with the system's: at
+ * 1.3 a fixed one left "Take a photo" under the bar.
+ */
+@Composable
+private fun cardMax(viewport: Dp) = (viewport - EMPTY_RESERVE * LocalDensity.current.fontScale).coerceAtLeast(EMPTY_MIN)
+
+/**
+ * The card's 4:5, but never taller than [max]: on a short phone what waits under it stays in sight.
+ * With [grow], taller than that when its content needs it, as words at the largest text sizes do.
+ */
+private fun Modifier.cardShape(max: Dp, grow: Boolean = false) = layout { measurable, constraints ->
+    val width = constraints.maxWidth
+    val height = minOf(width * 5 / 4, max.roundToPx())
+    val placeable = measurable.measure(Constraints(width, width, height, if (grow) Constraints.Infinity else height))
     layout(placeable.width, placeable.height) { placeable.place(0, 0) }
 }
 
@@ -178,9 +189,11 @@ fun TodayScreen(
     }
 
     Column(
+        // Measured inside the insets: the status bar is no room for the card (62 pt on an iPhone, which
+        // left "Choose a photo from today" under the bar).
         Modifier.fillMaxSize()
-            .onSizeChanged { viewport = with(density) { it.height.toDp() } }
             .screenInsets()
+            .onSizeChanged { viewport = with(density) { it.height.toDp() } }
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -318,11 +331,12 @@ private fun Empty(
 ) {
     // A 1080x1920 phone showed only the card: the buttons it is waiting for fell below the fold.
     // The reserve is the header above plus the help and both buttons below.
-    val cardMax = (viewport - EMPTY_RESERVE).coerceAtLeast(EMPTY_MIN)
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(
+        // A column and not a box: with the largest text the hint and the question no longer fit the
+        // shortened card, and the card grows instead of laying one over the other.
+        Column(
             Modifier.fillMaxWidth()
-                .cardShape(cardMax)
+                .cardShape(cardMax(viewport), grow = true)
                 .clip(RoundedCornerShape(CARD_RADIUS))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .padding(24.dp),
@@ -330,8 +344,7 @@ private fun Empty(
             // A suggestion to look for, not a task: no count, no streak, and it can be switched off.
             week?.let {
                 Row(
-                    Modifier.align(Alignment.TopStart)
-                        .clip(RoundedCornerShape(50))
+                    Modifier.clip(RoundedCornerShape(50))
                         .background(MaterialTheme.colorScheme.surface)
                         .padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -340,13 +353,13 @@ private fun Empty(
                     Spacer(Modifier.width(8.dp))
                     Text(S.weekHint(S.colorName(it.key)), style = Styles.caption.copy(color = MaterialTheme.colorScheme.onBackground))
                 }
+                Spacer(Modifier.height(16.dp))
             }
-            Column(Modifier.align(Alignment.BottomStart)) {
-                Text(S.todayPrompt, style = Styles.display)
-                Spacer(Modifier.height(4.dp))
-                // A blank to fill, not something to read out as six dashes.
-                Text("#------", style = Styles.code, modifier = Modifier.clearAndSetSemantics {})
-            }
+            Spacer(Modifier.weight(1f))
+            Text(S.todayPrompt, style = Styles.display)
+            Spacer(Modifier.height(4.dp))
+            // A blank to fill, not something to read out as six dashes.
+            Text("#------", style = Styles.code, modifier = Modifier.clearAndSetSemantics {})
         }
         if (firstTime) {
             Spacer(Modifier.height(16.dp))
@@ -368,7 +381,7 @@ private fun Picking(pending: Pending, viewport: Dp, onPick: (String) -> Unit, on
         pending.image,
         null,
         contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxWidth().cardShape((viewport - EMPTY_RESERVE).coerceAtLeast(EMPTY_MIN)).clip(RoundedCornerShape(CARD_RADIUS)),
+        modifier = Modifier.fillMaxWidth().cardShape(cardMax(viewport)).clip(RoundedCornerShape(CARD_RADIUS)),
     )
     Spacer(Modifier.height(24.dp))
     // The one instruction of the step, at reading size. Held down, a candidate says its name here

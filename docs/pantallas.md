@@ -154,7 +154,10 @@ paywall y el bloqueo.
   segundo botón sin texto que hacía lo mismo que el de debajo. En una pantalla baja la ficha se
   acorta, con el mismo ancho, hasta dejar 320 de alto para la cabecera, `firstHelp` y los dos
   botones (nunca menos de 200 de ficha): en un 1080x1920 la ficha entera dejaba `takePhoto` y
-  `fromGallery` fuera de la primera pantalla.
+  `fromGallery` fuera de la primera pantalla. Esos 320 se cuentan dentro de los márgenes del sistema (la
+  barra de estado del iPhone son 62) y son casi todo texto, así que crecen con la letra del sistema (416
+  a 1,3): fijos, a 1,3 `takePhoto` quedaba pegado a la cápsula, por debajo del pliegue. Con la letra de
+  accesibilidad la ficha crece lo que pidan la pista de la semana y `todayPrompt`, para no montarlos.
 - Primera sesión: bajo la ficha, `firstHelp` en `onMuted`.
 - Botón principal a lo ancho con el icono de cámara: `takePhoto`. Debajo, botón de texto:
   `fromGallery`.
