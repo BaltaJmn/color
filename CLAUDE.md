@@ -91,6 +91,7 @@ xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp \
 
 Iterar con el objetivo mínimo del módulo tocado; el build de todo, una vez al final.
 
-Publicar: nadie toca la versión ni pone etiquetas. Sale sola con el tren de los lunes (`store/ci.md`,
+Publicar: nadie toca `versionName` ni pone etiquetas (el `versionCode` solo sube para una build de
+prueba de TestFlight sin etiqueta). Sale sola con el tren de los lunes (`store/ci.md`,
 "Publicar una versión"). Quien cambia algo visible reescribe `store/whatsnew` en los trece idiomas en el
 mismo commit. Un arreglo urgente (patch), a mano y solo con el sí del usuario.
