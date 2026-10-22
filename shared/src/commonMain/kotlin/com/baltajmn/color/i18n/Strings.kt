@@ -358,7 +358,7 @@ object S {
     val addWord get() = t(
         "Add a word",
         "Añadir una palabra",
-        "Adicionar uma palavra",
+        "Adicionar palavra",
         "Ein Wort hinzufügen",
         "Ajouter un mot",
         "Aggiungi una parola",
