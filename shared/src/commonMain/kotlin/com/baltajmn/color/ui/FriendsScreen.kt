@@ -154,7 +154,8 @@ internal fun FriendsHeader(title: String, action: (@Composable () -> Unit)? = nu
     Layout(
         content = {
             Text(title, style = Styles.title, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.semantics { heading() })
-            action?.invoke()
+            // One measurable, whatever the action emits: a group passes two (Invite and the menu)
+            action?.let { Row(verticalAlignment = Alignment.CenterVertically) { it() } }
         },
         modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
     ) { measurables, constraints ->
